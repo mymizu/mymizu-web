@@ -1,8 +1,22 @@
-# My Mizu Hackathon
+# MyMizu Web
 
 pre-requisites:
 - [NodeJS](https://nodejs.org/en/download/package-manager/)
-- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
+- [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/)
+- mymizu api key
+- mymizu user token
+
+### How to get a MyMizu API key
+You will need to get someone from MyMizu to generate an API key for you.
+
+### How to generate a user token
+Simply run:
+```bash
+curl -l 'https://api.mymizu.co/api/start?api_key=$INSERT_API_KEY&platform=ios&client_version=1.0.0&client_build=12345&uuid=UNIQUEUSERID'
+
+# Your response should look like this:
+{"new_token":$YOUR_USER_TOKEN} # Use the `new_token` value for user token.
+```
 
 ## Development
 
@@ -10,7 +24,7 @@ pre-requisites:
 
 All commands should be run in the project root directory.
 ```bash
-# Create an .env file & insert the appropriate values
+# Create an .env file & insert the appropriate values. Be sure to include your api key and user token from the previous steps.
 cp .env.sample .env
 
 # Install dependencies

@@ -1,7 +1,7 @@
 {
-  "name": "node-http-server",
+  "name": "mymizu-www",
   "version": "1.0.0",
-  "description": "Node.js example server starter project",
+  "description": "MyMizu website",
   "scripts": {
     "build:client": "esbuild src/index.js --bundle --outfile=dist/bundle.js --loader:.js=jsx",
     "build:server": "esbuild server/server.jsx --bundle --outfile=build/server.js --platform=node",
