@@ -1,0 +1,140 @@
+.overlay {
+  height: 100%;
+  left: -100%;
+  width: 100%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: rgb(255,255,255);
+  background-color: rgb(255,255,255, 0.9);
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.overlay-content {
+  position: relative;
+  /* position: absolute; */
+  /* height: 100%;
+  width: 100%; */
+  text-align: center;
+  /* margin-top: 30px; */
+}
+
+.overlay a {
+  padding: 8px;
+  text-decoration: none;
+  font-size: 24px;
+  color: #818181;
+  display: block;
+  transition: 0.3s;
+}
+
+.overlay a:hover, .overlay a:focus {
+  color: #f1f1f1;
+}
+
+.overlay .closebtn {
+  cursor: pointer;
+  text-align: right;
+  display: block;
+  font-size: 36px;
+  padding-right: 14px;
+  padding-top: 5px;
+}
+
+.hamburger {
+  font-size: 30px;
+  cursor: pointer;
+}
+
+@media screen and (max-height: 450px) {
+  .overlay a {font-size: 20px}
+  .overlay .closebtn {
+  font-size: 40px;
+  top: 15px;
+  right: 35px;
+  }
+}
+
+.row.home {
+  margin-top: 50px;
+  margin-bottom: 100px;
+}
+
+.row.home .col {
+  text-align: center;
+  height: 208px;
+  background-position: center center;
+  border-radius: 20px;
+  color: white;
+  margin: 0 10px;
+}
+
+img#logo {
+  padding: 5px;
+}
+
+.nav-container {
+  margin: 0 15px;
+}
+
+.nav-link {
+  margin-right: 10px;
+  color: #2F97D1;
+}
+
+.nav-item.lang-selector .nav-link {
+  display: inline-block;
+  margin-right: 0;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+#forest {
+  background-image: url("../images/forest.jpg");
+}
+
+#money {
+  background-image: url("../images/money.jpg");
+}
+
+#ocean {
+  background-image: url("../images/ocean.jpg");
+}
+
+.footer {
+  background: #E6F4FD;
+  width: 100%;
+}
+
+footer {
+  padding-top: 25px;
+  padding-bottom: 50px;
+}
+
+footer p {
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+footer .nav-link {
+  margin: 0 10px;
+  padding-left: 0;
+  padding-right: 0;
+  color: #2F97D1;
+}
+
+footer .nav-link i {
+  font-size: 20px;
+  color: #2F97D1;
+}
+
+.marker {
+  color: #2F97D1;
+}
+
+.marker img.pin {
+  height: 40px;
+}
+
