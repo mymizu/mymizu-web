@@ -59,7 +59,11 @@ export function App({ gmApiKey }) {
   }
 
   const boundsChanged = async(bounds) => {
-      const params = new URLSearchParams([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
+      const params = new URLSearchParams([
+                                          ['c1', bounds.nw.lat], 
+                                          ['c2', bounds.nw.lng], 
+                                          ['c3', bounds.se.lat], 
+                                          ['c4', bounds.se.lng]]);
       
       try {
         setLoading(true);

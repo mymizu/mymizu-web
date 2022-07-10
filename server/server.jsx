@@ -46,14 +46,14 @@ app.get("/get-initial-markers", async (req, res) => {
 });
 
 app.get("/get-current-markers", async(req, res) => {
-  const currentPos = {
-    c1: parseFloat(req.query.c1),
-    c2: parseFloat(req.query.c2),
-    c3: parseFloat(req.query.c3),
-    c4: parseFloat(req.query.c4)
+
+    const currentPos = {
+    c1: req.query.c1,
+    c2: req.query.c2,
+    c3: req.query.c3,
+    c4: req.query.c4
   }
 
-  console.log(currentPos);  
    try {
     const markers = await myMizuClient.get(
       "/api/taps/nearby",
