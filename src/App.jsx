@@ -15,6 +15,7 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
+  // const [locale, setLocale] = ("ja")
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -29,11 +30,11 @@ export function App({ gmApiKey }) {
   }
 
   const topNav = [
-    { id: "topnav.map", ref: "https://mymizu.co/en/how-to", title: "給水MAPの使い方" },
-    { id: "topnav.about", ref: "https://mymizu.co/en-home", title: "mymizuについて" },
-    { id: "topnav.community", ref: "https://www.mymizu.co/en/business", title: "コミュニティに参加" },
-    { id: "topnav.partners", ref: "https://github.com/mymizu/mymizu-web", title: "mymizuについて" },
-    { id: "topnav.feedback", ref: "https://sij3.typeform.com/to/qADeh9", title: "お店にmymizuを紹介" },
+    { id: "topnav.map", href: "https://mymizu.co/en/how-to", title: "給水MAPの使い方" },
+    { id: "topnav.about", href: "https://mymizu.co/en-home", title: "mymizuについて" },
+    { id: "topnav.community", href: "https://www.mymizu.co/en/business", title: "コミュニティに参加" },
+    { id: "topnav.partners", href: "https://github.com/mymizu/mymizu-web", title: "mymizuについて" },
+    { id: "topnav.feedback", href: "https://sij3.typeform.com/to/qADeh9", title: "お店にmymizuを紹介" },
   ]
 
   const socialNav = [
@@ -43,11 +44,11 @@ export function App({ gmApiKey }) {
   ]
 
   const footerNav = [
-    { id: "footernav.joinus", ref: "https://www.mymizu.co/action-app-en", title: "給水MAPの使い方" },
-    { id: "footernav.supporters", ref: "https://www.mymizu.co/partners-en", title: "mymizuについて" },
-    { id: "footernav.contact", ref: "https://www.mymizu.co/contact-us-en", title: "コミュニティに参加" },
-    { id: "footernav.policy", ref: "https://legal.mymizu.co/privacy", title: "mymizuについて" },
-    { id: "footernav.terms", ref: "https://legal.mymizu.co/terms", title: "お店にmymizuを紹介" },
+    { id: "footernav.joinus", href: "https://www.mymizu.co/action-app-en", title: "給水MAPの使い方" },
+    { id: "footernav.supporters", href: "https://www.mymizu.co/partners-en", title: "mymizuについて" },
+    { id: "footernav.contact", href: "https://www.mymizu.co/contact-us-en", title: "コミュニティに参加" },
+    { id: "footernav.policy", href: "https://legal.mymizu.co/privacy", title: "mymizuについて" },
+    { id: "footernav.terms", href: "https://legal.mymizu.co/terms", title: "お店にmymizuを紹介" },
   ]
 
   const getInitialTaps = async () => {
