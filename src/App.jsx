@@ -3,6 +3,7 @@ import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { IntlProvider, FormattedMessage }  from "react-intl";
 import i18nConfig from "./i18nConfig";
+import { Statistics } from "./components/statistics";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -128,6 +129,12 @@ export function App({ gmApiKey }) {
             <div className="overlay-content">
               <span className="closebtn" onClick={handleNav} >&times;</span>
               <div className="nav-container">
+                {
+                  <li className="nav-item lang-selector">
+                    <a className="nav-link" href="#" onClick={() => setLocale("ja")}>JP</a> | <a className="nav-link" href="#" onClick={() => setLocale("en")}>EN</a>
+                  </li>
+                }
+                <Statistics/>
                 { [...topNav, ...footerNav].map((el, i) => (
                     <a href={el.href} key={i}>
                       <FormattedMessage
@@ -160,19 +167,7 @@ export function App({ gmApiKey }) {
           </GoogleMapReact>
         </div>
 
-        <div className="container-lg">
-          <div className="row home">
-            <div className="col" id="forest">
-              Column
-            </div>
-            <div className="col" id="money">
-              Column
-            </div>
-            <div className="col" id="ocean">
-              Column
-            </div>
-          </div>
-        </div>
+        <Statistics/>
 
         <div className="footer">
           <div className="container-lg">
