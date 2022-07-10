@@ -74,26 +74,33 @@ export function App({ gmApiKey }) {
     }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
+  // Key for local storage
+  const LANG_PREF_KEY = 'userLanguage';
   // Initial page load: get browser's default language and init localization
   useEffect(() => {
     const language = window.navigator.userLanguage || window.navigator.language;
     const supportedLanguages = ["en", "ja"];
+    const userLanguage = localStorage.getItem(LANG_PREF_KEY);
 
-    // Check if 'en' or 'ja' sub-strings are in the default's language: should handle
-    // particular cases such as en-GB, en-US, etc.
-    if (language.includes('en')){
-      setLocale("en")
+    if (userLanguage !== undefined) {
+      setLocale(userLanguage);
+    } else {
+      // Check if 'en' or 'ja' sub-strings are in the default's language: should handle
+      // particular cases such as en-GB, en-US, etc.
+      if (language.includes('en')) {
+        setLocale("en");
+      } else if (language.includes('ja')) {
+        setLocale("ja");
+      } else {
+        // Default language is read from i18nConfig, if browser's is something else
+        setLocale(i18nConfig.default);
+      }
     }
-    else if (language.includes('ja')){
-      setLocale("ja")
-    }
-    else{
-      // Default language is read from i18nConfig, if browser's is something else
-      setLocale(i18nConfig.default)
-    }
-    
-  }, []
-  )
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LANG_PREF_KEY, locale);
+  }, [locale]);
 
   return (
     <IntlProvider messages={translations[locale]} locale={locale} defaultLocale={i18nConfig.defaultLocale}>
