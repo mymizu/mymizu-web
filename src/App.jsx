@@ -9,7 +9,6 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
-  const [center, setCenter] = useState(null);
 
   const handleNav = () => {
     setNavOpen(!navOpen);
