@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "topnav.map": "How to Use this Map",
   "topnav.about": "About mymizu",
 <<<<<<< HEAD
@@ -27,3 +28,10 @@
   "fact11": "By 2050, it is estimated that there will be more plastic than fish in the sea."
 }
 >>>>>>> d40e9a6 (Refactor facts in English)
+=======
+  "topnav.map": "How to Use the Map",
+  "topnav.about": "About mymizu",
+  "topnav.community": "Participate in the  Community",
+  "topnav.partners": "Introduce mymizu to Store"
+}
+>>>>>>> f4498dc (Add mock translations for English and Japanese)
