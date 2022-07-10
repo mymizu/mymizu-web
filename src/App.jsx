@@ -21,7 +21,7 @@ export function App({ gmApiKey }) {
 
   const handleNav = () => {
     setNavOpen(!navOpen);
-  }
+  };
 
   const gmDefaultProps = {
     center: {
@@ -196,12 +196,12 @@ export function App({ gmApiKey }) {
                   )
                 }
               </ul>
-              <FunFacts />
+
             </footer>
           </div>
         </div>
 
       </div>
     </IntlProvider>
-  )
+  );
 }
