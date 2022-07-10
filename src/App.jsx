@@ -10,6 +10,7 @@ export function App({ gmApiKey }) {
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
   const [boundsState, setBoundsState] = useState({});
+  const [filters, setFilters] = useState({});
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -74,9 +75,14 @@ export function App({ gmApiKey }) {
     }
   }
 
-  const filterChanged = () => {
+  const filterChanged = async () => {
+    console.log(boundsState);
+    const data = { boundsState, filter: ["Refill Partner", "Cold", "Help Yourself", "wifi", "Rest pace"] };
     try {
       setLoading(true);
+      setFilters(["Refill Partner", "Cold", "Help Yourself", "wifi", "Rest pace"]);
+      const res = await axios.post("/set-filters", {}, { params: data });
+      setTaps(res.data.taps);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -136,13 +142,15 @@ export function App({ gmApiKey }) {
           ) : loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : null}
+          <Filter>
+            <button onClick={filterChanged}>
+              Test
+            </button>
+          </Filter>
         </GoogleMapReact>
+
       </div>
-      <div>
-        <button onClick={filterChanged}>
-          Test
-        </button>
-      </div>
+
       <div className="container-lg">
         <div className="row home">
           <div className="col" id="forest">

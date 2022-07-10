@@ -45,7 +45,7 @@ app.get("/get-initial-markers", async (req, res) => {
   }
 });
 
-app.get("/get-current-markers", async(req, res) => {
+app.get("/get-current-markers", async (req, res) => {
   const currentPos = {
     c1: parseFloat(req.query.c1),
     c2: parseFloat(req.query.c2),
@@ -53,12 +53,37 @@ app.get("/get-current-markers", async(req, res) => {
     c4: parseFloat(req.query.c4)
   }
 
-   try {
+  try {
     const markers = await myMizuClient.get(
       "/api/taps/nearby",
       currentPos,
     );
 
+    res.status(200).send(markers);
+  } catch (e) {
+    res.status(400).json({
+      message: "Unable to fetch updated markers",
+      error: e,
+    });
+  }
+});
+
+app.post("/set-filters", async (req, res) => {
+  const currentPos = {
+    c1: JSON.parse(req.query.boundsState[0])[1],
+    c2: JSON.parse(req.query.boundsState[1])[1],
+    c3: JSON.parse(req.query.boundsState[2])[1],
+    c4: JSON.parse(req.query.boundsState[3])[1]
+  }
+  try {
+    if(!currentPos || !req.query.filter) throw new Error("Missing elements");
+    console.log(currentPos, req.query.filter);
+    const markers = await myMizuClient.get(
+      "/api/taps/nearby",
+      currentPos,
+      req.query.filter
+    );
+    console.log("TEST")
     res.status(200).send(markers);
   } catch (e) {
     res.status(400).json({
