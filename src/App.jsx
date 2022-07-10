@@ -9,7 +9,7 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
-  const [center, setCenter] = useState(null);
+  const [filters, setFilters] = useState({});
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -49,6 +49,7 @@ export function App({ gmApiKey }) {
       setLoading(true);
       const res = await axios.get("/get-initial-markers");
       setInitialLoad(true);
+      setFilters({ filter: false });
       setTaps(res.data.taps);
       setLoading(false);
     } catch (e) {
@@ -58,18 +59,31 @@ export function App({ gmApiKey }) {
     }
   }
 
-  const boundsChanged = async(bounds) => {
-      const params = new URLSearchParams([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
-      
-      try {
-        setLoading(true);
-        const res = await axios.get("/get-current-markers", { params });
-        setTaps(res.data.taps);
-        setLoading(false);
-      } catch (e) {
-        setLoading(false);
-        console.log("error", e);
-      }
+  const boundsChanged = async (bounds) => {
+    const params = new URLSearchParams([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
+
+    try {
+      setLoading(true);
+      const res = await axios.get("/get-current-markers", { params });
+      setTaps(res.data.taps);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      console.log("error", e);
+    }
+  }
+
+  const filterChanged = () => {
+    try {
+      setLoading(true);
+      console.log("Test", filters);
+      setFilters(filters.filter = !filters.filter);
+      console.log(filters);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      console.log("error", e);
+    }
   }
 
   useEffect(() => {
@@ -126,7 +140,11 @@ export function App({ gmApiKey }) {
           ) : null}
         </GoogleMapReact>
       </div>
-
+      <div>
+        <button onClick={filterChanged}>
+          Test
+        </button>
+      </div>
       <div className="container-lg">
         <div className="row home">
           <div className="col" id="forest">
