@@ -46,8 +46,8 @@ export function App({ gmApiKey }) {
   const getInitialTaps = async () => {
     try {
       setLoading(true);
-
-      const res = await axios.get("/get-initial-markers");
+      const params = new URLSearchParams([['c1', 1], ['c2', 2], ['c3', 3], ['c4', 4]]);
+      const res = await axios.get("/get-initial-markers", { params });
 
       setInitialLoad(true);
       setTaps(res.data.taps);
@@ -58,6 +58,7 @@ export function App({ gmApiKey }) {
       console.log("error", e);
     }
   }
+
 
   useEffect(() => {
     if (!taps.length && !initialLoad) {
