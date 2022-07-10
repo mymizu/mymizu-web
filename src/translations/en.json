@@ -1,6 +1,7 @@
 {
   "topnav.map": "How to Use this Map",
   "topnav.about": "About mymizu",
+<<<<<<< HEAD
   "topnav.community": "Join as a Refill partners",
   "topnav.partners": "Contribute to this Project",
   "topnav.feedback": "Give Your Feedback",
@@ -10,3 +11,19 @@
   "footernav.policy": "Privacy Policy",
   "footernav.terms": "Terms and Conditions"
 }
+=======
+  "topnav.community": "Participate in the  Community",
+  "topnav.partners": "Introduce mymizu to Store",
+  "fact1": "740 plastic bottles are bought in Japan every second.",
+  "fact2": "More than 8 million tons of plastic are dumped into our oceans every year.",
+  "fact3": "Approximately 2 million plastic bags are used every minute around the world.",
+  "fact4": "The average plastic bag is used for only 12 minutes!",
+  "fact5": "Global plastic production has doubled in the past 50 years.",
+  "fact6": "It's estimated that 50% of the plastic we consume is used just once and thrown away.",
+  "fact7": "Approximately 90 percent of all trash floating on the ocean's surface is plastic, with 46,000 pieces of plastic per square mile.",
+  "fact8": "There are over 5 trillion pieces of plastic in our oceans – enough to circle the Earth over 400 times.",
+  "fact9": "Japan is the world's second-biggest producer per capita of plastic waste behind the U.S.",
+  "fact10": "Over 25 billion PET bottle products are produced every year in Japan, equal to approximately 180 bottles per person.",
+  "fact11": "By 2050, it is estimated that there will be more plastic than fish in the sea."
+}
+>>>>>>> d40e9a6 (Refactor facts in English)
