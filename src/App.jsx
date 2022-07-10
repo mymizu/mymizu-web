@@ -133,7 +133,7 @@ export function App({ gmApiKey }) {
           <div className="overlay" style={{
             left: navOpen ? "0%" : "-100%",
           }}>
-            <div className="overlay-content">
+            <div className="overlay-content" style={{textAlign: "left"}}>
               <span className="closebtn" onClick={handleNav} >&times;</span>
               <div className="nav-container">
                 {
