@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
   "topnav.map": "How to Use this Map",
   "topnav.about": "About mymizu",
   "topnav.community": "Join as a Refill partners",
@@ -21,10 +20,5 @@
   "fact9": "Japan is the world's second-biggest producer per capita of plastic waste behind the U.S.",
   "fact10": "Over 25 billion PET bottle products are produced every year in Japan, equal to approximately 180 bottles per person.",
   "fact11": "By 2050, it is estimated that there will be more plastic than fish in the sea."
-=======
-  "topnav.map": "How to Use the Map",
-  "topnav.about": "About mymizu",
-  "topnav.community": "Participate in the  Community",
-  "topnav.partners": "Introduce mymizu to Store"
->>>>>>> f4498dc (Add mock translations for English and Japanese)
 }
+
