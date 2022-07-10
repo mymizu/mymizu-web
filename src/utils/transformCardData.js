@@ -1,6 +1,7 @@
 
 
 export const transformCardData = (data) => {
+    console.log("more fields", data)
     return {
         carouselImg: data.photos,
         title: data.name,
@@ -12,8 +13,11 @@ export const transformCardData = (data) => {
         // refillMethod: ,// inside the comment - need to split the string?
         openingHours: data.opening_hours,
         link: data.website,
+        address: data.address,
+        comment: data.comment,
+        waterType: data.grouped_tags.Water,
         
         feedback: '', // opens a card (someone else)
-        slug: data.slug
+        slug: data.slug,
       }
 }

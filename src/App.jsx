@@ -2,18 +2,21 @@ import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { transformCardData } from "./utils/transformCardData";
+import { Modal } from "./components/Modal";
+import { useLang } from "./utils/useLang";
 
-const Marker = () => (
+const Marker = ({ category }) => (
   <div className="marker">
-    <img className="pin" src="/public/images/map-pin.svg" />
+    {category === 4 ?  <img className="pin" src="/public/images/map-pin-gold.svg" />: <img className="pin" src="/public/images/map-pin.svg" /> }
   </div>
 );
 
-export function App({ gmApiKey }) {
+export function App({ gmApiKey, params }) {
   const [navOpen, setNavOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
+  const [language] = useLang()
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -52,7 +55,7 @@ export function App({ gmApiKey }) {
     try {
       setLoading(true);
 
-      const res = await axios.get("/get-initial-markers");
+      const res = await axios.get("/get-initial-markers"); // TODO: pass language as a param
       console.log(res);
 
       setInitialLoad(true);
@@ -66,19 +69,28 @@ export function App({ gmApiKey }) {
   };
 
   useEffect(() => {
+    console.log("location", window.location)
+    console.log("params", params)
+  }, [params])
+
+  useEffect(() => {
     if (!taps.length && !initialLoad) {
       getInitialTaps();
     }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
+  const [cardData, setCardData] = useState(null)
   const onMarkerClick = (key, childProps) => {
-    console.log("stuff", key);
-    console.log(childProps);
+    const markerData = childProps.tap
+    setCardData(transformCardData(markerData))
 
-    const data = childProps.tap
-    const response = transformCardData(data)
+    // debug
+    const response = transformCardData(markerData)
     console.group(response)
   };
+  const handleCloseModal = () => {
+    setCardData(null)
+  }
 
   return (
     <div>
@@ -143,7 +155,7 @@ export function App({ gmApiKey }) {
         </div>
       </nav>
 
-      <div style={{ height: "70vh", width: "100%" }}>
+      <div style={{ height: "70vh", width: "100%", position: "relative" }}>
         <GoogleMapReact
           bootstrapURLKeys={{ key: gmApiKey }}
           defaultCenter={gmDefaultProps.center}
@@ -156,11 +168,18 @@ export function App({ gmApiKey }) {
                   key={tap.id}
                   lat={tap.latitude}
                   lng={tap.longitude}
+                  category={tap.category_id}
                   tap={tap}
                 />
               ))
             : null}
         </GoogleMapReact>
+        {cardData && 
+        <div style={{ height: "calc(70vh - 64px)", position: "absolute", zIndex:999, top: 32, left: 32, }}>
+          {/* TODO: properly calculate height */}
+          <Modal cardData={cardData} onClose={handleCloseModal}/>
+        </div>
+        }
       </div>
 
       <div className="container-lg">
