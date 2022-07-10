@@ -78,16 +78,17 @@ export function App({ gmApiKey }) {
     const language = window.navigator.userLanguage || window.navigator.language;
     const supportedLanguages = ["en", "ja"];
 
+    // Check if 'en' or 'ja' sub-strings are in the default's language: should handle
+    // particular cases such as en-GB, en-US, etc.
     if (language.includes('en')){
       setLocale("en")
-      console.log("en")
     }
     else if (language.includes('ja')){
       setLocale("ja")
     }
     else{
-      // Default language is Japanese if browser's is something else
-      setLocale("ja")
+      // Default language is read from i18nConfig, if browser's is something else
+      setLocale(i18nConfig.default)
     }
     
   }, []
