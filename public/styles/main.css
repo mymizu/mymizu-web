@@ -160,6 +160,7 @@ footer .nav-link i {
   padding-top: 20px;
   padding-bottom: 20px;
   padding-left: calc(2 * 20px + 18px); /* 20px + icon width + 20px */
+  padding-right: calc(2 * 20px + 20px);
   border: none;
   width: 100%;
 }
@@ -175,6 +176,15 @@ footer .nav-link i {
   left: 20px;
   width: 20px;
   height: 20px;
+}
+
+.maps-location-reset-icon {
+  position: absolute; /* relative to search container */
+  top: 20px;
+  right: 20px;
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
 }
 
 .maps-location-search-results-container {

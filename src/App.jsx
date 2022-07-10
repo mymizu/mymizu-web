@@ -21,6 +21,11 @@ export function App({ gmApiKey }) {
     googleMapsInstanceAPI.search(query, searchResultCallback)
   }
 
+  const handleReset = () => {
+    setQuery("")
+    setResults([])
+  }
+
   const searchResultCallback = (results) => {
     setResults(results || [])
   }
@@ -135,7 +140,7 @@ export function App({ gmApiKey }) {
           ) : null }
 
         </GoogleMapReact>
-        <Search results={results} onSearch={handleSearchQuery} />
+        <Search results={results} onSearch={handleSearchQuery} onReset={handleReset} />
         <SearchResults results={results} onSearchResultClick={handleResultClick} />
       </div>
 
