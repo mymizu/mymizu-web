@@ -8,10 +8,9 @@ export function FunFacts() {
     return (
         <>
             <div className="facts">
-
                 <FormattedMessage id={funFacts[currentIndex].fact} />
             </div>
 
         </>
-    )
+    );
 }
