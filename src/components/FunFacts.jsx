@@ -9,6 +9,7 @@ export function FunFacts() {
         const maxFactKey = 11;
         setRandomKey(Math.floor(Math.random() * maxFactKey + 1));
     }, []);
+
     const funEmoji = ["💧", "🌊", "⏳", "🛍", "🥽", "🗑", "🏝", "🌏", "😯", "♳", "🐟"];
 
     function randomEmoji() {
