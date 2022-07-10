@@ -8,7 +8,6 @@ const translations = {
   en: require("./translations/en.json"),
   ja: require("./translations/ja.json")
 };
-
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
 
 export function App({ gmApiKey }) {
@@ -30,24 +29,25 @@ export function App({ gmApiKey }) {
   }
 
   const topNav = [
-    { id: "topnav.map", ref: "#", title: "給水MAPの使い方" },
-    { id: "topnav.about", ref: "#", title: "mymizuについて" },
-    { id: "topnav.community", ref: "#", title: "コミュニティに参加" },
-    { id: "topnav.about", ref: "#", title: "mymizuについて" },
-    { id: "topnav.partners", ref: "#", title: "お店にmymizuを紹介" },
+    { id: "topnav.map", ref: "https://mymizu.co/en/how-to", title: "給水MAPの使い方" },
+    { id: "topnav.about", ref: "https://mymizu.co/en-home", title: "mymizuについて" },
+    { id: "topnav.community", ref: "https://www.mymizu.co/en/business", title: "コミュニティに参加" },
+    { id: "topnav.partners", ref: "https://github.com/mymizu/mymizu-web", title: "mymizuについて" },
+    { id: "topnav.feedback", ref: "https://sij3.typeform.com/to/qADeh9", title: "お店にmymizuを紹介" },
   ]
 
   const socialNav = [
-    { href: "#", iconName: "bi-instagram" },
-    { href: "#", iconName: "bi-facebook" },
-    { href: "#", iconName: "bi-twitter" },
+    { href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram" },
+    { href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook" },
+    { href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter" },
   ]
 
   const footerNav = [
-    { href: "#", title: "マイボトルを購入" },
-    { href: "#", title: "mymizuサポーター" },
-    { href: "#", title: "フィードバックを送信" },
-    { href: "#", title: "お問い合わせ" },
+    { id: "footernav.joinus", ref: "https://www.mymizu.co/action-app-en", title: "給水MAPの使い方" },
+    { id: "footernav.supporters", ref: "https://www.mymizu.co/partners-en", title: "mymizuについて" },
+    { id: "footernav.contact", ref: "https://www.mymizu.co/contact-us-en", title: "コミュニティに参加" },
+    { id: "footernav.policy", ref: "https://legal.mymizu.co/privacy", title: "mymizuについて" },
+    { id: "footernav.terms", ref: "https://legal.mymizu.co/terms", title: "お店にmymizuを紹介" },
   ]
 
   const getInitialTaps = async () => {
@@ -101,8 +101,19 @@ export function App({ gmApiKey }) {
             <div className="overlay-content">
               <span className="closebtn" onClick={handleNav} >&times;</span>
               <div className="nav-container">
-                { [...topNav, ...footerNav].map((el, i) => <a href={el.href} key={i}>{el.title}</a>) }
-                { socialNav.map((el, i) => <a href={el.href} key={i}><i className={`bi ${el.iconName}`} /></a>)}
+                { [...topNav, ...footerNav].map((el, i) => (
+                    <a href={el.href} key={i}>
+                      {el.title}
+                    </a>
+                   ) 
+                  )
+                }
+                { socialNav.map((el, i) => (
+                  <a href={el.href} key={i}>
+                    <i className={`bi ${el.iconName}`} />
+                  </a>
+                  )
+                )}
               </div>
             </div>
           </div>
