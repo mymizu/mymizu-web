@@ -2,16 +2,11 @@ import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { IntlProvider }  from "react-intl";
+import i18nConfig from "./i18nConfig";
 
 const translations = {
   en: require("./translations/en.json"),
   ja: require("./translations/ja.json")
-};
-const i18nConfig = {
-  // TODO: locale should be stored in state and use users's locale by default
-  locale: "ja",
-  defaultLocale: "ja",
-  messages: translations["ja"]
 };
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
@@ -78,7 +73,7 @@ export function App({ gmApiKey }) {
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
   return (
-    <IntlProvider messages={i18nConfig.messages} locale={i18nConfig.locale} defaultLocale={i18nConfig.defaultLocale}>
+    <IntlProvider messages={translations[locale]} locale={locale} defaultLocale={i18nConfig.defaultLocale}>
       <div>
         {/* Header */}
         <nav className="navbar navbar-expand-lg bg-light">
