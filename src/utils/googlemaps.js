@@ -12,6 +12,7 @@ class GoogleMapsAPI {
     }, (predictions) => {
       if (!predictions) {
         callback([])
+        return
       }
       Promise.all(
         predictions.map(prediction => {
