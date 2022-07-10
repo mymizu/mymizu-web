@@ -62,12 +62,22 @@ export function App({ gmApiKey }) {
 
   const apiIsLoaded = (map, maps) => {
     // Get bounds by our places
-    console.log(map);
+    // console.log("MAP");
+    // console.log(maps);
     // const bounds = maps.LatLngBounds();
+    // console.log("BOUNDS");
+    // console.log(bounds);
     // const ne = bounds.getNorthEast();
     // const sw = bounds.getSouthWest();
     // console.log(((Math.PI * ne.lat())/180), ((Math.PI *ne.lng())/180));
   };
+
+  const boundsChanged = (bounds, marginBounds) => {
+    console.log("BOUNDS");
+    console.log(bounds);
+    console.log("marginBounds");
+    console.log(marginBounds);
+  }
 
   useEffect(() => {
     if (!taps.length && !initialLoad) {
@@ -119,6 +129,8 @@ export function App({ gmApiKey }) {
           bootstrapURLKeys={{ key: gmApiKey }}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
+          yesIWantToUseGoogleMapApiInternals
+          onChange={({ center, zoom, bounds, marginBounds }) => boundsChanged(bounds, marginBounds)}
           onGoogleApiLoaded={({ map, maps }) => apiIsLoaded(map, maps)}>
           {!loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
