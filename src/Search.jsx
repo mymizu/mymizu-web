@@ -1,12 +1,13 @@
 import React from 'react'
+import { SearchResults } from './SearchResults'
 
-export function Search() {
+export function Search({ results }) {
   return (
     <>
-      <input
-        className="maps-location-search"
-        />
-      <img className="maps-location-search-icon" src="/public/search.png" />
+      <div className="maps-location-search-container">
+        <input className={`maps-location-search-input ${results.length > 0 ? "maps-location-search-input-with-results" : ""}`} placeholder="Search" />
+        <img className="maps-location-search-icon" src="/public/search.png" />
+      </div>
     </>
   )
 }

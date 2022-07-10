@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { Search } from "./Search";
+import { SearchResults } from './SearchResults'
+import { results } from './SearchResults.test'
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
 
@@ -109,7 +111,8 @@ export function App({ gmApiKey }) {
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : null }
         </GoogleMapReact>
-        <Search />
+        <Search results={results} />
+        <SearchResults results={results} onSearchResultClick={() => {}} />
       </div>
 
       <div className="container-lg">
