@@ -9,7 +9,7 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
-  const [filters, setFilters] = useState({});
+  const [boundsState, setBoundsState] = useState({});
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -49,7 +49,6 @@ export function App({ gmApiKey }) {
       setLoading(true);
       const res = await axios.get("/get-initial-markers");
       setInitialLoad(true);
-      setFilters({ filter: false });
       setTaps(res.data.taps);
       setLoading(false);
     } catch (e) {
@@ -60,7 +59,9 @@ export function App({ gmApiKey }) {
   }
 
   const boundsChanged = async (bounds) => {
-    const params = new URLSearchParams([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
+    setBoundsState([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
+    const params = new URLSearchParams(boundsState);
+    console.log(boundsState);
 
     try {
       setLoading(true);
@@ -76,9 +77,6 @@ export function App({ gmApiKey }) {
   const filterChanged = () => {
     try {
       setLoading(true);
-      console.log("Test", filters);
-      setFilters(filters.filter = !filters.filter);
-      console.log(filters);
       setLoading(false);
     } catch (e) {
       setLoading(false);
