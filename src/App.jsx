@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
+import { Search } from "./Search";
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
 
@@ -99,7 +100,7 @@ export function App({ gmApiKey }) {
         </div>
       </nav>
 
-      <div style={{ height: "70vh", width: "100%" }}>
+      <div className="maps-container">
         <GoogleMapReact
           bootstrapURLKeys={{ key: gmApiKey }}
           defaultCenter={gmDefaultProps.center}
@@ -108,6 +109,7 @@ export function App({ gmApiKey }) {
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : null }
         </GoogleMapReact>
+        <Search />
       </div>
 
       <div className="container-lg">
