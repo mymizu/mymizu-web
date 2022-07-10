@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
-import { IntlProvider }  from "react-intl";
+import { IntlProvider, FormattedMessage }  from "react-intl";
 import i18nConfig from "./i18nConfig";
 
 const translations = {
@@ -15,7 +15,7 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
-  // const [locale, setLocale] = ("ja")
+  const [locale, setLocale] = useState("ja");
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -85,12 +85,17 @@ export function App({ gmApiKey }) {
                 {
                   topNav.map((el, i) =>
                     <li className="nav-item" key={i}>
-                      <a className="nav-link" href={el.href}>{ el.title }</a>
+                      <a className="nav-link" href={el.href}>
+                        <FormattedMessage
+                          id={el.id}
+                          defaultMessage=""
+                        />
+                      </a>
                     </li>
                   )
                 }
                 <li className="nav-item lang-selector">
-                  <a className="nav-link" href="#">JP</a> | <a className="nav-link" href="#">EN</a>
+                  <a className="nav-link" href="#" onClick={() => setLocale("ja")}>JP</a> | <a className="nav-link" href="#" onClick={() => setLocale("en")}>EN</a>
                 </li>
               </ul>
             </div>
@@ -104,7 +109,10 @@ export function App({ gmApiKey }) {
               <div className="nav-container">
                 { [...topNav, ...footerNav].map((el, i) => (
                     <a href={el.href} key={i}>
-                      {el.title}
+                      <FormattedMessage
+                        id={el.id}
+                        defaultMessage=""
+                      />
                     </a>
                    ) 
                   )
@@ -164,7 +172,10 @@ export function App({ gmApiKey }) {
                 footerNav.map((el, i) =>
                   <li className="nav-item" key={i}>
                     <a href={el.href} className="nav-link px-2">
-                      { el.title }
+                      <FormattedMessage
+                        id={el.id}
+                        defaultMessage=""
+                      />
                     </a>
                   </li>
                 )
