@@ -4,7 +4,7 @@ export function SearchResults({ results, onSearchResultClick }) {
   return (
     <>
       <div className="maps-location-search-results-container">
-        {results.map((result) => {
+        {results.filter(Boolean).map((result) => {
           return (
             <div
               key={result.name + result.formatted_address}
