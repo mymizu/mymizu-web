@@ -1,20 +1,14 @@
 {
-<<<<<<< HEAD
   "topnav.map": "How to Use this Map",
   "topnav.about": "About mymizu",
-<<<<<<< HEAD
   "topnav.community": "Join as a Refill partners",
-  "topnav.partners": "Contribute to this Project",
+  "topnav.partners": "Introduce mymizu to Store",
   "topnav.feedback": "Give Your Feedback",
   "footernav.joinus": "Contribute to this Project",
   "footernav.supporters": "mymizu Supporters",
   "footernav.contact": "Contact Us",
   "footernav.policy": "Privacy Policy",
-  "footernav.terms": "Terms and Conditions"
-}
-=======
-  "topnav.community": "Participate in the  Community",
-  "topnav.partners": "Introduce mymizu to Store",
+  "footernav.terms": "Terms and Conditions",
   "fact1": "740 plastic bottles are bought in Japan every second.",
   "fact2": "More than 8 million tons of plastic are dumped into our oceans every year.",
   "fact3": "Approximately 2 million plastic bags are used every minute around the world.",
@@ -27,11 +21,3 @@
   "fact10": "Over 25 billion PET bottle products are produced every year in Japan, equal to approximately 180 bottles per person.",
   "fact11": "By 2050, it is estimated that there will be more plastic than fish in the sea."
 }
->>>>>>> d40e9a6 (Refactor facts in English)
-=======
-  "topnav.map": "How to Use the Map",
-  "topnav.about": "About mymizu",
-  "topnav.community": "Participate in the  Community",
-  "topnav.partners": "Introduce mymizu to Store"
-}
->>>>>>> f4498dc (Add mock translations for English and Japanese)
