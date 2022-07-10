@@ -10,6 +10,9 @@ class GoogleMapsAPI {
     this.AutocompleteService.getPlacePredictions({
       input,
     }, (predictions) => {
+      if (!predictions) {
+        callback([])
+      }
       Promise.all(
         predictions.map(prediction => {
           return this.lookupPlace(prediction.place_id)
