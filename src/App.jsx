@@ -73,6 +73,26 @@ export function App({ gmApiKey }) {
     }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
+  // Initial page load: get browser's default language and init localization
+  useEffect(() => {
+    const language = window.navigator.userLanguage || window.navigator.language;
+    const supportedLanguages = ["en", "ja"];
+
+    if (language.includes('en')){
+      setLocale("en")
+      console.log("en")
+    }
+    else if (language.includes('ja')){
+      setLocale("ja")
+    }
+    else{
+      // Default language is Japanese if browser's is something else
+      setLocale("ja")
+    }
+    
+  }, []
+  )
+
   return (
     <IntlProvider messages={translations[locale]} locale={locale} defaultLocale={i18nConfig.defaultLocale}>
       <div>
