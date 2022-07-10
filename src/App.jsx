@@ -60,18 +60,22 @@ export function App({ gmApiKey }) {
 
   const boundsChanged = async(bounds) => {
       const params = new URLSearchParams([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
-      const res = await axios.get("/get-current-markers", { params });
+      
+      try {
+        setLoading(true);
+        const res = await axios.get("/get-current-markers", { params });
+        setTaps(res.data.taps);
+        setLoading(false);
+      } catch (e) {
+        setLoading(false);
+        console.log("error", e);
+      }
   }
 
   useEffect(() => {
     if (!taps.length && !initialLoad) {
       getInitialTaps();
     }
-    // if (initialLoad && gmDefaultProps.center !== center) {
-    //   const res = await axios.get("/get-current-markers");
-    //   setTaps(res.data.taps);
-    // }
-    // console.log(`TAPS: ${JSON.stringify(taps)},\nloading: ${JSON.stringify(loading)}`)
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
   return (

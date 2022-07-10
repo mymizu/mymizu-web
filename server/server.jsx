@@ -55,8 +55,8 @@ app.get("/get-current-markers", async(req, res) => {
 
   console.log(currentPos);  
    try {
-    const markers = await myMizuClient.post(
-      "/api/taps/search",
+    const markers = await myMizuClient.get(
+      "/api/taps/nearby",
       currentPos,
     );
 
