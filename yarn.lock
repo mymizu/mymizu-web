@@ -1034,6 +1034,16 @@ intl-messageformat@10.1.1:
     "@formatjs/icu-messageformat-parser" "2.1.4"
     tslib "2.4.0"
 
+intl-messageformat@10.1.1:
+  version "10.1.1"
+  resolved "https://registry.yarnpkg.com/intl-messageformat/-/intl-messageformat-10.1.1.tgz#226767e7921fa86cef2cbe4a13911050716720bc"
+  integrity sha512-FeJne2oooYW6shLPbrqyjRX6hTELVrQ90Dn88z7NomLk/xZBCLxLPAkgaYaTQJBRBV78nZ933d8APHHkTQrD9Q==
+  dependencies:
+    "@formatjs/ecma402-abstract" "1.11.8"
+    "@formatjs/fast-memoize" "1.2.4"
+    "@formatjs/icu-messageformat-parser" "2.1.4"
+    tslib "2.4.0"
+
 intl@^1.2.5:
   version "1.2.5"
   resolved "https://registry.yarnpkg.com/intl/-/intl-1.2.5.tgz#82244a2190c4e419f8371f5aa34daa3420e2abde"
