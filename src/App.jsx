@@ -118,7 +118,7 @@ export function App({ gmApiKey }) {
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
           yesIWantToUseGoogleMapApiInternals
-          onChange={({ center, zoom, bounds, marginBounds }) => boundsChanged(bounds)}>
+          onChange={({ bounds }) => boundsChanged(bounds)}>
           {!loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : loading && taps.length ? taps.map((tap) =>
