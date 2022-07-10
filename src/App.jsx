@@ -196,6 +196,7 @@ export function App({ gmApiKey }) {
                   )
                 }
               </ul>
+              <FunFacts />
             </footer>
           </div>
         </div>
