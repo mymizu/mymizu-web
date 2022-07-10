@@ -45,6 +45,31 @@ app.get("/get-initial-markers", async (req, res) => {
   }
 });
 
+app.get("/get-current-markers", async(req, res) => {
+
+    const currentPos = {
+    c1: req.query.c1,
+    c2: req.query.c2,
+    c3: req.query.c3,
+    c4: req.query.c4
+  }
+
+   try {
+    const markers = await myMizuClient.get(
+      "/api/taps/nearby",
+      currentPos,
+    );
+
+    res.status(200).send(markers);
+  } catch (e) {
+    res.status(400).json({
+      message: "Unable to fetch updated markers",
+      error: e,
+    });
+  }
+});
+
+
 app.get("/", (req, res) => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
     if (err) {
