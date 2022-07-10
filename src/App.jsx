@@ -101,7 +101,8 @@ export function App({ gmApiKey }) {
             <div className="overlay-content">
               <span className="closebtn" onClick={handleNav} >&times;</span>
               <div className="nav-container">
-                { topNav.map((el, i) => <a href={el.href} key={i}>{el.title}</a>) }
+                { [...topNav, ...footerNav].map((el, i) => <a href={el.href} key={i}>{el.title}</a>) }
+                { socialNav.map((el, i) => <a href={el.href} key={i}><i className={`bi ${el.iconName}`} /></a>)}
               </div>
             </div>
           </div>
