@@ -13,7 +13,7 @@ export const ShareModal = ({ data, setShareModal }) => {
             <a>Share this Refill spot</a>
             <div className='share-link'>{data.title}</div>
             <div>{data.action.share ? data.action.share : "No Link, feel free to add one!"}</div>
-            <button className='copy-button' onClick={copyFunc(data)}>Copy</button>
+            <button className='copy-button' onClick={() => copyFunc(data)}>Copy</button>
             <button className='close-share-modal' onClick={closeFunc}>X</button>
         </div>
     )
