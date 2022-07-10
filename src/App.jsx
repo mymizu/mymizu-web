@@ -3,7 +3,7 @@ import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { Search } from "./Search";
 import { SearchResults } from './SearchResults'
-import { results } from './SearchResults.test'
+import googleMapsInstanceAPI from './utils/googlemaps'
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
 
@@ -12,6 +12,23 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
+
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
+
+
+  const handleSearchQuery = (query) => {
+    googleMapsInstanceAPI.search(query, searchResultCallback)
+  }
+
+  const searchResultCallback = (results) => {
+    setResults(results || [])
+  }
+
+  const handleResultClick = (result) => {
+    googleMapsInstanceAPI.map.setCenter(result.geometry.location)
+    setResults([])
+  }
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -104,15 +121,22 @@ export function App({ gmApiKey }) {
 
       <div className="maps-container">
         <GoogleMapReact
-          bootstrapURLKeys={{ key: gmApiKey }}
+          bootstrapURLKeys={{
+            key: gmApiKey,
+            libraries:['places'],
+          }}
           defaultCenter={gmDefaultProps.center}
-          defaultZoom={gmDefaultProps.zoom}>
+          defaultZoom={gmDefaultProps.zoom}
+          onGoogleApiLoaded={({map, maps}) => googleMapsInstanceAPI.setGoogleAPIObject(map, maps)}
+          yesIWantToUseGoogleMapApiInternals
+        >
           { !loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : null }
+
         </GoogleMapReact>
-        <Search results={results} />
-        <SearchResults results={results} onSearchResultClick={() => {}} />
+        <Search results={results} onSearch={handleSearchQuery} />
+        <SearchResults results={results} onSearchResultClick={handleResultClick} />
       </div>
 
       <div className="container-lg">

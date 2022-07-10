@@ -221,6 +221,10 @@ footer .nav-link i {
   flex-basis: 36px; /* width of icon + right padding */
 }
 
+.maps-location-icon {
+  width: 16px;
+}
+
 .maps-location-search-results-result-name {
   font-size: 16px;
 }

@@ -7,9 +7,9 @@ export function SearchResults({ results, onSearchResultClick }) {
         {results.map((result) => {
           return (
             <div
-              key={result.name + result.vicinity}
+              key={result.name + result.formatted_address}
               className="maps-location-search-results-result"
-              onClick={onSearchResultClick(result.geometry && result.geometry.location)}
+              onClick={() => onSearchResultClick(result)}
               tabIndex={0}
             >
               <div className="maps-location-icon-container">
@@ -17,7 +17,7 @@ export function SearchResults({ results, onSearchResultClick }) {
               </div>
               <div>
                 <div className="maps-location-search-results-result-name">{result.name}</div>
-                <div className="maps-location-search-results-result-address">{result.vicinity}</div>
+                <div className="maps-location-search-results-result-address">{result.formatted_address}</div>
               </div>
             </div>
           )
