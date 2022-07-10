@@ -4,6 +4,7 @@ import axios from "axios";
 import { IntlProvider, FormattedMessage }  from "react-intl";
 import i18nConfig from "./i18nConfig";
 import { Statistics } from "./components/statistics";
+import { FunFacts } from "./components/FunFacts";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -195,6 +196,7 @@ export function App({ gmApiKey }) {
                   )
                 }
               </ul>
+              <FunFacts />
             </footer>
           </div>
         </div>
