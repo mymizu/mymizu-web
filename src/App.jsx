@@ -47,9 +47,7 @@ export function App({ gmApiKey }) {
   const getInitialTaps = async () => {
     try {
       setLoading(true);
-      const params = new URLSearchParams([['c1', 1], ['c2', 2], ['c3', 3], ['c4', 4]]);
-      const res = await axios.get("/get-initial-markers", { params });
-
+      const res = await axios.get("/get-initial-markers");
       setInitialLoad(true);
       setTaps(res.data.taps);
       setLoading(false);
@@ -60,9 +58,9 @@ export function App({ gmApiKey }) {
     }
   }
 
-  const boundsChanged = (bounds) => {
-    console.log("BOUNDS");
-    console.log(bounds);
+  const boundsChanged = async(bounds) => {
+      const params = new URLSearchParams([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
+      const res = await axios.get("/get-current-markers", { params });
   }
 
   useEffect(() => {
