@@ -4,31 +4,31 @@ import axios from "axios";
 import { transformCardData } from "./utils/transformCardData";
 import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
+import  getSlug  from "./utils/getSlug";
+import { Marker } from "./components/Marker";
 
-const Marker = ({ category }) => (
-  <div className="marker">
-    {category === 4 ?  <img className="pin" src="/public/images/map-pin-gold.svg" />: <img className="pin" src="/public/images/map-pin.svg" /> }
-  </div>
-);
 
-export function App({ gmApiKey, params }) {
-  const [navOpen, setNavOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(false);
-  const [taps, setTaps] = useState([]);
-  const [language] = useLang()
-
-  const handleNav = () => {
-    setNavOpen(!navOpen);
-  };
-
-  const gmDefaultProps = {
+export function App({ gmApiKey }) {
+   const gmDefaultProps = {
     center: {
       lat: 35.662,
       lng: 139.7038,
     },
     zoom: 11,
+   };
+  
+  const [navOpen, setNavOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(false);
+  const [taps, setTaps] = useState([]);
+  const [language] = useLang()
+  const [center, setCenter] = useState(gmDefaultProps.center)
+
+  const handleNav = () => {
+    setNavOpen(!navOpen);
   };
+
+ 
 
   const topNav = [
     { href: "#", title: "給水MAPの使い方" },
@@ -68,10 +68,7 @@ export function App({ gmApiKey, params }) {
     }
   };
 
-  useEffect(() => {
-    console.log("location", window.location)
-    console.log("params", params)
-  }, [params])
+  
 
   useEffect(() => {
     if (!taps.length && !initialLoad) {
@@ -80,6 +77,23 @@ export function App({ gmApiKey, params }) {
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
   const [cardData, setCardData] = useState(null)
+  // if slug exists
+  useEffect(() => {
+    const load = async () => {
+      const REFILL_SPOT_ROUTE = "/refill_spots/" // TODO: constants
+      const slug = getSlug(REFILL_SPOT_ROUTE)
+      if (slug) {
+        const res = await axios.get(`/get-refill-spot/${slug}`)
+        setCardData(transformCardData(res.data))
+        setCenter(
+          { lat: res?.data?.latitude ??  gmDefaultProps.center.lng, lng: res?.data?.longitude ?? gmDefaultProps.center.lng }
+        );
+      }
+    }
+    load()
+  }, [])
+
+
   const onMarkerClick = (key, childProps) => {
     const markerData = childProps.tap
     setCardData(transformCardData(markerData))
@@ -88,6 +102,7 @@ export function App({ gmApiKey, params }) {
     const response = transformCardData(markerData)
     console.group(response)
   };
+  
   const handleCloseModal = () => {
     setCardData(null)
   }
@@ -158,6 +173,7 @@ export function App({ gmApiKey, params }) {
       <div style={{ height: "70vh", width: "100%", position: "relative" }}>
         <GoogleMapReact
           bootstrapURLKeys={{ key: gmApiKey }}
+          center={center}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
           onChildClick={onMarkerClick}

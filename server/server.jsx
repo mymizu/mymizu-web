@@ -22,7 +22,18 @@ app.use("/public", express.static(
   path.join(__dirname, "../public")
 ));
 
-
+app.get("/get-refill-spot/:slug", async (req, res) => {
+  console.log("req", req.params)
+  try {
+    const info = await myMizuClient.get(`/api/taps/${req.params.slug}`)
+    res.status(200).send(info);
+  } catch (e) {
+    res.status(400).json({
+      message: "Unable to fetch refill spot",
+      error: e,
+    });
+  }
+})
 
 app.get("/get-initial-markers", async (req, res) => {
   const initialPos = {
@@ -64,7 +75,7 @@ app.get("/refill_spots/:slug", (req, res) => {
         '<div id="root"></div>',
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
-        <div id="root">${ReactDOMServer.renderToString(<App gmApiKey={gmapApiKey} params={req.params} />)}</div>
+        <div id="root">${ReactDOMServer.renderToString(<App gmApiKey={gmapApiKey} />)}</div>
         `
       )
     );

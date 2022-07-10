@@ -25,7 +25,6 @@ export const Carousel = (props) => {
     const index = shouldResetIndex ? 0 : currentIndex + 1; 
     setCurrentIndex(index)
   } 
-  console.log(images)
 
   const ImageSlide = ({url}) => {
 	  const styles = {
@@ -42,8 +41,8 @@ export const Carousel = (props) => {
 
 
   return (<div className="carousel">
-    <ArrowButton onClick={previousSlide} direction="back" style={{ left: 0 }} />
+    <ArrowButton  onClick={previousSlide} direction="back" className={"left-carousel-button"} />
     <ImageSlide url={images?.[currentIndex]?.url} />
-    <ArrowButton onClick={nextSlide} direction="forward" style={{ left: "100%" }} />
+    <ArrowButton onClick={nextSlide} direction="forward" className={"right-carousel-button"} />
   </div>);
 } 
