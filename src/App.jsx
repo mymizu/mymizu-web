@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
+import Message from './components/Message';
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
 
@@ -108,6 +109,9 @@ export function App({ gmApiKey }) {
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : null }
         </GoogleMapReact>
+
+        {/* TODO: add a logic based on spot's availability */}
+        {false && <Message />}
       </div>
 
       <div className="container-lg">
