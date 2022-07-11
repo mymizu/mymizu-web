@@ -3,6 +3,7 @@ import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { FormattedMessage, IntlProvider } from "react-intl";
 import { i18nConfig } from "./i18nConfig";
+import { Statistics } from "./components/statistics";
 
 const translations = {
   en: require("./translations/en.json"),
