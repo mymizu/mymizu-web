@@ -1,8 +1,9 @@
 {
   "topnav.map": "給水MAPの使い方",
   "topnav.about": "mymizuについて",
-  "topnav.community": "コミュニティに参加",
-  "topnav.partners": "お店にmymizuを紹介",
+  "topnav.community": "お店（給水パートナー）として参加",
+  "topnav.partners": "開発に貢献する",
+  "topnav.feedback": "フィードバックを送信",
   "footernav.joinus": "参加する",
   "footernav.supporters": "mymizuサポーター",
   "footernav.contact": "お問い合わせ",
