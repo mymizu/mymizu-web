@@ -57,20 +57,6 @@
   }
 }
 
-.row.home {
-  margin-top: 50px;
-  margin-bottom: 100px;
-}
-
-.row.home .col {
-  text-align: center;
-  height: 208px;
-  background-position: center center;
-  border-radius: 20px;
-  color: white;
-  margin: 0 10px;
-}
-
 img#logo {
   padding: 5px;
 }
@@ -89,18 +75,6 @@ img#logo {
   margin-right: 0;
   padding-left: 0;
   padding-right: 0;
-}
-
-#forest {
-  background-image: url("../images/forest.jpg");
-}
-
-#money {
-  background-image: url("../images/money.jpg");
-}
-
-#ocean {
-  background-image: url("../images/ocean.jpg");
 }
 
 .footer {

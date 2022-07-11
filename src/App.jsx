@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
+import Metrics from './components/Metrics';
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
 
@@ -110,19 +111,7 @@ export function App({ gmApiKey }) {
         </GoogleMapReact>
       </div>
 
-      <div className="container-lg">
-        <div className="row home">
-          <div className="col" id="forest">
-            Column
-          </div>
-          <div className="col" id="money">
-            Column
-          </div>
-          <div className="col" id="ocean">
-            Column
-          </div>
-        </div>
-      </div>
+      <Metrics />
 
       <div className="footer">
         <div className="container-lg">
