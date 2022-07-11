@@ -45,6 +45,18 @@ app.get("/get-initial-markers", async (req, res) => {
   }
 });
 
+app.get("/community", async (_, res) => {
+  try {
+    const data = await myMizuClient.get("/api/community");
+    res.status(200).send(data);
+  } catch (error) {
+    res.status(400).json({
+      message: "Unable to fetch community",
+      error,
+    });
+  }
+});
+
 app.get("/", (req, res) => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
     if (err) {
