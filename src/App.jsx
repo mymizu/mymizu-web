@@ -56,7 +56,6 @@ export function App({ gmApiKey }) {
       setLoading(true);
 
       const res = await axios.get("/get-initial-markers"); // TODO: pass language as a param
-      console.log(res);
 
       setInitialLoad(true);
       setTaps(res.data.taps);
@@ -76,35 +75,31 @@ export function App({ gmApiKey }) {
     }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
-  const [cardData, setCardData] = useState(null)
+  const [cardData, setCardData] = useState(null);
   // if slug exists
   useEffect(() => {
     const load = async () => {
-      const REFILL_SPOT_ROUTE = "/refill_spots/" // TODO: constants
-      const slug = getSlug(REFILL_SPOT_ROUTE)
+      const REFILL_SPOT_ROUTE = "/refill_spots/"; // TODO: constants
+      const slug = getSlug(REFILL_SPOT_ROUTE);
       if (slug) {
-        const res = await axios.get(`/get-refill-spot/${slug}`)
-        setCardData(transformCardData(res.data))
+        const res = await axios.get(`/get-refill-spot/${slug}`);
+        setCardData(transformCardData(res.data));
         setCenter(
           { lat: res?.data?.latitude ??  gmDefaultProps.center.lng, lng: res?.data?.longitude ?? gmDefaultProps.center.lng }
         );
       }
     }
-    load()
-  }, [])
+    load();
+  }, []);
 
 
   const onMarkerClick = (key, childProps) => {
-    const markerData = childProps.tap
-    setCardData(transformCardData(markerData))
-
-    // debug
-    const response = transformCardData(markerData)
-    console.group(response)
+    const markerData = childProps.tap;
+    setCardData(transformCardData(markerData));
   };
   
   const handleCloseModal = () => {
-    setCardData(null)
+    setCardData(null);
   }
 
   return (

@@ -23,7 +23,6 @@ app.use("/public", express.static(
 ));
 
 app.get("/get-refill-spot/:slug", async (req, res) => {
-  console.log("req", req.params)
   try {
     const info = await myMizuClient.get(`/api/taps/${req.params.slug}`)
     res.status(200).send(info);

@@ -7,4 +7,4 @@ const ArrowButton = ({ onClick, direction, className }) => {
     </button>
   );
 };
-export default ArrowButton
+export default ArrowButton;

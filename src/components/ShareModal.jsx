@@ -3,7 +3,7 @@ import React from 'react';
 export const ShareModal = ({ data, setShareModal }) => {
     const copyFunc = (data) => {
         navigator.clipboard.writeText(data.action.share);
-        alert("Copied")
+        alert("Copied");
     }
     const closeFunc = () => {
         setShareModal(false);

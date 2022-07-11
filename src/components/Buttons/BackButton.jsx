@@ -7,4 +7,4 @@ const BackButton = ({ onClick, direction, className }) => {
     </button>
   );
 };
-export default BackButton
+export default BackButton;

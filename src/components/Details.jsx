@@ -7,9 +7,6 @@ export const Details = ({ data }) => {
     const commentArray = data.comment.split("\n");
     const refill = commentArray.indexOf("How to Refill:\r");
     const refillMethod = commentArray[refill + 1];
-    console.log(refill);
-
-    console.log("details", data)
   
     return (
     <div>

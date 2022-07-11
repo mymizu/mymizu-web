@@ -1,7 +1,7 @@
 
 
 export const transformCardData = (data) => {
-    console.log("more fields", data)
+
     return {
         carouselImg: data.photos,
         title: data.name,
