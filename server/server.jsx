@@ -1,15 +1,11 @@
 import path from "path";
 import fs from "fs";
-import React from "react";
-import ReactDOMServer from "react-dom/server";
 import express from "express";
 
-import config from "./config"
-import { App } from "../src/App";
 import { myMizuClient } from "./myMizuClient"
+import render from "./render";
 
 const PORT = process.env.PORT || 3000;
-const gmapApiKey = config.gmApiKey;
 const app = express();
 
 app.get("/bundle.js", (req, res) => {
@@ -46,25 +42,12 @@ app.get("/get-initial-markers", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
+  fs.readFile(path.resolve("./public/index.html"), "utf8", (err, template) => {
     if (err) {
       console.error(err);
       return res.status(500).send("An error occurred");
     }
-
-    // @NOTE:
-    // You can inject SEO headers to the <head> tag as well
-    return res.send(
-      // @TODO:
-      // You can turn this into a function on a different file
-      data.replace(
-        '<div id="root"></div>',
-        `
-        <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
-        <div id="root">${ReactDOMServer.renderToString(<App gmApiKey={gmapApiKey} />)}</div>
-        `
-      )
-    );
+    return res.send(render.dynamicContent(template));
   });
 });
 
