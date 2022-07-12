@@ -142,11 +142,9 @@ export function App({ gmApiKey }) {
           ) : loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : null}
-          <Filter>
-            <button onClick={filterChanged}>
-              Test
-            </button>
-          </Filter>
+          <button onClick={filterChanged}>
+            Test
+          </button>
         </GoogleMapReact>
 
       </div>
