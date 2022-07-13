@@ -10,7 +10,8 @@
     "start:reload": "nodemon ./build/server.js",
     "build": "npm run build:client && npm run build:server",
     "build:prod": "npm run build:client:prod && npm run build:server:prod",
-    "start": "node ./build/server.js"
+    "start": "node ./build/server.js",
+    "restart": "npm run build && npm run start:reload"
   },
   "dependencies": {
     "axios": "^0.27.2",

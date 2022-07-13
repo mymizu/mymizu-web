@@ -9,6 +9,8 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
+  const [boundsState, setBoundsState] = useState({});
+  const [filters, setFilters] = useState({});
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -46,15 +48,44 @@ export function App({ gmApiKey }) {
   const getInitialTaps = async () => {
     try {
       setLoading(true);
-
       const res = await axios.get("/get-initial-markers");
-
       setInitialLoad(true);
       setTaps(res.data.taps);
       setLoading(false);
     } catch (e) {
       setLoading(false);
       setInitialLoad(true);
+      console.log("error", e);
+    }
+  }
+
+  const boundsChanged = async (bounds) => {
+    setBoundsState([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
+    const params = new URLSearchParams(boundsState);
+    console.log(boundsState);
+
+    try {
+      setLoading(true);
+      const res = await axios.get("/get-current-markers", { params });
+      setTaps(res.data.taps);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      console.log("error", e);
+    }
+  }
+
+  const filterChanged = async () => {
+    console.log(boundsState);
+    const data = { boundsState, filter: ["Refill Partner", "Cold", "Help Yourself", "wifi", "Rest pace"] };
+    try {
+      setLoading(true);
+      setFilters(["Refill Partner", "Cold", "Help Yourself", "wifi", "Rest pace"]);
+      const res = await axios.post("/set-filters", {}, { params: data });
+      setTaps(res.data.taps);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
       console.log("error", e);
     }
   }
@@ -76,7 +107,7 @@ export function App({ gmApiKey }) {
               {
                 topNav.map((el, i) =>
                   <li className="nav-item" key={i}>
-                    <a className="nav-link" href={el.href}>{ el.title }</a>
+                    <a className="nav-link" href={el.href}>{el.title}</a>
                   </li>
                 )
               }
@@ -93,7 +124,7 @@ export function App({ gmApiKey }) {
           <div className="overlay-content">
             <span className="closebtn" onClick={handleNav} >&times;</span>
             <div className="nav-container">
-              { topNav.map((el, i) => <a href={el.href} key={i}>{el.title}</a>) }
+              {topNav.map((el, i) => <a href={el.href} key={i}>{el.title}</a>)}
             </div>
           </div>
         </div>
@@ -103,11 +134,19 @@ export function App({ gmApiKey }) {
         <GoogleMapReact
           bootstrapURLKeys={{ key: gmApiKey }}
           defaultCenter={gmDefaultProps.center}
-          defaultZoom={gmDefaultProps.zoom}>
-          { !loading && taps.length ? taps.map((tap) =>
+          defaultZoom={gmDefaultProps.zoom}
+          yesIWantToUseGoogleMapApiInternals
+          onChange={({ bounds }) => boundsChanged(bounds)}>
+          {!loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
-          ) : null }
+          ) : loading && taps.length ? taps.map((tap) =>
+            <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
+          ) : null}
+          <button onClick={filterChanged}>
+            Test
+          </button>
         </GoogleMapReact>
+
       </div>
 
       <div className="container-lg">
@@ -126,30 +165,30 @@ export function App({ gmApiKey }) {
 
       <div className="footer">
         <div className="container-lg">
-        <footer>
-          <ul className="nav justify-content-center">
-            {
-              socialNav.map((el, i) =>
-                <li className="nav-item" key={i}>
-                  <a href={el.href} className="nav-link px-2 text-muted">
-                    <i className={`bi ${el.iconName}`} />
-                  </a>
-                </li>
-              )
-            }
-          </ul>
-          <ul className="nav justify-content-center">
-            {
-              footerNav.map((el, i) =>
-                <li className="nav-item" key={i}>
-                  <a href={el.href} className="nav-link px-2">
-                    { el.title }
-                  </a>
-                </li>
-              )
-            }
-          </ul>
-        </footer>
+          <footer>
+            <ul className="nav justify-content-center">
+              {
+                socialNav.map((el, i) =>
+                  <li className="nav-item" key={i}>
+                    <a href={el.href} className="nav-link px-2 text-muted">
+                      <i className={`bi ${el.iconName}`} />
+                    </a>
+                  </li>
+                )
+              }
+            </ul>
+            <ul className="nav justify-content-center">
+              {
+                footerNav.map((el, i) =>
+                  <li className="nav-item" key={i}>
+                    <a href={el.href} className="nav-link px-2">
+                      {el.title}
+                    </a>
+                  </li>
+                )
+              }
+            </ul>
+          </footer>
         </div>
       </div>
 
