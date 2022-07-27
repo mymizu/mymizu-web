@@ -235,7 +235,7 @@ function filterApply(text) {
             return buttonValue[key]
         });
         console.log(values);
-        getSetTaps.set(values);
+        // getSetTaps.set(values);
     });
     return ApplyButton;
 }

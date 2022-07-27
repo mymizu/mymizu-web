@@ -12,7 +12,6 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState(useTaps.get());
-  const [boundsState, setBoundsState] = useState({});
   const [filters, setFilters] = useState(false);
   const [mapReference, setMapReference] = useState(null);
   const [mapsReference, setMapsReference] = useState(null);
@@ -61,22 +60,6 @@ export function App({ gmApiKey }) {
     } catch (e) {
       setLoading(false);
       setInitialLoad(true);
-      console.log("error", e);
-    }
-  }
-
-  const boundsChanged = async (bounds) => {
-    setBoundsState([['c1', bounds.nw.lat], ['c2', bounds.nw.lng], ['c3', bounds.se.lat], ['c4', bounds.se.lng]]);
-    const params = new URLSearchParams(boundsState);
-    console.log(boundsState);
-
-    try {
-      setLoading(true);
-      const res = await axios.get("/get-current-markers", { params });
-      setTaps(res.data.taps);
-      setLoading(false);
-    } catch (e) {
-      setLoading(false);
       console.log("error", e);
     }
   }
@@ -134,7 +117,6 @@ export function App({ gmApiKey }) {
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
           yesIWantToUseGoogleMapApiInternals={true}
-          onChange={({ bounds }) => boundsChanged(bounds)}
           onGoogleApiLoaded={({ map, maps }) => {
             setMapReference(map);
             setMapsReference(maps);
