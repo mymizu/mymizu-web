@@ -77,7 +77,6 @@ app.post("/set-filters", async (req, res) => {
   }
   try {
     if(!currentPos || !req.query.filter) throw new Error("Missing elements");
-    console.log(currentPos, req.query.filter);
     const markers = await myMizuClient.get(
       "/api/taps/nearby",
       currentPos,

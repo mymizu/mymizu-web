@@ -1,16 +1,21 @@
 import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
+import { createFilter } from "./filter";
+import { getSetTaps } from "./useTaps"
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
+const useTaps = getSetTaps([]);
 
 export function App({ gmApiKey }) {
   const [navOpen, setNavOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
-  const [taps, setTaps] = useState([]);
+  const [taps, setTaps] = useState(useTaps.get());
   const [boundsState, setBoundsState] = useState({});
-  const [filters, setFilters] = useState({});
+  const [filters, setFilters] = useState(false);
+  const [mapReference, setMapReference] = useState(null);
+  const [mapsReference, setMapsReference] = useState(null);
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -50,7 +55,8 @@ export function App({ gmApiKey }) {
       setLoading(true);
       const res = await axios.get("/get-initial-markers");
       setInitialLoad(true);
-      setTaps(res.data.taps);
+      useTaps.set(res.data.taps)
+      setTaps(useTaps.get());
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -75,24 +81,16 @@ export function App({ gmApiKey }) {
     }
   }
 
-  const filterChanged = async () => {
-    console.log(boundsState);
-    const data = { boundsState, filter: ["Refill Partner", "Cold", "Help Yourself", "wifi", "Rest pace"] };
-    try {
-      setLoading(true);
-      setFilters(["Refill Partner", "Cold", "Help Yourself", "wifi", "Rest pace"]);
-      const res = await axios.post("/set-filters", {}, { params: data });
-      setTaps(res.data.taps);
-      setLoading(false);
-    } catch (e) {
-      setLoading(false);
-      console.log("error", e);
-    }
-  }
-
   useEffect(() => {
     if (!taps.length && !initialLoad) {
       getInitialTaps();
+    }
+    if (mapReference && mapsReference) {
+      if (!filters) {
+        createFilter(mapReference, mapsReference);
+        const opposite = !filters;
+        setFilters(opposite);
+      }
     }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
@@ -135,20 +133,20 @@ export function App({ gmApiKey }) {
           bootstrapURLKeys={{ key: gmApiKey }}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
-          yesIWantToUseGoogleMapApiInternals
-          onChange={({ bounds }) => boundsChanged(bounds)}>
+          yesIWantToUseGoogleMapApiInternals={true}
+          onChange={({ bounds }) => boundsChanged(bounds)}
+          onGoogleApiLoaded={({ map, maps }) => {
+            setMapReference(map);
+            setMapsReference(maps);
+          }}
+        >
           {!loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
           ) : null}
-          <button onClick={filterChanged}>
-            Test
-          </button>
         </GoogleMapReact>
-
       </div>
-
       <div className="container-lg">
         <div className="row home">
           <div className="col" id="forest">
