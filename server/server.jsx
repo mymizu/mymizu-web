@@ -76,10 +76,10 @@ app.post("/filters-params", async (req, res) => {
       categories: 4,
       geotags: 6141
     };
-    const result = await myMizuClient.get(
+    const result = await myMizuClient.post(
       "/api/taps/search",
-      test,
       {},
+      test,
     );
     console.log("Result: ", result);
     res.status(200).send("YES");
