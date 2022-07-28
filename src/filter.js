@@ -1,6 +1,6 @@
 // Change State hook of App to change the markers on the map
 
-import { getSetTaps } from "./useTaps"
+import axios from "axios";
 
 let buttonValue = {
     Distance: false,
@@ -21,7 +21,16 @@ let buttonValue = {
     Space: false,
 }
 
+let position = {};
+
 export function createFilter(map, maps) {
+    const bounds = map.getBounds();
+    position = {
+        c1: bounds.getNorthEast().lat(),
+        c2: bounds.getSouthWest().lng(),
+        c4: bounds.getSouthWest().lat(),
+        c3: bounds.getNorthEast().lng(),
+    }
     let clickBool = false;
     let control = document.createElement('div');
     const filterButtonUI = menuButtonUi();
@@ -69,7 +78,7 @@ function menuButtonUi() {
     imgButton.style.width = "24px";
     imgButton.style.marginTop = "7px";
     imgButton.style.marginLeft = "8px";
-    imgButton.src = "/public/images/parameters.png";
+    imgButton.src = "/public/images/Vector.png";
     divButton.appendChild(imgButton);
 
     return divButton;
@@ -229,13 +238,14 @@ function filterApply(text) {
     ApplyButton.style.top = "89%";
     ApplyButton.style.left = "38%";
 
-    ApplyButton.addEventListener("click", () => {
+    ApplyButton.addEventListener("click", async () => {
         const keys = Object.keys(buttonValue);
         const values = keys.filter(function (key) {
             return buttonValue[key]
         });
         console.log(values);
-        // getSetTaps.set(values);
+        const places = ['Cold', 'Rest Space'];
+        const test = await axios.post("/filters-params", {} ,{ params: {position, places}});
     });
     return ApplyButton;
 }

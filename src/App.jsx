@@ -2,16 +2,16 @@ import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { createFilter } from "./filter";
-import { getSetTaps } from "./useTaps"
+// import { getSetTaps } from "./useTaps"
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
-const useTaps = getSetTaps([]);
+// const useTaps = getSetTaps([]);
 
 export function App({ gmApiKey }) {
   const [navOpen, setNavOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
-  const [taps, setTaps] = useState(useTaps.get());
+  const [taps, setTaps] = useState([]);
   const [filters, setFilters] = useState(false);
   const [mapReference, setMapReference] = useState(null);
   const [mapsReference, setMapsReference] = useState(null);
@@ -52,10 +52,11 @@ export function App({ gmApiKey }) {
   const getInitialTaps = async () => {
     try {
       setLoading(true);
+
       const res = await axios.get("/get-initial-markers");
+
       setInitialLoad(true);
-      useTaps.set(res.data.taps)
-      setTaps(useTaps.get());
+      setTaps(res.data.taps);
       setLoading(false);
     } catch (e) {
       setLoading(false);
