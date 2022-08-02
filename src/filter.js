@@ -254,7 +254,7 @@ function filterApply(text) {
         let places = "";
         const keys = Object.keys(buttonValue);
         const values = keys.filter(function (key) {
-            return buttonValue[key]
+            return buttonValue[key];
         });
         const bounds = setMap.getBounds();
         position = {
@@ -270,8 +270,15 @@ function filterApply(text) {
                 else places += `, ${buttonTags[tags]}`;
             }
         }
-        const test = await axios.post("/filters-params", {}, { params: { position, places } });
-        setPlaces(test.data);
+        let { data } = await axios.post("/filters-params", {}, { params: { position, places } });
+        console.log(data.length);
+        if (values.includes('Staff')) {
+            data = data.filter((key) => key.refill_instruction && key.refill_instruction.includes('staff'));
+        } else if (values.includes('Yourself')) {
+            data = data.filter((key) => !key.refill_instruction || !key.refill_instruction.includes('staff'));
+        }
+        console.log(data);
+        setPlaces(data);
     });
     return ApplyButton;
 }
