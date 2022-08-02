@@ -2,10 +2,8 @@ import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { createFilter } from "./filter";
-// import { getSetTaps } from "./useTaps"
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
-// const useTaps = getSetTaps([]);
 
 export function App({ gmApiKey }) {
   const [navOpen, setNavOpen] = useState(false);
@@ -71,7 +69,7 @@ export function App({ gmApiKey }) {
     }
     if (mapReference && mapsReference) {
       if (!filters) {
-        createFilter(mapReference, mapsReference);
+        createFilter(mapReference, mapsReference, setTaps);
         const opposite = !filters;
         setFilters(opposite);
       }

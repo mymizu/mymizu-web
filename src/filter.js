@@ -32,9 +32,11 @@ const buttonTags = {
 
 
 let position = {};
+let setPlaces;
 
-export function createFilter(map, maps) {
+export function createFilter(map, maps, setTaps) {
     const bounds = map.getBounds();
+    setPlaces = setTaps;
     position = {
         c1: bounds.getNorthEast().lat(),
         c2: bounds.getSouthWest().lng(),
@@ -105,7 +107,7 @@ function filterBoxUi(clickBool, filterBoxDiv) {
     filterUI.style.marginTop = "30px";
     filterUI.style.marginLeft = "30px";
     filterUI.style.height = "480px";
-    filterUI.style.width = "350px";
+    filterUI.style.width = "300px";
     filterUI.style.visibility = "hidden";
 
 
@@ -156,7 +158,7 @@ function filterTitle() {
     return filterBoxTitle;
 }
 
-function filterParametersUi(filterUI) {
+function filterParametersUi(filterUI, setTaps) {
     filterCategory("Sort", ["By Distance", "By Rating", "By Name"], filterUI);
     filterCategory("Type of Refill Spot", ["Refill Partner", "Public", "Natural Spring"], filterUI);
     filterCategory("Type of Water", ["Cold", "Hot", "Filtered", "Tap"], filterUI);
@@ -254,7 +256,6 @@ function filterApply(text) {
     ApplyButton.style.marginLeft = "10%";
     ApplyButton.style.height = "32px";
     ApplyButton.style.paddingTop = "5px";
-
     ApplyButton.addEventListener("click", async () => {
         let places = "";
         const keys = Object.keys(buttonValue);
@@ -269,7 +270,7 @@ function filterApply(text) {
             }
         }
         const test = await axios.post("/filters-params", {} ,{ params: {position, places}});
-        console.log('Result: ', test.data)
+        setPlaces(test.data);
     });
     return ApplyButton;
 }
