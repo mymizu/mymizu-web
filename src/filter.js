@@ -21,6 +21,16 @@ let buttonValue = {
     Space: false,
 }
 
+const buttonTags = {
+    Filtered: 1,
+    Hot: 2,
+    Cold: 3,
+    WiFi: 4,
+    Accessible: 5,
+    Tap: 6,
+}
+
+
 let position = {};
 
 export function createFilter(map, maps) {
@@ -28,8 +38,8 @@ export function createFilter(map, maps) {
     position = {
         c1: bounds.getNorthEast().lat(),
         c2: bounds.getSouthWest().lng(),
-        c4: bounds.getSouthWest().lat(),
-        c3: bounds.getNorthEast().lng(),
+        c3: bounds.getSouthWest().lat(),
+        c4: bounds.getNorthEast().lng(),
     }
     let clickBool = false;
     let control = document.createElement('div');
@@ -246,13 +256,20 @@ function filterApply(text) {
     ApplyButton.style.paddingTop = "5px";
 
     ApplyButton.addEventListener("click", async () => {
+        let places = "";
         const keys = Object.keys(buttonValue);
         const values = keys.filter(function (key) {
             return buttonValue[key]
         });
-        console.log(values);
-        const places = ['Cold', 'Rest Space'];
+        console.log(position);
+        for(let tags of values) {
+            if(buttonTags.hasOwnProperty(tags)) {
+                if(places.length === 0) places += buttonTags[tags];
+                else places += `, ${buttonTags[tags]}`;
+            }
+        }
         const test = await axios.post("/filters-params", {} ,{ params: {position, places}});
+        console.log('Result: ', test.data)
     });
     return ApplyButton;
 }
