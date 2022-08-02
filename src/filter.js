@@ -98,6 +98,7 @@ function filterBoxUi(clickBool, filterBoxDiv) {
     filterUI.style.width = "350px";
     filterUI.style.visibility = "hidden";
 
+
     const topMenu = document.createElement("div");
     topMenu.style.display = "flex";
     topMenu.style.justifyContent = "center";
@@ -107,6 +108,8 @@ function filterBoxUi(clickBool, filterBoxDiv) {
     crossButton.src = "/public/images/cross.png";
     crossButton.style.height = "24px";
     crossButton.style.width = "24px";
+    crossButton.style.marginRight = "10px";
+    crossButton.style.marginTop = "5px";
 
     topMenu.appendChild(filterBoxTitle);
     topMenu.appendChild(crossButton);
@@ -132,12 +135,14 @@ function filterTitle() {
     const filterBoxTitle = document.createElement("div");
     filterBoxTitle.innerHTML = "Filters";
     filterBoxTitle.style.color = "rgb(25,25,25)";
-    filterBoxTitle.style.fontFamily = "Roboto,Arial,sans-serif";
-    filterBoxTitle.style.fontSize = "16px";
-    filterBoxTitle.style.lineHeight = "38px";
-    filterBoxTitle.style.paddingLeft = "50px";
+    filterBoxTitle.style.fontSize = "18px";
+    filterBoxTitle.style.lineHeight = "34px";
+    filterBoxTitle.style.paddingLeft = "75px";
     filterBoxTitle.style.paddingRight = "50px";
-    filterBoxTitle.style.textAlign = "center"
+    filterBoxTitle.style.textAlign = "center";
+    filterBoxTitle.style.paddingTop = "2px";
+    filterBoxTitle.style.flexGrow = 8;
+
     return filterBoxTitle;
 }
 
@@ -165,7 +170,7 @@ function filterText(text) {
     const filterText = document.createElement("div");
     filterText.innerHTML = text;
     filterText.style.color = "rgb(25,25,25)";
-    filterText.style.fontFamily = "IBM Plex Sans";
+    filterText.style.fontFamily = "Roboto,Arial,sans-serif";
     filterText.style.fontStyle = "normal";
     filterText.style.fontWeight = "700";
     filterText.style.fontSize = "16px";
@@ -177,7 +182,7 @@ function filterText(text) {
 function filterButtonRowUi(buttons) {
     const filterUI = document.createElement("div");
     filterUI.style.display = "flex";
-    filterUI.style.justifyContent = "center";
+    filterUI.style.flexWrap = "wrap";
     for (let button of buttons) {
         const fButton = filterButton(button);
         filterUI.appendChild(fButton);
@@ -194,16 +199,18 @@ function filterButton(text) {
     filterButton.style.background = "#F2F2F2";
     filterButton.style.color = "#333333";
     filterButton.style.borderRadius = "100px";
-    filterButton.style.width = "80px";
+    filterButton.style.flexBasis = "auto";
+    filterButton.style.flexShrink = 0;
+    filterButton.style.padding = "15px";
     filterButton.style.height = "32px";
-    filterButton.style.marginBottom = "20px";
+    filterButton.style.marginBottom = "10px";
     filterButton.style.marginTop = "6px";
     filterButton.style.marginLeft = "10px";
     filterButton.style.display = "flex";
     filterButton.style.flexDirection = "row";
     filterButton.style.justifyContent = "center";
     filterButton.style.alignItems = "center";
-    filterButton.style.fontFamily = "Futura PT";
+    filterButton.style.fontFamily = "Roboto,Arial,sans-serif";
 
     filterButton.addEventListener("click", () => {
         const words = text.split(' ');
@@ -229,14 +236,14 @@ function filterApply(text) {
     ApplyButton.style.borderRadius = "100px";
     ApplyButton.style.marginTop = "5px";
     ApplyButton.style.marginLeft = "10px";
-    ApplyButton.style.fontFamily = "Futura PT";
+    ApplyButton.style.fontFamily = "Roboto,Arial,sans-serif";
     ApplyButton.style.fontStyle = "normal";
+    ApplyButton.style.fontSize = "16px";
     ApplyButton.style.color = "#2F97D1";
-    ApplyButton.style.width = "100px";
+    ApplyButton.style.width = "80%";
+    ApplyButton.style.marginLeft = "10%";
     ApplyButton.style.height = "32px";
-    ApplyButton.style.position = "absolute";
-    ApplyButton.style.top = "89%";
-    ApplyButton.style.left = "38%";
+    ApplyButton.style.paddingTop = "5px";
 
     ApplyButton.addEventListener("click", async () => {
         const keys = Object.keys(buttonValue);
