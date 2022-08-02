@@ -31,18 +31,12 @@ const buttonTags = {
 }
 
 
-let position = {};
 let setPlaces;
+let setMap;
 
 export function createFilter(map, maps, setTaps) {
-    const bounds = map.getBounds();
+    setMap = map;
     setPlaces = setTaps;
-    position = {
-        c1: bounds.getNorthEast().lat(),
-        c2: bounds.getSouthWest().lng(),
-        c3: bounds.getSouthWest().lat(),
-        c4: bounds.getNorthEast().lng(),
-    }
     let clickBool = false;
     let control = document.createElement('div');
     const filterButtonUI = menuButtonUi();
@@ -262,14 +256,21 @@ function filterApply(text) {
         const values = keys.filter(function (key) {
             return buttonValue[key]
         });
+        const bounds = setMap.getBounds();
+        position = {
+            c1: bounds.getNorthEast().lat(),
+            c2: bounds.getSouthWest().lng(),
+            c3: bounds.getSouthWest().lat(),
+            c4: bounds.getNorthEast().lng(),
+        }
         console.log(position);
-        for(let tags of values) {
-            if(buttonTags.hasOwnProperty(tags)) {
-                if(places.length === 0) places += buttonTags[tags];
+        for (let tags of values) {
+            if (buttonTags.hasOwnProperty(tags)) {
+                if (places.length === 0) places += buttonTags[tags];
                 else places += `, ${buttonTags[tags]}`;
             }
         }
-        const test = await axios.post("/filters-params", {} ,{ params: {position, places}});
+        const test = await axios.post("/filters-params", {}, { params: { position, places } });
         setPlaces(test.data);
     });
     return ApplyButton;
