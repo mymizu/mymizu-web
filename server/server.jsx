@@ -76,15 +76,10 @@ app.post("/filters-params", async (req, res) => {
     var data = new FormData();
     data.append('tags', places);
     data.append('categories', '4');
-    data.append('geotags', '6141');
-    data.append('c1', '41.657678573914765');
-    data.append('c2', '127.55060578125');
-    data.append('c3', '29.17272950067319');
-    data.append('c4', '151.94025421875');
-    // data.append('c1', position.c1.toString());
-    // data.append('c2', position.c2.toString());
-    // data.append('c3', position.c3.toString());
-    // data.append('c4', position.c4.toString());
+    data.append('c1', position.c1.toString());
+    data.append('c2', position.c2.toString());
+    data.append('c3', position.c3.toString());
+    data.append('c4', position.c4.toString());
     const result = await myMizuClient.post(
       "/api/taps/search?api_key=56b13329-6163-4884-afc8-b6839cd3f618&l=en&v=1",
       data,
