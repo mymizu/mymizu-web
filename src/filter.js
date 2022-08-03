@@ -32,7 +32,7 @@ const buttonTags = {
 
 const buttonCategories = {
     Spring: 1,
-    Public: [2, 3],
+    Public: [0, 2, 3],
     Partner: 4
 }
 
