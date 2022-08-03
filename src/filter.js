@@ -30,6 +30,12 @@ const buttonTags = {
     Tap: 6,
 }
 
+const buttonCategories = {
+    Spring: 1,
+    Public: [2, 3],
+    Partner: 4
+}
+
 
 let setPlaces;
 let setMap;
@@ -252,10 +258,8 @@ function filterApply(text) {
     ApplyButton.style.paddingTop = "5px";
     ApplyButton.addEventListener("click", async () => {
         let places = "";
-        const keys = Object.keys(buttonValue);
-        const values = keys.filter(function (key) {
-            return buttonValue[key];
-        });
+        let categories = "";
+        const values = Object.keys(buttonValue).filter((key) => buttonValue[key]);
         const bounds = setMap.getBounds();
         position = {
             c1: bounds.getNorthEast().lat(),
@@ -265,12 +269,12 @@ function filterApply(text) {
         }
         console.log(position);
         for (let tags of values) {
-            if (buttonTags.hasOwnProperty(tags)) {
-                if (places.length === 0) places += buttonTags[tags];
-                else places += `, ${buttonTags[tags]}`;
-            }
+            if (buttonTags.hasOwnProperty(tags)) 
+                places += places.length === 0 ? buttonTags[tags] : `, ${buttonTags[tags]}`;
+            else if (buttonCategories.hasOwnProperty(tags)) 
+                categories += categories.length === 0 ? buttonCategories[tags] : `, ${buttonCategories[tags]}`;
         }
-        let { data } = await axios.post("/filters-params", {}, { params: { position, places } });
+        let { data } = await axios.post("/filters-params", {}, { params: { position, places, categories } });
         console.log(data.length);
         if (values.includes('Staff')) {
             data = data.filter((key) => key.refill_instruction && key.refill_instruction.includes('staff'));

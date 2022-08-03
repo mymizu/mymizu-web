@@ -48,11 +48,12 @@ app.get("/get-initial-markers", async (req, res) => {
 
 app.post("/filters-params", async (req, res) => {
   try {
-    let { position, places } = req.query;
+    let { position, places, categories } = req.query;
     position = JSON.parse(position);
     var data = new FormData();
     data.append('tags', places);
-    data.append('categories', '4');
+    data.append('per_page', '100');
+    data.append('categories', categories);
     data.append('c1', position.c1.toString());
     data.append('c2', position.c2.toString());
     data.append('c3', position.c3.toString());
