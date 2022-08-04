@@ -3,21 +3,21 @@
 import axios from "axios";
 
 let buttonValue = {
+    Spring: false,
+    Public: false,
+    Partner: false,
+    Filtered: false,
+    Hot: false,
+    Cold: false,
+    WiFi: false,
+    Accessible: false,
+    Tap: false,
     Beauty: false,
     Restaurant: false,
     Accommodation: false,
     Shop: false,
-    Partner: false,
-    Public: false,
-    Spring: false,
-    Cold: false,
-    Hot: false,
-    Filtered: false,
-    Tap: false,
     Yourself: false,
     Staff: false,
-    WiFi: false,
-    Accessible: false,
 }
 
 const buttonTags = {
@@ -278,6 +278,7 @@ function filterApply(text) {
             else if (buttonCategories.hasOwnProperty(tags)) 
                 categories += categories.length === 0 ? buttonCategories[tags] : `, ${buttonCategories[tags]}`;
         }
+        console.log(places);
         let { data } = await axios.post("/filters-params", {}, { params: { position, places, categories } });
         console.log(data.length);
         if (values.includes('Staff')) {
