@@ -42,34 +42,30 @@ const buttonCategories = {
 
 let setPlaces;
 let setMap;
+let setMaps;
+let clickBool = false;
 
 export function createFilter(map, maps, setTaps) {
     setMap = map;
+    setMaps = maps;
     setPlaces = setTaps;
-    let clickBool = false;
+
     let control = document.createElement('div');
     const filterButtonUI = menuButtonUi();
     control.appendChild(filterButtonUI);
-    map.controls[maps.ControlPosition.RIGHT_BOTTOM].push(control);
-
-
+    setMap.controls[maps.ControlPosition.RIGHT_BOTTOM].push(control);
     const filterBoxDiv = document.createElement("div");
-    filterBoxDiv.style.visibility = "hidden";
-
-    const filterUI = filterBoxUi(clickBool, filterBoxDiv);
+    const filterUI = filterBoxUi(filterBoxDiv);
     filterParametersUi(filterUI);
 
     filterBoxDiv.appendChild(filterUI);
-    map.controls[maps.ControlPosition.TOP_LEFT].push(filterBoxDiv);
 
     filterButtonUI.addEventListener("click", () => {
         if (!clickBool) {
-            filterBoxDiv.style.visibility = "visible";
-            filterUI.style.visibility = "visible";
+            setMap.controls[setMaps.ControlPosition.TOP_LEFT].push(filterBoxDiv);
             clickBool = !clickBool;
         } else {
-            filterBoxDiv.style.visibility = "hidden";
-            filterUI.style.visibility = "hidden";
+            setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
             clickBool = !clickBool;
         }
     });
@@ -99,7 +95,7 @@ function menuButtonUi() {
     return divButton;
 }
 
-function filterBoxUi(clickBool, filterBoxDiv) {
+function filterBoxUi(filterBoxDiv) {
     const filterUI = document.createElement("div");
     filterUI.title = "Filter";
     filterUI.style.backgroundColor = "#fff";
@@ -111,7 +107,6 @@ function filterBoxUi(clickBool, filterBoxDiv) {
     filterUI.style.marginLeft = "30px";
     filterUI.style.height = "480px";
     filterUI.style.width = "300px";
-    filterUI.style.visibility = "hidden";
 
 
     const topMenu = document.createElement("div");
@@ -131,13 +126,12 @@ function filterBoxUi(clickBool, filterBoxDiv) {
     filterUI.appendChild(topMenu);
 
     crossButton.addEventListener("click", () => {
+        console.log(clickBool);
         if (!clickBool) {
-            filterBoxDiv.style.visibility = "visible";
-            filterUI.style.visibility = "visible";
+            setMap.controls[setMaps.ControlPosition.TOP_LEFT].push(filterBoxDiv);
             clickBool = !clickBool;
         } else {
-            filterBoxDiv.style.visibility = "hidden";
-            filterUI.style.visibility = "hidden";
+            setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
             clickBool = !clickBool;
         }
     });
@@ -272,10 +266,10 @@ function filterApply(text) {
         }
         console.log(position);
         for (let tags of values) {
-            if(tags.includes('/')) tags= tags.split('/')[1];
-            if (buttonTags.hasOwnProperty(tags)) 
+            if (tags.includes('/')) tags = tags.split('/')[1];
+            if (buttonTags.hasOwnProperty(tags))
                 places += places.length === 0 ? buttonTags[tags] : `, ${buttonTags[tags]}`;
-            else if (buttonCategories.hasOwnProperty(tags)) 
+            else if (buttonCategories.hasOwnProperty(tags))
                 categories += categories.length === 0 ? buttonCategories[tags] : `, ${buttonCategories[tags]}`;
         }
         console.log(places);
@@ -288,6 +282,8 @@ function filterApply(text) {
         }
         console.log(data);
         setPlaces(data);
+        setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
+        clickBool = !clickBool;
     });
     return ApplyButton;
 }
