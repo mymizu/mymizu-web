@@ -1,11 +1,12 @@
-// Change State hook of App to change the markers on the map
+// Add Place Filter
 
 import axios from "axios";
 
 let buttonValue = {
-    Distance: false,
-    Rating: false,
-    Name: false,
+    Beauty: false,
+    Restaurant: false,
+    Accommodation: false,
+    Shop: false,
     Partner: false,
     Public: false,
     Spring: false,
@@ -16,9 +17,7 @@ let buttonValue = {
     Yourself: false,
     Staff: false,
     WiFi: false,
-    Toilet: false,
     Accessible: false,
-    Space: false,
 }
 
 const buttonTags = {
@@ -28,6 +27,10 @@ const buttonTags = {
     WiFi: 4,
     Accessible: 5,
     Tap: 6,
+    Beauty: 7,
+    Restaurant: 8,
+    Accommodation: 9,
+    Shop: 10,
 }
 
 const buttonCategories = {
@@ -158,12 +161,12 @@ function filterTitle() {
     return filterBoxTitle;
 }
 
-function filterParametersUi(filterUI, setTaps) {
-    filterCategory("Sort", ["By Distance", "By Rating", "By Name"], filterUI);
+function filterParametersUi(filterUI) {
     filterCategory("Type of Refill Spot", ["Refill Partner", "Public", "Natural Spring"], filterUI);
     filterCategory("Type of Water", ["Cold", "Hot", "Filtered", "Tap"], filterUI);
     filterCategory("How to Refill", ["Help Yourself", "Ask Staff"], filterUI);
-    filterCategory("Other", ["WiFi", "Toilet", "Wheel-Chair Accessible", "Rest Space"], filterUI);
+    filterCategory("Other", ["WiFi", "Wheel-Chair Accessible"], filterUI);
+    filterCategory("Business Type", ["Health/Beauty", "Cafe/Restaurant", "Hotel/Accommodation", "Store/Shop"], filterUI);
 
     const ApplyButton = filterApply("Apply");
     filterUI.appendChild(ApplyButton);
@@ -269,6 +272,7 @@ function filterApply(text) {
         }
         console.log(position);
         for (let tags of values) {
+            if(tags.includes('/')) tags= tags.split('/')[1];
             if (buttonTags.hasOwnProperty(tags)) 
                 places += places.length === 0 ? buttonTags[tags] : `, ${buttonTags[tags]}`;
             else if (buttonCategories.hasOwnProperty(tags)) 
