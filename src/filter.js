@@ -61,14 +61,16 @@ export function createFilter(map, maps, setTaps) {
     filterBoxDiv.appendChild(filterUI);
 
     filterButtonUI.addEventListener("click", () => {
-        if (!clickBool) {
-            setMap.controls[setMaps.ControlPosition.TOP_LEFT].push(filterBoxDiv);
-            clickBool = !clickBool;
-        } else {
-            setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
-            clickBool = !clickBool;
-        }
+        filteringMenuAction(filterBoxDiv)
     });
+
+    // Update map when dragged
+    // setMaps.event.addListener(map, 'dragend', async () => {
+    //     await updatePlaces();
+    // });
+    // setMaps.event.addListener(map, 'zoom_changed', async () => {
+    //     await updatePlaces();
+    // });
 }
 
 function menuButtonUi() {
@@ -126,14 +128,7 @@ function filterBoxUi(filterBoxDiv) {
     filterUI.appendChild(topMenu);
 
     crossButton.addEventListener("click", () => {
-        console.log(clickBool);
-        if (!clickBool) {
-            setMap.controls[setMaps.ControlPosition.TOP_LEFT].push(filterBoxDiv);
-            clickBool = !clickBool;
-        } else {
-            setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
-            clickBool = !clickBool;
-        }
+        filteringMenuAction(filterBoxDiv);
     });
     return filterUI;
 }
@@ -235,7 +230,6 @@ function filterButton(text) {
     return filterButton;
 }
 
-
 function filterApply(text) {
     const ApplyButton = document.createElement("div");
     ApplyButton.innerHTML = text;
@@ -254,36 +248,47 @@ function filterApply(text) {
     ApplyButton.style.height = "32px";
     ApplyButton.style.paddingTop = "5px";
     ApplyButton.addEventListener("click", async () => {
-        let places = "";
-        let categories = "";
-        const values = Object.keys(buttonValue).filter((key) => buttonValue[key]);
-        const bounds = setMap.getBounds();
-        position = {
-            c1: bounds.getNorthEast().lat(),
-            c2: bounds.getSouthWest().lng(),
-            c3: bounds.getSouthWest().lat(),
-            c4: bounds.getNorthEast().lng(),
-        }
-        console.log(position);
-        for (let tags of values) {
-            if (tags.includes('/')) tags = tags.split('/')[1];
-            if (buttonTags.hasOwnProperty(tags))
-                places += places.length === 0 ? buttonTags[tags] : `, ${buttonTags[tags]}`;
-            else if (buttonCategories.hasOwnProperty(tags))
-                categories += categories.length === 0 ? buttonCategories[tags] : `, ${buttonCategories[tags]}`;
-        }
-        console.log(places);
-        let { data } = await axios.post("/filters-params", {}, { params: { position, places, categories } });
-        console.log(data.length);
-        if (values.includes('Staff')) {
-            data = data.filter((key) => key.refill_instruction && key.refill_instruction.includes('staff'));
-        } else if (values.includes('Yourself')) {
-            data = data.filter((key) => !key.refill_instruction || !key.refill_instruction.includes('staff'));
-        }
-        console.log(data);
-        setPlaces(data);
+        await updatePlaces();
         setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
         clickBool = !clickBool;
     });
     return ApplyButton;
+}
+
+function filteringMenuAction(filterBoxDiv) {
+    if (!clickBool) {
+        setMap.controls[setMaps.ControlPosition.TOP_LEFT].push(filterBoxDiv);
+        clickBool = !clickBool;
+    } else {
+        setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
+        clickBool = !clickBool;
+    }
+}
+
+async function updatePlaces() {
+    let places = "";
+    let categories = "";
+    const values = Object.keys(buttonValue).filter((key) => buttonValue[key]);
+    const bounds = setMap.getBounds();
+    position = {
+        c1: bounds.getNorthEast().lat(),
+        c2: bounds.getSouthWest().lng(),
+        c3: bounds.getSouthWest().lat(),
+        c4: bounds.getNorthEast().lng(),
+    }
+    for (let tags of values) {
+        if (tags.includes('/')) tags = tags.split('/')[1];
+        if (buttonTags.hasOwnProperty(tags))
+            places += places.length === 0 ? buttonTags[tags] : `, ${buttonTags[tags]}`;
+        else if (buttonCategories.hasOwnProperty(tags))
+            categories += categories.length === 0 ? buttonCategories[tags] : `, ${buttonCategories[tags]}`;
+    }
+    let { data } = await axios.post("/filters-params", {}, { params: { position, places, categories } });
+    console.log(data);
+    if (values.includes('Staff')) {
+        data = data.filter((key) => key.refill_instruction && key.refill_instruction.includes('staff'));
+    } else if (values.includes('Yourself')) {
+        data = data.filter((key) => !key.refill_instruction || !key.refill_instruction.includes('staff'));
+    }
+    setPlaces(data);
 }
