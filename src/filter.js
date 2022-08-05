@@ -67,16 +67,17 @@ export function createFilter(map, maps, setTaps) {
 
     // Update map when dragged
     const updateBoxDiv = document.createElement("div");
+    updateBoxDiv.style.cursor = "pointer";
     const updateUI = updateBoxUI();
     updateBoxDiv.appendChild(updateUI);
     setMaps.event.addListener(map, 'dragend', async () => {
-        if(!updateBool) {
+        if (!updateBool) {
             setMap.controls[setMaps.ControlPosition.TOP_CENTER].push(updateBoxDiv);
             updateBool = !updateBool;
         }
     });
     setMaps.event.addListener(map, 'zoom_changed', async () => {
-        if(!updateBool) {
+        if (!updateBool) {
             setMap.controls[setMaps.ControlPosition.TOP_CENTER].push(updateBoxDiv);
             updateBool = !updateBool;
         }
@@ -164,8 +165,8 @@ function filterParametersUi(filterUI) {
     filterCategory("Type of Refill Spot", ["Refill Partner", "Public", "Natural Spring"], filterUI);
     filterCategory("Type of Water", ["Cold", "Hot", "Filtered", "Tap"], filterUI);
     filterCategory("How to Refill", ["Help Yourself", "Ask Staff"], filterUI);
-    filterCategory("Other", ["WiFi", "Wheel-Chair Accessible"], filterUI);
     filterCategory("Business Type", ["Health/Beauty", "Cafe/Restaurant", "Hotel/Accommodation", "Store/Shop"], filterUI);
+    filterCategory("Other", ["WiFi", "Wheel-Chair Accessible"], filterUI);
 
     const ApplyButton = filterApply("Apply");
     filterUI.appendChild(ApplyButton);
@@ -262,6 +263,14 @@ function filterApply(text) {
         setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
         clickBool = !clickBool;
     });
+    ApplyButton.addEventListener("mouseover", () => {
+        ApplyButton.style.backgroundColor = "#2F97D1";
+        ApplyButton.style.color = "#FFFFFF";
+    });
+    ApplyButton.addEventListener("mouseout", () => {
+        ApplyButton.style.backgroundColor = "#FFFFFF";
+        ApplyButton.style.color = "#2F97D1";
+    });
     return ApplyButton;
 }
 
@@ -323,6 +332,14 @@ function updateBoxUI() {
         setMap.controls[setMaps.ControlPosition.TOP_CENTER].clear();
         updateBool = !updateBool;
         await updatePlaces();
+    });
+    UpdaterButton.addEventListener("mouseover", () => {
+        UpdaterButton.style.backgroundColor = "#2F97D1";
+        UpdaterButton.style.color = "#FFFFFF";
+    });
+    UpdaterButton.addEventListener("mouseout", () => {
+        UpdaterButton.style.backgroundColor = "#FFFFFF";
+        UpdaterButton.style.color = "#2F97D1";
     });
     return UpdaterButton;
 }
