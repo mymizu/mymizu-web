@@ -44,6 +44,7 @@ let setPlaces;
 let setMap;
 let setMaps;
 let clickBool = false;
+// let updateBool = false;
 
 export function createFilter(map, maps, setTaps) {
     setMap = map;
@@ -65,11 +66,20 @@ export function createFilter(map, maps, setTaps) {
     });
 
     // Update map when dragged
+    // const updateBoxDiv = document.createElement("div");
+    // const updateUI = updateBoxUI();
+    // updateBoxDiv.appendChild(updateUI);
     // setMaps.event.addListener(map, 'dragend', async () => {
-    //     await updatePlaces();
+    //     if(!updateBool) {
+    //         setMap.controls[setMaps.ControlPosition.TOP_CENTER].push(updateBoxDiv);
+    //         updateBool = !updateBool;
+    //     }
     // });
     // setMaps.event.addListener(map, 'zoom_changed', async () => {
-    //     await updatePlaces();
+    //     if(!updateBool) {
+    //         setMap.controls[setMaps.ControlPosition.TOP_CENTER].push(updateBoxDiv);
+    //         updateBool = !updateBool;
+    //     }
     // });
 }
 
@@ -292,3 +302,27 @@ async function updatePlaces() {
     }
     setPlaces(data);
 }
+
+// function updateBoxUI() {
+//     const UpdaterButton = document.createElement("div");
+//     UpdaterButton.innerHTML = "Search in this area";
+//     UpdaterButton.style.textAlign = "center";
+//     UpdaterButton.style.backgroundColor = "#FFFFFF";
+//     UpdaterButton.style.border = "1px solid #77CCFF";
+//     UpdaterButton.style.borderRadius = "100px";
+//     UpdaterButton.style.marginTop = "10px";
+//     UpdaterButton.style.fontFamily = "Roboto,Arial,sans-serif";
+//     UpdaterButton.style.fontStyle = "normal";
+//     UpdaterButton.style.fontSize = "16px";
+//     UpdaterButton.style.color = "#2F97D1";
+//     UpdaterButton.style.height = "32px";
+//     UpdaterButton.style.width = "150px";
+//     UpdaterButton.style.paddingTop = "5px";
+
+//     UpdaterButton.addEventListener("click", async () => {
+//         setMap.controls[setMaps.ControlPosition.TOP_CENTER].clear();
+//         updateBool = !updateBool;
+//         await updatePlaces();
+//     });
+//     return UpdaterButton;
+// }
