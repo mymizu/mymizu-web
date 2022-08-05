@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
+import { createFilter } from "./filter";
 
 const Marker = () => <div className="marker"><img className="pin" src="/public/images/map-pin.svg" /></div>;
 
@@ -9,6 +10,9 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
+  const [filters, setFilters] = useState(false);
+  const [mapReference, setMapReference] = useState(null);
+  const [mapsReference, setMapsReference] = useState(null);
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -63,6 +67,13 @@ export function App({ gmApiKey }) {
     if (!taps.length && !initialLoad) {
       getInitialTaps();
     }
+    if (mapReference && mapsReference) {
+      if (!filters) {
+        createFilter(mapReference, mapsReference, setTaps);
+        const opposite = !filters;
+        setFilters(opposite);
+      }
+    }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
 
   return (
@@ -76,7 +87,7 @@ export function App({ gmApiKey }) {
               {
                 topNav.map((el, i) =>
                   <li className="nav-item" key={i}>
-                    <a className="nav-link" href={el.href}>{ el.title }</a>
+                    <a className="nav-link" href={el.href}>{el.title}</a>
                   </li>
                 )
               }
@@ -93,7 +104,7 @@ export function App({ gmApiKey }) {
           <div className="overlay-content">
             <span className="closebtn" onClick={handleNav} >&times;</span>
             <div className="nav-container">
-              { topNav.map((el, i) => <a href={el.href} key={i}>{el.title}</a>) }
+              {topNav.map((el, i) => <a href={el.href} key={i}>{el.title}</a>)}
             </div>
           </div>
         </div>
@@ -103,13 +114,20 @@ export function App({ gmApiKey }) {
         <GoogleMapReact
           bootstrapURLKeys={{ key: gmApiKey }}
           defaultCenter={gmDefaultProps.center}
-          defaultZoom={gmDefaultProps.zoom}>
-          { !loading && taps.length ? taps.map((tap) =>
+          defaultZoom={gmDefaultProps.zoom}
+          yesIWantToUseGoogleMapApiInternals={true}
+          onGoogleApiLoaded={({ map, maps }) => {
+            setMapReference(map);
+            setMapsReference(maps);
+          }}
+        >
+          {!loading && taps.length ? taps.map((tap) =>
             <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
-          ) : null }
+          ) : loading && taps.length ? taps.map((tap) =>
+            <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
+          ) : null}
         </GoogleMapReact>
       </div>
-
       <div className="container-lg">
         <div className="row home">
           <div className="col" id="forest">
@@ -126,30 +144,30 @@ export function App({ gmApiKey }) {
 
       <div className="footer">
         <div className="container-lg">
-        <footer>
-          <ul className="nav justify-content-center">
-            {
-              socialNav.map((el, i) =>
-                <li className="nav-item" key={i}>
-                  <a href={el.href} className="nav-link px-2 text-muted">
-                    <i className={`bi ${el.iconName}`} />
-                  </a>
-                </li>
-              )
-            }
-          </ul>
-          <ul className="nav justify-content-center">
-            {
-              footerNav.map((el, i) =>
-                <li className="nav-item" key={i}>
-                  <a href={el.href} className="nav-link px-2">
-                    { el.title }
-                  </a>
-                </li>
-              )
-            }
-          </ul>
-        </footer>
+          <footer>
+            <ul className="nav justify-content-center">
+              {
+                socialNav.map((el, i) =>
+                  <li className="nav-item" key={i}>
+                    <a href={el.href} className="nav-link px-2 text-muted">
+                      <i className={`bi ${el.iconName}`} />
+                    </a>
+                  </li>
+                )
+              }
+            </ul>
+            <ul className="nav justify-content-center">
+              {
+                footerNav.map((el, i) =>
+                  <li className="nav-item" key={i}>
+                    <a href={el.href} className="nav-link px-2">
+                      {el.title}
+                    </a>
+                  </li>
+                )
+              }
+            </ul>
+          </footer>
         </div>
       </div>
 

@@ -3,6 +3,7 @@ import fs from "fs";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import express from "express";
+import FormData from 'form-data';
 
 import config from "./config"
 import { App } from "../src/App";
@@ -44,6 +45,38 @@ app.get("/get-initial-markers", async (req, res) => {
     });
   }
 });
+
+app.post("/filters-params", async (req, res) => {
+  try {
+    let { position, places, categories } = req.query;
+    position = JSON.parse(position);
+    var data = new FormData();
+    data.append('tags', places);
+    data.append('per_page', '100');
+    data.append('categories', categories);
+    data.append('c1', position.c1.toString());
+    data.append('c2', position.c2.toString());
+    data.append('c3', position.c3.toString());
+    data.append('c4', position.c4.toString());
+    const result = await myMizuClient.post(
+      `/api/taps/search?api_key=${config.apiKey}&l=en&v=1`,
+      data,
+      {
+        headers: {
+          'Authorization': 'Bearer 80687679-180a-420d-9143-33c612d2f971',
+          ...data.getHeaders()
+        }
+      },
+    );
+    res.status(200).send(result.data);
+  } catch (e) {
+    res.status(400).json({
+      message: "Unable to fetch updated markers",
+      error: e,
+    });
+  }
+});
+
 
 app.get("/", (req, res) => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
