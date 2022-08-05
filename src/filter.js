@@ -261,6 +261,8 @@ function filterApply(text) {
     ApplyButton.addEventListener("click", async () => {
         await updatePlaces();
         setMap.controls[setMaps.ControlPosition.TOP_LEFT].clear();
+        setMap.controls[setMaps.ControlPosition.TOP_CENTER].clear();
+        updateBool = false;
         clickBool = !clickBool;
     });
     ApplyButton.addEventListener("mouseover", () => {
