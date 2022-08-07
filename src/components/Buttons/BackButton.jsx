@@ -3,7 +3,7 @@ import React from "react";
 const BackButton = ({ onClick, direction, className }) => {
   return (
     <button className={className} onClick={onClick}>
-      <img id="back" src="/public/images/modal-back-arrow.svg" alt=""  />
+      <img id="back" src="/public/images/close-button.svg" alt=""  />
     </button>
   );
 };
