@@ -228,7 +228,12 @@ export function App({ gmApiKey }) {
 
         <div style={{ height: "70vh", width: "100%" }}>
           <GoogleMapReact
-            bootstrapURLKeys={{ key: gmApiKey }}
+            bootstrapURLKeys={{
+              key: gmApiKey,
+              language: locale,
+              region: locale,
+              libraries: ["places"],
+            }}
             defaultCenter={gmDefaultProps.center}
             defaultZoom={gmDefaultProps.zoom}
           >
