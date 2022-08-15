@@ -4,23 +4,19 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 import express from "express";
 
-import config from "./config"
+import config from "./config";
 import { App } from "../src/App";
-import { myMizuClient } from "./myMizuClient"
+import { myMizuClient } from "./myMizuClient";
 
 const PORT = process.env.PORT || 3000;
 const gmapApiKey = config.gmApiKey;
 const app = express();
 
 app.get("/bundle.js", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../dist/bundle.js")
-  );
+  res.sendFile(path.join(__dirname, "../dist/bundle.js"));
 });
 
-app.use("/public", express.static(
-  path.join(__dirname, "../public")
-));
+app.use("/public", express.static(path.join(__dirname, "../public")));
 
 app.get("/get-initial-markers", async (req, res) => {
   const initialPos = {
@@ -28,13 +24,10 @@ app.get("/get-initial-markers", async (req, res) => {
     c2: 39.73655447363853,
     c3: 32.64245244856602,
     c4: 150.75432142615318,
-  }
+  };
 
   try {
-    const markers = await myMizuClient.get(
-      "/api/taps/nearby",
-      initialPos,
-    );
+    const markers = await myMizuClient.get("/api/taps/nearby", initialPos);
 
     res.status(200).send(markers);
   } catch (e) {
@@ -42,6 +35,25 @@ app.get("/get-initial-markers", async (req, res) => {
       message: "Unable to fetch initial markers",
       error: e,
     });
+  }
+});
+
+app.get("/get-marker-moving-map?", async (req, res) => {
+  try {
+    const { c1, c2, c3, c4 } = req.query;
+
+    const pos = {
+      c1,
+      c2,
+      c3,
+      c4,
+    };
+
+    const markers = await myMizuClient.get("/api/taps/nearby", pos);
+
+    res.status(200).send(markers);
+  } catch (e) {
+    console.log(e);
   }
 });
 
@@ -61,7 +73,9 @@ app.get("/", (req, res) => {
         '<div id="root"></div>',
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
-        <div id="root">${ReactDOMServer.renderToString(<App gmApiKey={gmapApiKey} />)}</div>
+        <div id="root">${ReactDOMServer.renderToString(
+          <App gmApiKey={gmapApiKey} />
+        )}</div>
         `
       )
     );
