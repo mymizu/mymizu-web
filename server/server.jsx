@@ -4,23 +4,19 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 import express from "express";
 
-import config from "./config"
+import config from "./config";
 import { App } from "../src/App";
-import { myMizuClient } from "./myMizuClient"
+import { myMizuClient } from "./myMizuClient";
 
 const PORT = process.env.PORT || 3000;
 const gmapApiKey = config.gmApiKey;
 const app = express();
 
 app.get("/bundle.js", (req, res) => {
-  res.sendFile(
-    path.join(__dirname, "../dist/bundle.js")
-  );
+  res.sendFile(path.join(__dirname, "../dist/bundle.js"));
 });
 
-app.use("/public", express.static(
-  path.join(__dirname, "../public")
-));
+app.use("/public", express.static(path.join(__dirname, "../public")));
 
 app.get("/get-initial-markers", async (req, res) => {
   const initialPos = {
@@ -28,13 +24,10 @@ app.get("/get-initial-markers", async (req, res) => {
     c2: 39.73655447363853,
     c3: 32.64245244856602,
     c4: 150.75432142615318,
-  }
+  };
 
   try {
-    const markers = await myMizuClient.get(
-      "/api/taps/nearby",
-      initialPos,
-    );
+    const markers = await myMizuClient.get("/api/taps/nearby", initialPos);
 
     res.status(200).send(markers);
   } catch (e) {
@@ -43,6 +36,43 @@ app.get("/get-initial-markers", async (req, res) => {
       error: e,
     });
   }
+});
+
+app.get("/get-refill-spot/:slug", async (req, res) => {
+  try {
+    const info = await myMizuClient.get(`/api/taps/${req.params.slug}`);
+    res.status(200).send(info);
+  } catch (e) {
+    res.status(400).json({
+      message: "Unable to fetch refill spot",
+      error: e,
+    });
+  }
+});
+
+app.get("/refill_spots/:slug", (req, res) => {
+  fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("An error occurred");
+    }
+
+    // @NOTE:
+    // You can inject SEO headers to the <head> tag as well
+    return res.send(
+      // @TODO:
+      // You can turn this into a function on a different file
+      data.replace(
+        '<div id="root"></div>',
+        `
+        <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
+        <div id="root">${ReactDOMServer.renderToString(
+          <App gmApiKey={gmapApiKey} />
+        )}</div>
+        `
+      )
+    );
+  });
 });
 
 app.get("/", (req, res) => {
@@ -61,7 +91,9 @@ app.get("/", (req, res) => {
         '<div id="root"></div>',
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
-        <div id="root">${ReactDOMServer.renderToString(<App gmApiKey={gmapApiKey} />)}</div>
+        <div id="root">${ReactDOMServer.renderToString(
+          <App gmApiKey={gmapApiKey} />
+        )}</div>
         `
       )
     );
