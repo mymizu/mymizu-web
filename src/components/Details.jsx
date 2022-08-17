@@ -32,13 +32,16 @@ export const Details = ({ data }) => {
       )}
       {data.address && (
         <div className="detail-section">
+          <img src="/public/images/marker.svg" alt="" />
           <div>Address: {data.address}</div>
         </div>
       )}
       <div className="detail-section">
+        <img src="/public/images/info.svg" alt="" />
         <div>Report/Suggest change to details</div>
       </div>
       <div className="detail-section">
+        <img src="/public/images/pencil.svg" alt="" />
         <div>Feedback: {data.description.feedback}</div>
       </div>
     </div>
