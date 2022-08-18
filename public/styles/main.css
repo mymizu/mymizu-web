@@ -193,12 +193,23 @@ footer .nav-link i {
   border-bottom: 0.5px solid #2F97D1;
   padding: 1rem 0;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  width: 100%;
+  position: relative;
 }
 
 .detail-section img {
   width: 25px;
   margin-right: 1rem;
+}
+
+.detail-section .fontawesome-icon {
+  width: 21px;
+}
+
+.detail-section div {
+  width: calc(100% - 50px);
 }
 
 .carousel {
