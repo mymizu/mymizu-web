@@ -68,7 +68,6 @@ export function App({ gmApiKey }) {
   const getTapsWhenMapsMoved = async (value) => {
     try {
       if (initialLoad) {
-        console.log(value);
         const { nw, se } = value;
 
         const res = await axios.get(
