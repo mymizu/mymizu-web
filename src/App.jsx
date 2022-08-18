@@ -123,19 +123,21 @@ export function App({ gmApiKey }) {
 
   useEffect(() => {
     const language = window.navigator.userLanguage || window.navigator.language;
+    const userLanguage = localStorage.getItem(LANG_PREF_KEY);
 
     // Check if 'en' or 'ja' sub-strings are in the default's language: should handle
     // particular cases such as en-GB, en-US, etc.
 
-    switch (language.includes) {
-      case "en":
+    if (userLanguage) {
+      setLocale(userLanguage);
+    } else {
+      if (language.includes("en")) {
         setLocale("en");
-        break;
-      case "ja":
+      } else if (language.includes("ja")) {
         setLocale("ja");
-        break;
-      default:
+      } else {
         setLocale(i18nConfig.defaultLocale);
+      }
     }
   }, []);
 
