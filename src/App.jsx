@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import GoogleMapReact from "google-map-react";
+import debounce from "lodash.debounce";
 import axios from "axios";
 
 const Marker = () => (
@@ -13,6 +14,7 @@ export function App({ gmApiKey }) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
+  const [coordinate, setCoordinate] = useState({});
 
   const handleNav = () => {
     setNavOpen(!navOpen);
@@ -66,7 +68,7 @@ export function App({ gmApiKey }) {
   const getTapsWhenMapsMoved = async (value) => {
     try {
       if (initialLoad) {
-        const { nw, se } = value.bounds;
+        const { nw, se } = value;
 
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
@@ -96,11 +98,21 @@ export function App({ gmApiKey }) {
     }
   };
 
+  const handleDebounce = useMemo(() => {
+    return debounce((value) => setCoordinate(value.bounds), 500);
+  }, []);
+
   useEffect(() => {
     if (!taps.length && !initialLoad) {
       getInitialTaps();
     }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
+
+  useEffect(() => {
+    if (Object.keys(coordinate).length > 0) {
+      getTapsWhenMapsMoved(coordinate);
+    }
+  }, [coordinate]);
 
   return (
     <div>
@@ -168,7 +180,7 @@ export function App({ gmApiKey }) {
       <div style={{ height: "70vh", width: "100%" }}>
         <GoogleMapReact
           bootstrapURLKeys={{ key: gmApiKey }}
-          onChange={(value) => getTapsWhenMapsMoved(value)}
+          onChange={handleDebounce}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
         >
