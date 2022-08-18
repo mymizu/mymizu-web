@@ -68,6 +68,7 @@ export function App({ gmApiKey }) {
   const getTapsWhenMapsMoved = async (value) => {
     try {
       if (initialLoad) {
+        console.log(value);
         const { nw, se } = value;
 
         const res = await axios.get(
@@ -99,7 +100,7 @@ export function App({ gmApiKey }) {
   };
 
   const handleDebounce = useMemo(() => {
-    return debounce((value) => setCoordinate(value.bounds), 500);
+    return debounce((value) => setCoordinate(value.bounds), 3000);
   }, []);
 
   useEffect(() => {
