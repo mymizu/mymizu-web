@@ -182,6 +182,7 @@ export function App({ gmApiKey }) {
           </div>
         </div>
       </nav>
+
       <div className="maps-container">
         <GoogleMapReact
           bootstrapURLKeys={{

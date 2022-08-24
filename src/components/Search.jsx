@@ -30,6 +30,10 @@ export function Search({ results, onSearch, onReset }) {
         <img
           className="maps-location-reset-icon"
           src="../../public/images/reset.svg"
+        />
+        <img
+          className="maps-location-reset-icon"
+          src="/public/images/reset.svg"
           onClick={handleReset}
         />
       </div>
