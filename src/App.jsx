@@ -99,7 +99,7 @@ export function App({ gmApiKey }) {
   };
 
   const handleDebounce = useMemo(() => {
-    return debounce((value) => setCoordinate(value.bounds), 3000);
+    return debounce((value) => setCoordinate(value.bounds), 1500);
   }, []);
 
   useEffect(() => {
