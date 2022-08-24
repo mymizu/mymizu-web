@@ -23,10 +23,13 @@ export function Search({ results, onSearch, onReset }) {
           placeholder="Search"
           onChange={(e) => debounced(e.target.value)}
         />
-        <img className="maps-location-search-icon" src="/public/search.svg" />
+        <img
+          className="maps-location-search-icon"
+          src="/public/images/search.svg"
+        />
         <img
           className="maps-location-reset-icon"
-          src="/public/reset.svg"
+          src="/public/images/reset.svg"
           onClick={handleReset}
         />
       </div>

@@ -155,7 +155,7 @@ export function App({ gmApiKey }) {
         </div>
       </nav>
 
-      <div className="map-container">
+      <div className="maps-container">
         <GoogleMapReact
           bootstrapURLKeys={{
             key: gmApiKey,

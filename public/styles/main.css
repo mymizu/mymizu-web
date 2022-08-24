@@ -120,9 +120,17 @@ img#logo {
   width: 100%;
 }
 
+.maps-location-search-input:focus {
+  outline: none
+}
+
 .maps-location-search-input-with-results {
   border-bottom-left-radius: 0;
   border-bottom-right-radius: 0;
+}
+
+.maps-location-search-input-with-results:focus {
+  outline: none
 }
 
 .maps-location-search-icon {
