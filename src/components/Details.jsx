@@ -37,7 +37,7 @@ export const Details = ({ data }) => {
             src="/public/images/marker.svg"
             alt=""
           />
-          <div>Address: {data.address}</div>
+          <div>{data.address}</div>
         </div>
       )}
       <div className="detail-section">
