@@ -1,3 +1,48 @@
+// function googleMapsAPI(map, maps) {
+//   const autoCompleteService = new maps.places.AutocompleteService();
+//   const placeService = new maps.places.PlacesService(map);
+
+//   const search = (input, callback) => {
+//     autoCompleteService.getPlacePredictions(
+//       {
+//         input,
+//       },
+//       (predictions) => {
+//         if (!predictions) {
+//           callback([]);
+//           return;
+//         }
+//         Promise.all(
+//           predictions.map((prediction) => {
+//             return lookupPlace(prediction.place_id);
+//           })
+//         ).then(callback);
+//       }
+//     );
+//   };
+
+//   const lookupPlace = (placeId) => {
+//     new Promise((resolve, reject) => {
+//       placeService.getDetails(
+//         {
+//           placeId,
+//           fields: ["icon", "name", "formatted_address", "geometry.location"],
+//         },
+//         resolve
+//       );
+//     });
+//   };
+
+//   return {
+//     map,
+//     maps,
+//     search,
+//     lookupPlace,
+//   };
+// }
+
+// export default googleMapsAPI;
+
 class GoogleMapsAPI {
   setGoogleAPIObject = (map, maps) => {
     this.map = map;
