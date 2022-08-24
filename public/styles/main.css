@@ -172,7 +172,7 @@ img#logo {
 
   /* for scrolling */
   max-height: calc(100% - 2 * 16px - 60px);
-  overflow: scroll;
+  overflow-y: scroll;
 }
 
 .maps-location-search-results-result:last-child {
