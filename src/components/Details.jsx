@@ -27,33 +27,21 @@ export const Details = ({ data }) => {
       {data.link && (
         <div className="detail-section">
           <img src="/public/images/globe.svg" alt="" />
-          <div>Link: {data.link}</div>
+          <div>{data.link}</div>
         </div>
       )}
       {data.address && (
         <div className="detail-section">
-          <img
-            className="fontawesome-icon"
-            src="/public/images/marker.svg"
-            alt=""
-          />
+          <img src="/public/images/pin_drop.svg" alt="" />
           <div>{data.address}</div>
         </div>
       )}
       <div className="detail-section">
-        <img
-          className="fontawesome-icon"
-          src="/public/images/info.svg"
-          alt=""
-        />
+        <img src="/public/images/info.svg" alt="" />
         <div>Report/Suggest change to details</div>
       </div>
       <div className="detail-section">
-        <img
-          className="fontawesome-icon"
-          src="/public/images/pencil.svg"
-          alt=""
-        />
+        <img src="/public/images/edit.svg" alt="" />
         <div>Feedback: {data.description.feedback}</div>
       </div>
     </div>
