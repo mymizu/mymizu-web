@@ -3,7 +3,7 @@ import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
-import googleMapsInstanceAPI from "../utils/googlemaps";
+import googleMapAPI from "../utils/googlemaps";
 
 const Marker = () => (
   <div className="marker">
@@ -18,9 +18,11 @@ export function App({ gmApiKey }) {
   const [taps, setTaps] = useState([]);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
+  const [googleMapFn, setGoogleMapFn] = useState();
 
   const handleSearchQuery = (query) => {
-    googleMapsInstanceAPI.search(query, searchResultCallback);
+    // const googleMapFunction = googleMapAPI(map, maps);
+    googleMapFn.search(query, searchResultCallback);
   };
 
   const handleReset = () => {
@@ -33,7 +35,7 @@ export function App({ gmApiKey }) {
   };
 
   const handleResultClick = (result) => {
-    googleMapsInstanceAPI.map.setCenter(result.geometry.location);
+    googleMapFn.map.setCenter(result.geometry.location);
     setResults([]);
   };
 
@@ -163,9 +165,9 @@ export function App({ gmApiKey }) {
           }}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
-          onGoogleApiLoaded={({ map, maps }) =>
-            googleMapsInstanceAPI.setGoogleAPIObject(map, maps)
-          }
+          onGoogleApiLoaded={({ map, maps }) => {
+            setGoogleMapFn(googleMapAPI(map, maps));
+          }}
           yesIWantToUseGoogleMapApiInternals
         >
           {!loading && taps.length
