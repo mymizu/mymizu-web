@@ -8,7 +8,13 @@ import getSlug from "./utils/getSlug";
 import { Marker } from "./components/Marker";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
-import googleMapAPI from "../utils/googlemaps";
+import googleMapsInstanceAPI from "../utils/googlemaps";
+
+const Marker = () => (
+  <div className="marker">
+    <img className="pin" src="/public/images/map-pin.svg" />
+  </div>
+);
 
 export function App({ gmApiKey }) {
   const gmDefaultProps = {
@@ -31,7 +37,7 @@ export function App({ gmApiKey }) {
   const [googleMapFn, setGoogleMapFn] = useState();
 
   const handleSearchQuery = (query) => {
-    googleMapFn.search(query, searchResultCallback);
+    googleMapsInstanceAPI.search(query, searchResultCallback);
   };
 
   const handleReset = () => {
