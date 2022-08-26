@@ -9,8 +9,6 @@ export const Details = ({ data }) => {
   const refill = commentArray.indexOf("How to Refill:\r");
   const refillMethod = commentArray[refill + 1];
 
-  console.log(data);
-
   return (
     <div>
       <div className="border-blue"></div>
