@@ -258,6 +258,10 @@ footer .nav-link i {
   cursor: pointer;
 }
 
+.marker img.pin-large {
+  height: 50px
+}
+
 .info-card {
   height: 100%;
   border-radius: 30px;
@@ -323,8 +327,14 @@ footer .nav-link i {
   margin-right: 1rem;
 }
 
-.detail-section .fontawesome-icon {
-  width: 21px;
+.place-open-section {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.place-open-day {
+  margin-right: 0.75rem;
 }
 
 .detail-section div {

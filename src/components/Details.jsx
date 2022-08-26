@@ -21,7 +21,14 @@ export const Details = ({ data }) => {
       {data.openingHours && (
         <div className="detail-section">
           <img src="/public/images/clock.svg" alt="" />
-          <div>{data.openingHours}</div>
+          <div>
+            {Object.keys(data.openingHours).map((key, keyIdx) => (
+              <div className="place-open-section" key={keyIdx}>
+                <p className="place-open-day">{key}</p>
+                <p>{data.openingHours[key][0]}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {data.link && (

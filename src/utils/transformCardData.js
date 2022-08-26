@@ -13,7 +13,7 @@ export const transformCardData = (data) => {
     address: data.address,
     comment: data.comment,
     waterType: data.grouped_tags.Water,
-
+    isSearch: data.isSearch,
     feedback: "", // opens a card (someone else)
     slug: data.slug,
     categoryId: data.category_id,

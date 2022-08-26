@@ -9,6 +9,7 @@ import { Marker } from "./components/Marker";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
+import * as turf from "@turf/turf";
 
 export function App({ gmApiKey }) {
   const gmDefaultProps = {
@@ -26,7 +27,6 @@ export function App({ gmApiKey }) {
   const [language] = useLang();
   const [center, setCenter] = useState(gmDefaultProps.center);
   const [cardData, setCardData] = useState(null);
-
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [googleMapFn, setGoogleMapFn] = useState();
@@ -45,7 +45,32 @@ export function App({ gmApiKey }) {
   };
 
   const handleResultClick = (result) => {
+    const { location } = result.geometry;
+
+    const resultLat = String(location.lat()).slice(0, 6);
+    const resultLng = String(location.lng()).slice(0, 7);
+
+    const newPlaces = taps.map((tap) => {
+      const tapLat = String(tap.latitude).slice(0, 6);
+      const tapLng = String(tap.longitude).slice(0, 7);
+      if (
+        resultLat === tapLat &&
+        resultLng === tapLng &&
+        tap.category_id === 4
+      ) {
+        return {
+          ...tap,
+          isSearch: true,
+        };
+      }
+      return {
+        ...tap,
+        isSearch: false,
+      };
+    });
+
     googleMapFn.map.setCenter(result.geometry.location);
+    setTaps(newPlaces);
     setResults([]);
   };
 
@@ -80,8 +105,15 @@ export function App({ gmApiKey }) {
 
       const res = await axios.get("/get-initial-markers");
 
+      const newTaps = res.data.taps.map((tap) => {
+        return {
+          ...tap,
+          isSearch: false,
+        };
+      });
+
       setInitialLoad(true);
-      setTaps(res.data.taps);
+      setTaps(newTaps);
       setLoading(false);
     } catch (e) {
       setLoading(false);
@@ -207,6 +239,7 @@ export function App({ gmApiKey }) {
                   lng={tap.longitude}
                   category={tap.category_id}
                   tap={tap}
+                  isSearch={tap.isSearch}
                 />
               ))
             : null}
@@ -225,18 +258,20 @@ export function App({ gmApiKey }) {
             <Modal cardData={cardData} onClose={handleCloseModal} />
           </div>
         )}
-
-        <Search
-          results={results}
-          onSearch={handleSearchQuery}
-          onReset={handleReset}
-        />
-        <SearchResults
-          results={results}
-          onSearchResultClick={handleResultClick}
-        />
+        {taps.length > 0 && (
+          <>
+            <Search
+              results={results}
+              onSearch={handleSearchQuery}
+              onReset={handleReset}
+            />
+            <SearchResults
+              results={results}
+              onSearchResultClick={handleResultClick}
+            />
+          </>
+        )}
       </div>
-
       <div className="container-lg">
         <div className="row home">
           <div className="col" id="forest">
