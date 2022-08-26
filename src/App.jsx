@@ -26,6 +26,7 @@ export function App({ gmApiKey }) {
   const [language] = useLang();
   const [center, setCenter] = useState(gmDefaultProps.center);
   const [cardData, setCardData] = useState(null);
+
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [googleMapFn, setGoogleMapFn] = useState();
@@ -224,6 +225,7 @@ export function App({ gmApiKey }) {
             <Modal cardData={cardData} onClose={handleCloseModal} />
           </div>
         )}
+
         <Search
           results={results}
           onSearch={handleSearchQuery}
