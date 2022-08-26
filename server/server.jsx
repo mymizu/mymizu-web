@@ -38,6 +38,43 @@ app.get("/get-initial-markers", async (req, res) => {
   }
 });
 
+app.get("/get-refill-spot/:slug", async (req, res) => {
+  try {
+    const info = await myMizuClient.get(`/api/taps/${req.params.slug}`);
+    res.status(200).send(info);
+  } catch (e) {
+    res.status(400).json({
+      message: "Unable to fetch refill spot",
+      error: e,
+    });
+  }
+});
+
+app.get("/refill_spots/:slug", (req, res) => {
+  fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
+    if (err) {
+      console.error(err);
+      return res.status(500).send("An error occurred");
+    }
+
+    // @NOTE:
+    // You can inject SEO headers to the <head> tag as well
+    return res.send(
+      // @TODO:
+      // You can turn this into a function on a different file
+      data.replace(
+        '<div id="root"></div>',
+        `
+        <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
+        <div id="root">${ReactDOMServer.renderToString(
+          <App gmApiKey={gmapApiKey} />
+        )}</div>
+        `
+      )
+    );
+  });
+});
+
 app.get("/", (req, res) => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
     if (err) {

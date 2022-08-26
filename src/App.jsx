@@ -2,30 +2,32 @@ import React, { useState, useEffect, useMemo } from "react";
 import GoogleMapReact from "google-map-react";
 import debounce from "lodash.debounce";
 import axios from "axios";
-
-const Marker = () => (
-  <div className="marker">
-    <img className="pin" src="/public/images/map-pin.svg" />
-  </div>
-);
+import { transformCardData } from "./utils/transformCardData";
+import { Modal } from "./components/Modal";
+import { useLang } from "./utils/useLang";
+import getSlug from "./utils/getSlug";
+import { Marker } from "./components/Marker";
 
 export function App({ gmApiKey }) {
-  const [navOpen, setNavOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [initialLoad, setInitialLoad] = useState(false);
-  const [taps, setTaps] = useState([]);
-  const [coordinate, setCoordinate] = useState({});
-
-  const handleNav = () => {
-    setNavOpen(!navOpen);
-  };
-
   const gmDefaultProps = {
     center: {
       lat: 35.662,
       lng: 139.7038,
     },
     zoom: 11,
+  };
+
+  const [navOpen, setNavOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [initialLoad, setInitialLoad] = useState(false);
+  const [taps, setTaps] = useState([]);
+  const [coordinate, setCoordinate] = useState({});
+  const [language] = useLang();
+  const [center, setCenter] = useState(gmDefaultProps.center);
+  const [cardData, setCardData] = useState(null);
+
+  const handleNav = () => {
+    setNavOpen(!navOpen);
   };
 
   const topNav = [
@@ -101,6 +103,15 @@ export function App({ gmApiKey }) {
   const handleDebounce = useMemo(() => {
     return debounce((value) => setCoordinate(value.bounds), 1500);
   }, []);
+  
+  const onMarkerClick = (key, childProps) => {
+    const markerData = childProps.tap;
+    setCardData(transformCardData(markerData));
+  };
+
+  const handleCloseModal = () => {
+    setCardData(null);
+  };
 
   useEffect(() => {
     if (!taps.length && !initialLoad) {
@@ -113,6 +124,19 @@ export function App({ gmApiKey }) {
       getTapsWhenMapsMoved(coordinate);
     }
   }, [coordinate]);
+    const load = async () => {
+      const REFILL_SPOT_ROUTE = "/refill_spots/"; // TODO: constants
+      const slug = getSlug(REFILL_SPOT_ROUTE);
+      if (slug) {
+        const res = await axios.get(`/get-refill-spot/${slug}`);
+        setCardData(transformCardData(res.data));
+        setCenter({
+          lat: res?.data?.latitude ?? gmDefaultProps.center.lng,
+          lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
+        });
+      }
+    };
+  }, []);
 
   return (
     <div>
@@ -177,19 +201,41 @@ export function App({ gmApiKey }) {
         </div>
       </nav>
 
-      <div style={{ height: "70vh", width: "100%" }}>
+      <div style={{ height: "70vh", width: "100%", position: "relative" }}>
         <GoogleMapReact
           bootstrapURLKeys={{ key: gmApiKey }}
           onChange={handleDebounce}
+          center={center}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
+          onChildClick={onMarkerClick}
         >
           {!loading && taps.length
             ? taps.map((tap) => (
-                <Marker key={tap.id} lat={tap.latitude} lng={tap.longitude} />
+                <Marker
+                  key={tap.id}
+                  lat={tap.latitude}
+                  lng={tap.longitude}
+                  category={tap.category_id}
+                  tap={tap}
+                />
               ))
             : null}
         </GoogleMapReact>
+        {cardData && (
+          <div
+            style={{
+              height: "calc(70vh - 64px)",
+              position: "absolute",
+              zIndex: 999,
+              top: 32,
+              left: 32,
+            }}
+          >
+            {/* TODO: properly calculate height */}
+            <Modal cardData={cardData} onClose={handleCloseModal} />
+          </div>
+        )}
       </div>
 
       <div className="container-lg">
