@@ -1,9 +1,7 @@
 import React from "react";
 
 export const ShareModal = ({ data, setShareModal }) => {
-  const action = data.action.share
-    ? data.action.share
-    : "No Link, feel free to add one!";
+  const action = data.action.share || "No Link, feel free to add one!";
 
   const copyFunc = (data) => {
     navigator.clipboard.writeText(data.action.share);
