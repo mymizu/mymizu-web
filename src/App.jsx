@@ -103,7 +103,7 @@ export function App({ gmApiKey }) {
   const handleDebounce = useMemo(() => {
     return debounce((value) => setCoordinate(value.bounds), 1500);
   }, []);
-  
+
   const onMarkerClick = (key, childProps) => {
     const markerData = childProps.tap;
     setCardData(transformCardData(markerData));
@@ -124,6 +124,8 @@ export function App({ gmApiKey }) {
       getTapsWhenMapsMoved(coordinate);
     }
   }, [coordinate]);
+
+  useEffect(() => {
     const load = async () => {
       const REFILL_SPOT_ROUTE = "/refill_spots/"; // TODO: constants
       const slug = getSlug(REFILL_SPOT_ROUTE);
