@@ -1,8 +1,4 @@
 import React from "react";
-// import CupIcon from "../../public/images/cup.svg";
-// import cup from "../../public/images/cup.svg";
-// import clock from "../../public/images/clock.svg";
-// import globe from "../../public/images/globe.svg";
 
 export const Details = ({ data }) => {
   const commentArray = data.comment.split("\n");
