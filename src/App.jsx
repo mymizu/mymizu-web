@@ -15,7 +15,6 @@ const translations = {
   ja: require("./translations/ja.json"),
 };
 
-
 export function App({ gmApiKey }) {
   const gmDefaultProps = {
     center: {
@@ -119,7 +118,6 @@ export function App({ gmApiKey }) {
     }
   };
 
-
   const onMarkerClick = (key, childProps) => {
     const markerData = childProps.tap;
     setCardData(transformCardData(markerData));
@@ -158,8 +156,9 @@ export function App({ gmApiKey }) {
   useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
   }, [locale]);
-  
-   const load = async () => {
+
+  useEffect(() => {
+    const load = async () => {
       const REFILL_SPOT_ROUTE = "/refill_spots/"; // TODO: constants
       const slug = getSlug(REFILL_SPOT_ROUTE);
       if (slug) {
@@ -257,50 +256,46 @@ export function App({ gmApiKey }) {
           </div>
         </nav>
 
-   
-
-  
-
-      <div style={{ height: "70vh", width: "100%", position: "relative" }}>
-        <GoogleMapReact
-          bootstrapURLKeys={{ 
-            key: gmApiKey,
-            language: locale,
-            region: locale,
-            libraries: ["places"], 
-          }}
-          center={center}
-          defaultCenter={gmDefaultProps.center}
-          defaultZoom={gmDefaultProps.zoom}
-          onChildClick={onMarkerClick}
-        >
-          {!loading && taps.length
-            ? taps.map((tap) => (
-                <Marker
-                  key={tap.id}
-                  lat={tap.latitude}
-                  lng={tap.longitude}
-                  category={tap.category_id}
-                  tap={tap}
-                />
-              ))
-            : null}
-        </GoogleMapReact>
-        {cardData && (
-          <div
-            style={{
-              height: "calc(70vh - 64px)",
-              position: "absolute",
-              zIndex: 999,
-              top: 32,
-              left: 32,
+        <div style={{ height: "70vh", width: "100%", position: "relative" }}>
+          <GoogleMapReact
+            bootstrapURLKeys={{
+              key: gmApiKey,
+              language: locale,
+              region: locale,
+              libraries: ["places"],
             }}
+            center={center}
+            defaultCenter={gmDefaultProps.center}
+            defaultZoom={gmDefaultProps.zoom}
+            onChildClick={onMarkerClick}
           >
-            {/* TODO: properly calculate height */}
-            <Modal cardData={cardData} onClose={handleCloseModal} />
-          </div>
-        )}
-      </div>
+            {!loading && taps.length
+              ? taps.map((tap) => (
+                  <Marker
+                    key={tap.id}
+                    lat={tap.latitude}
+                    lng={tap.longitude}
+                    category={tap.category_id}
+                    tap={tap}
+                  />
+                ))
+              : null}
+          </GoogleMapReact>
+          {cardData && (
+            <div
+              style={{
+                height: "calc(70vh - 64px)",
+                position: "absolute",
+                zIndex: 999,
+                top: 32,
+                left: 32,
+              }}
+            >
+              {/* TODO: properly calculate height */}
+              <Modal cardData={cardData} onClose={handleCloseModal} />
+            </div>
+          )}
+        </div>
 
         <Statistics />
 
@@ -332,6 +327,5 @@ export function App({ gmApiKey }) {
         </div>
       </div>
     </IntlProvider>
-
   );
 }
