@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SearchResults } from "./SearchResults";
 import googleMapsInstanceAPI from "../../utils/googlemaps";
+import classnames from "classnames";
 
 export function Search({ results, onSearch, onReset }) {
   const inputRef = useRef();
@@ -17,9 +18,9 @@ export function Search({ results, onSearch, onReset }) {
       <div className="maps-location-search-container">
         <input
           ref={inputRef}
-          className={`maps-location-search-input ${
-            results.length > 0 ? "maps-location-search-input-with-results" : ""
-          }`}
+          className={classnames(`maps-location-search-input`, {
+            ["maps-location-search-input-with-results"]: results.length > 0,
+          })}
           placeholder="Search"
           onChange={(e) => debounced(e.target.value)}
         />
