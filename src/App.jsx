@@ -9,7 +9,6 @@ import { Marker } from "./components/Marker";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
-import * as turf from "@turf/turf";
 
 export function App({ gmApiKey }) {
   const gmDefaultProps = {
@@ -105,12 +104,16 @@ export function App({ gmApiKey }) {
 
       const res = await axios.get("/get-initial-markers");
 
-      const newTaps = res.data.taps.map((tap) => {
-        return {
-          ...tap,
-          isSearch: false,
-        };
-      });
+      const { taps } = res.data;
+
+      const newTaps = taps
+        ? taps.map((tap) => {
+            return {
+              ...tap,
+              isSearch: false,
+            };
+          })
+        : [];
 
       setInitialLoad(true);
       setTaps(newTaps);
