@@ -7,7 +7,7 @@ export const transformCardData = (data) => {
       route: "",
       share: data.website, // button to a link (href)
     },
-    // refillMethod: ,// inside the comment - need to split the string?
+    refillMethod: data.refill_instruction,
     openingHours: data.opening_hours,
     link: data.website,
     address: data.address,

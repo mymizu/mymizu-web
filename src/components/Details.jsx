@@ -8,10 +8,12 @@ export const Details = ({ data }) => {
   return (
     <div>
       <div className="border-blue"></div>
+      {data.refillMethod && (
       <div className="detail-section">
         <img src="/public/images/cup.svg" alt="" />
-        <div>{refillMethod}</div>
+        <div>{data.refillMethod}</div>
       </div>
+      )}
       {data.openingHours && (
         <div className="detail-section">
           <img src="/public/images/clock.svg" alt="" />
