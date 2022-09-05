@@ -17,5 +17,7 @@ export const transformCardData = (data) => {
     feedback: "", // opens a card (someone else)
     slug: data.slug,
     categoryId: data.category_id,
+    latitude: data.latitude,
+    longitude: data.longitude
   };
 };

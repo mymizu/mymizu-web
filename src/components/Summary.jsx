@@ -20,7 +20,7 @@ export const Summary = ({ data }) => {
       </div>
       {/* route and share buttons go here */}
       <div className="actionbuttons">
-        <RouteButton />
+        <RouteButton latitude={data.latitude} longitude={data.longitude} />
         <ShareButton setShareModal={setShareModal} shareModal={shareModal} />
       </div>
       {shareModal ? (
