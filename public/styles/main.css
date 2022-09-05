@@ -59,7 +59,7 @@
 
 .row.home {
   margin-top: 50px;
-  margin-bottom: 100px;
+  margin-bottom: 60px;
 }
 
 .row.home .col {
@@ -220,6 +220,12 @@ img#logo {
 
 #ocean {
   background-image: url("../images/ocean.jpg");
+}
+
+.facts {
+  text-align: center;
+  margin-bottom: 60px;
+  color: #2F97D1;
 }
 
 .footer {
