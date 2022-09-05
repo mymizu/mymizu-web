@@ -1,5 +1,6 @@
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect, useMemo} from "react";
 import GoogleMapReact from "google-map-react";
+import debounce from "lodash.debounce";
 import axios from "axios";
 import {FormattedMessage, IntlProvider} from "react-intl";
 import i18nConfig from "./i18nConfig";
@@ -31,6 +32,7 @@ export function App({gmApiKey}) {
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
+  const [coordinate, setCoordinate] = useState({});
   const [locale, setLocale] = useState("ja");
   const [language] = useLang();
   const [center, setCenter] = useState(gmDefaultProps.center);
@@ -80,6 +82,9 @@ export function App({gmApiKey}) {
     googleMapFn.map.setCenter(result.geometry.location);
     setTaps(newPlaces);
     setResults([]);
+    if (Object.keys(coordinate).length > 0) {
+      getTapsWhenMapsMoved(coordinate);
+    }
   };
 
   const LANG_PREF_KEY = "userLanguage";
@@ -177,6 +182,43 @@ export function App({gmApiKey}) {
     }
   };
 
+  const getTapsWhenMapsMoved = async (value) => {
+    try {
+      if (initialLoad) {
+        const {nw, se} = value;
+
+        const res = await axios.get(
+          `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
+        );
+
+        const {taps: resTaps} = res.data;
+
+        const newTaps = [];
+
+        for (let i = 0; i < resTaps.length; i++) {
+          let flag = false;
+          for (let j = 0; j < taps.length; j++) {
+            if (resTaps[i].id === taps[j].id) {
+              flag = true;
+              break;
+            }
+          }
+          if (!flag) {
+            newTaps.push(resTaps[i]);
+          }
+        }
+
+        setTaps([...taps, ...newTaps]);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleDebounce = useMemo(() => {
+    return debounce((value) => setCoordinate(value.bounds), 1500);
+  }, []);
+
   const onMarkerClick = (key, childProps) => {
     const markerData = childProps.tap;
     setCardData(transformCardData(markerData));
@@ -191,6 +233,12 @@ export function App({gmApiKey}) {
       getInitialTaps();
     }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
+
+  useEffect(() => {
+    if (Object.keys(coordinate).length > 0) {
+      getTapsWhenMapsMoved(coordinate);
+    }
+  }, [coordinate]);
 
   useEffect(() => {
     const language = window.navigator.userLanguage || window.navigator.language;
@@ -229,7 +277,6 @@ export function App({gmApiKey}) {
         });
       }
     };
-    load();
   }, []);
 
   return (
@@ -289,96 +336,97 @@ export function App({gmApiKey}) {
           </div>
         </nav>
 
-        <div className="maps-container">
-          <div style={{height: "70vh", width: "100%", position: "relative"}}>
-            <GoogleMapReact
-              bootstrapURLKeys={{
-                key: gmApiKey,
-                language: locale,
-                region: locale,
-                libraries: ["places"],
+        <div style={{height: "70vh", width: "100%", position: "relative"}}>
+          <GoogleMapReact
+            bootstrapURLKeys={{
+              key: gmApiKey,
+              language: locale,
+              region: locale,
+              libraries: ["places"],
+            }}
+            onChange={handleDebounce}
+            center={center}
+            defaultCenter={gmDefaultProps.center}
+            defaultZoom={gmDefaultProps.zoom}
+            onChildClick={onMarkerClick}
+            onGoogleApiLoaded={({ map, maps }) => {
+              setGoogleMapFn(googleMapAPI(map, maps));
+            }}
+            yesIWantToUseGoogleMapApiInternals
+          >
+            {!loading && taps.length
+              ? taps.map((tap) => (
+                <Marker
+                  key={tap.id}
+                  lat={tap.latitude}
+                  lng={tap.longitude}
+                  category={tap.category_id}
+                  tap={tap}
+                />
+              ))
+              : null}
+          </GoogleMapReact>
+          {cardData && (
+            <div
+              style={{
+                height: "calc(70vh - 64px)",
+                position: "absolute",
+                zIndex: 999,
+                top: 32,
+                left: 32,
               }}
-              center={center}
-              defaultCenter={gmDefaultProps.center}
-              defaultZoom={gmDefaultProps.zoom}
-              onGoogleApiLoaded={({ map, maps }) => {
-                setGoogleMapFn(googleMapAPI(map, maps));
-              }}
-              yesIWantToUseGoogleMapApiInternals
-              onChildClick={onMarkerClick}
             >
-              {!loading && taps.length
-                ? taps.map((tap) => (
-                  <Marker
-                    key={tap.id}
-                    lat={tap.latitude}
-                    lng={tap.longitude}
-                    category={tap.category_id}
-                    tap={tap}
-                  />
-                ))
-                : null}
-            </GoogleMapReact>
-            {cardData && (
-              <div
-                style={{
-                  height: "calc(70vh - 64px)",
-                  position: "absolute",
-                  zIndex: 999,
-                  top: 32,
-                  left: 32,
-                }}
-              >
                 {/* TODO: properly calculate height */}
-                <Modal cardData={cardData} onClose={handleCloseModal}/>
-              </div>
-            )}
-            {taps.length > 0 && (
-              <>
-                <Search
-                  results={results}
-                  onSearch={handleSearchQuery}
-                  onReset={handleReset}
-                />
-                <SearchResults
-                  results={results}
-                  onSearchResultClick={handleResultClick}
-                />
-              </>
-            )}
-          </div>
-          <div className="container-lg">
-            <Statistics/>
+              <Modal cardData={cardData} onClose={handleCloseModal}/>
+            </div>
+          )}
+          {taps.length > 0 && (
+            <>
+              <Search
+                results={results}
+                onSearch={handleSearchQuery}
+                onReset={handleReset}
+              />
+              <SearchResults
+                results={results}
+                onSearchResultClick={handleResultClick}
+              />
+            </>
+          )}
+        </div>
 
-            <FunFacts/>
+        <div className="container-lg">
+          <Statistics/>
 
-            <div className="footer">
-              <div className="container-lg">
-                <footer>
-                  <ul className="nav justify-content-center">
-                    {socialNav.map((el, i) => (
-                      <li className="nav-item" key={i}>
-                        <a href={el.href} className="nav-link px-2 text-muted">
-                          <i className={`bi ${el.iconName}`}/>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <ul className="nav justify-content-center">
-                    {footerNav.map((el, i) => (
-                      <li className="nav-item" key={i}>
-                        <a href={el.href} className="nav-link px-2">
-                          <FormattedMessage id={el.id} defaultMessage=""/>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </footer>
-              </div>
+          <FunFacts/>
+
+          <div className="footer">
+            <div className="container-lg">
+              <footer>
+                <ul className="nav justify-content-center">
+                  {socialNav.map((el, i) => (
+                    <li className="nav-item" key={i}>
+                      <a href={el.href} className="nav-link px-2 text-muted">
+                        <i className={`bi ${el.iconName}`}/>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <ul className="nav justify-content-center">
+                  {footerNav.map((el, i) => (
+                    <li className="nav-item" key={i}>
+                      <a href={el.href} className="nav-link px-2">
+                        <FormattedMessage id={el.id} defaultMessage=""/>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </footer>
             </div>
           </div>
         </div>
       </div>
+
     </IntlProvider>
   );
 }

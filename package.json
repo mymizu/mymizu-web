@@ -20,6 +20,7 @@
     "esbuild": "0.14.13",
     "express": "4.17.2",
     "google-map-react": "^2.1.10",
+    "lodash.debounce": "^4.0.8",
     "intl": "^1.2.5",
     "query-string": "^7.1.1",
     "react": "17.0.2",
