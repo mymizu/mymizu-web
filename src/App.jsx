@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, {useState, useEffect, useMemo} from "react";
 import GoogleMapReact from "google-map-react";
 import debounce from "lodash.debounce";
 import axios from "axios";
@@ -182,13 +182,13 @@ export function App({gmApiKey}) {
   const getTapsWhenMapsMoved = async (value) => {
     try {
       if (initialLoad) {
-        const { nw, se } = value;
+        const {nw, se} = value;
 
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
         );
 
-        const { taps: resTaps } = res.data;
+        const {taps: resTaps} = res.data;
 
         const newTaps = [];
 
@@ -330,95 +330,96 @@ export function App({gmApiKey}) {
             >
               &#9776;
             </span>
-        </div>
-      </nav>
-
-      <div style={{ height: "70vh", width: "100%", position: "relative" }}>
-            <GoogleMapReact
-              bootstrapURLKeys={{
-                key: gmApiKey,
-                language: locale,
-                region: locale,
-                libraries: ["places"],
-              }}
-              onChange={handleDebounce}
-              center={center}
-              defaultCenter={gmDefaultProps.center}
-              defaultZoom={gmDefaultProps.zoom}
-              onChildClick={onMarkerClick}
-            >
-              {!loading && taps.length
-                ? taps.map((tap) => (
-                  <Marker
-                    key={tap.id}
-                    lat={tap.latitude}
-                    lng={tap.longitude}
-                    category={tap.category_id}
-                    tap={tap}
-                  />
-                ))
-                : null}
-            </GoogleMapReact>
-            {cardData && (
-              <div
-                style={{
-                  height: "calc(70vh - 64px)",
-                  position: "absolute",
-                  zIndex: 999,
-                  top: 32,
-                  left: 32,
-                }}
-              >
-                {/* TODO: properly calculate height */}
-                <Modal cardData={cardData} onClose={handleCloseModal}/>
-              </div>
-            )}
-            {taps.length > 0 && (
-              <>
-                <Search
-                  results={results}
-                  onSearch={handleSearchQuery}
-                  onReset={handleReset}
-                />
-                <SearchResults
-                  results={results}
-                  onSearchResultClick={handleResultClick}
-                />
-              </>
-            )}
           </div>
+        </nav>
 
-          <div className="container-lg">
-            <Statistics/>
+        <div style={{height: "70vh", width: "100%", position: "relative"}}>
+          <GoogleMapReact
+            bootstrapURLKeys={{
+              key: gmApiKey,
+              language: locale,
+              region: locale,
+              libraries: ["places"],
+            }}
+            onChange={handleDebounce}
+            center={center}
+            defaultCenter={gmDefaultProps.center}
+            defaultZoom={gmDefaultProps.zoom}
+            onChildClick={onMarkerClick}
+          >
+            {!loading && taps.length
+              ? taps.map((tap) => (
+                <Marker
+                  key={tap.id}
+                  lat={tap.latitude}
+                  lng={tap.longitude}
+                  category={tap.category_id}
+                  tap={tap}
+                />
+              ))
+              : null}
+          </GoogleMapReact>
+          {cardData && (
+            <div
+              style={{
+                height: "calc(70vh - 64px)",
+                position: "absolute",
+                zIndex: 999,
+                top: 32,
+                left: 32,
+              }}
+            >
+              {/* TODO: properly calculate height */}
+              <Modal cardData={cardData} onClose={handleCloseModal}/>
+            </div>
+          )}
+          )}
+          {taps.length > 0 && (
+            <>
+              <Search
+                results={results}
+                onSearch={handleSearchQuery}
+                onReset={handleReset}
+              />
+              <SearchResults
+                results={results}
+                onSearchResultClick={handleResultClick}
+              />
+            </>
+          )}
+        </div>
 
-            <FunFacts/>
+        <div className="container-lg">
+          <Statistics/>
 
-            <div className="footer">
-              <div className="container-lg">
-                <footer>
-                  <ul className="nav justify-content-center">
-                    {socialNav.map((el, i) => (
-                      <li className="nav-item" key={i}>
-                        <a href={el.href} className="nav-link px-2 text-muted">
-                          <i className={`bi ${el.iconName}`}/>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                  <ul className="nav justify-content-center">
-                    {footerNav.map((el, i) => (
-                      <li className="nav-item" key={i}>
-                        <a href={el.href} className="nav-link px-2">
-                          <FormattedMessage id={el.id} defaultMessage=""/>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </footer>
-              </div>
+          <FunFacts/>
+
+          <div className="footer">
+            <div className="container-lg">
+              <footer>
+                <ul className="nav justify-content-center">
+                  {socialNav.map((el, i) => (
+                    <li className="nav-item" key={i}>
+                      <a href={el.href} className="nav-link px-2 text-muted">
+                        <i className={`bi ${el.iconName}`}/>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+                <ul className="nav justify-content-center">
+                  {footerNav.map((el, i) => (
+                    <li className="nav-item" key={i}>
+                      <a href={el.href} className="nav-link px-2">
+                        <FormattedMessage id={el.id} defaultMessage=""/>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </footer>
             </div>
           </div>
         </div>
+      </div>
 
     </IntlProvider>
   );
