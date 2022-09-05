@@ -1,3 +1,18 @@
+# 1. **What is this project**
+
+**mymizu Open-Source Web App**
+
+For the past 3 years, mymizu has been harnessing the power of technology and community to tackle single-use plastic waste and encourage people to think and act on the environment in their everyday lives. Now we would like to open up the building of the mymizu platform to the global tech community to see what magic that brings.
+
+We are launching an open-source web app for mymizu that is enabling anyone to search our global, 200,000-strong refill spot network from their browser, but also - we hope - to develop and test out new ideas and features (e.g. filtering refill spots, live community stats, etc).
+
+And we need YOUR HELP to build it.
+
+Each line of code you write has the potential to drastically reduce plastic in Japan.
+For more information see details below!
+
+# 2. How to get started
+
 # MyMizu Web
 
 pre-requisites:
@@ -68,3 +83,22 @@ app.get("/a-new-page", (req, res) => {
 });
 ```
 
+# 3. Pick a feature to work on
+
+- **You can select from our list of features:**
+
+Check out the issues list on github for features to work on including spec and design information:
+[Issues](https://github.com/mymizu/mymizu-web/issues).
+If you have any questions regarding features, feel free to comment directly on the issues or ask in our [Slack community](https://docs.google.com/forms/d/1Y87ByAJrkfp2Hk3idfg4bx1t3iDfrO5bEu9zmKv9ewg/prefill).
+
+- **If you have any suggestions or new features ideas:**
+ [Please add in this form](https://docs.google.com/forms/d/1zG-V5DbkX3XTqUemAHjZXXduMXQrAGrC5-XzuVXjdY8/edit?usp=sharing)
+ 
+- **If you found a bug on mymizu webapp:**
+Please create an [issue](https://github.com/mymizu/mymizu-web/issues) on GitHub page or let us know in the [Slack community](https://docs.google.com/forms/d/1Y87ByAJrkfp2Hk3idfg4bx1t3iDfrO5bEu9zmKv9ewg/prefill)
+
+# 4. Join our slack community
+
+Please feel free to join our [Slack community](https://docs.google.com/forms/d/1Y87ByAJrkfp2Hk3idfg4bx1t3iDfrO5bEu9zmKv9ewg/prefill)
+You can introduce yourself and share any questions. If you have any ideas for features and / or issues you can also reach out to us here!
+Or reach out to us directly if you have any questions [opensource@mymizu.co](mailto:opensource@mymizu.co)
