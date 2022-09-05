@@ -373,7 +373,6 @@ export function App({gmApiKey}) {
               <Modal cardData={cardData} onClose={handleCloseModal}/>
             </div>
           )}
-          )}
           {taps.length > 0 && (
             <>
               <Search
