@@ -301,6 +301,10 @@ export function App({gmApiKey}) {
               center={center}
               defaultCenter={gmDefaultProps.center}
               defaultZoom={gmDefaultProps.zoom}
+              onGoogleApiLoaded={({ map, maps }) => {
+                setGoogleMapFn(googleMapAPI(map, maps));
+              }}
+              yesIWantToUseGoogleMapApiInternals
               onChildClick={onMarkerClick}
             >
               {!loading && taps.length
@@ -328,7 +332,6 @@ export function App({gmApiKey}) {
                 {/* TODO: properly calculate height */}
                 <Modal cardData={cardData} onClose={handleCloseModal}/>
               </div>
-            )}
             )}
             {taps.length > 0 && (
               <>
