@@ -1,6 +1,8 @@
 import React from "react";
 
 export const ShareModal = ({ data, setShareModal }) => {
+  const action = data.action.share || "No Link, feel free to add one!";
+
   const copyFunc = (data) => {
     navigator.clipboard.writeText(data.action.share);
     alert("Copied");
@@ -13,11 +15,7 @@ export const ShareModal = ({ data, setShareModal }) => {
       <a className="share-modal-title">Share this Refill spot</a>
       <div className="share-link">{data.title}</div>
       <div className="link-copy">
-        <div>
-          {data.action.share
-            ? data.action.share
-            : "No Link, feel free to add one!"}
-        </div>
+        <div>{action}</div>
         <button className="copy-button" onClick={() => copyFunc(data)}>
           Copy
         </button>

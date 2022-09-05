@@ -15,6 +15,7 @@
   "dependencies": {
     "-": "^0.0.1",
     "axios": "^0.27.2",
+    "classnames": "^2.3.1",
     "dotenv": "^16.0.1",
     "esbuild": "0.14.13",
     "express": "4.17.2",
@@ -23,7 +24,9 @@
     "query-string": "^7.1.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
-    "react-intl": "^6.0.5"
+    "react-intl": "^6.0.5",
+    "react-ga": "^3.3.1",
+    "use-debounce": "8.0.1"
   },
   "devDependencies": {
     "nodemon": "1.18.4"
