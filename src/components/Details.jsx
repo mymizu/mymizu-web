@@ -1,7 +1,7 @@
 import React from "react";
 
 export const Details = ({ data }) => {
-  const commentArray = data.comment.split("\n");
+  const commentArray = data.comment ? data.comment.split("\n") : [];
   const refill = commentArray.indexOf("How to Refill:\r");
   const refillMethod = commentArray[refill + 1];
 
