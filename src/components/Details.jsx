@@ -1,8 +1,4 @@
 import React from "react";
-// import CupIcon from "../../public/images/cup.svg";
-// import cup from "../../public/images/cup.svg";
-// import clock from "../../public/images/clock.svg";
-// import globe from "../../public/images/globe.svg";
 
 export const Details = ({ data }) => {
   const commentArray = data.comment.split("\n");
@@ -12,14 +8,23 @@ export const Details = ({ data }) => {
   return (
     <div>
       <div className="border-blue"></div>
+      {data.refillMethod && (
       <div className="detail-section">
         <img src="/public/images/cup.svg" alt="" />
-        <div>{refillMethod}</div>
+        <div>{data.refillMethod}</div>
       </div>
+      )}
       {data.openingHours && (
         <div className="detail-section">
           <img src="/public/images/clock.svg" alt="" />
-          <div>{data.openingHours}</div>
+          <div>
+            {Object.keys(data.openingHours).map((key, keyIdx) => (
+              <div className="place-open-section" key={keyIdx}>
+                <p className="place-open-day">{key}</p>
+                <p>{data.openingHours[key][0]}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
       {data.link && (

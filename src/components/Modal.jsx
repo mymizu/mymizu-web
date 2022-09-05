@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { Summary } from "./Summary";
 import { Details } from "./Details";
 import { Carousel } from "./Carousel";
-//import ArrowButton from "./Buttons/ArrowButton";
 import BackButton from "./Buttons/BackButton";
 
 export const Modal = ({ onClose, cardData }) => {
