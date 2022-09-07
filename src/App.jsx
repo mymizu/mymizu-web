@@ -242,6 +242,7 @@ export function App({gmApiKey}) {
   };
 
   useEffect(() => {
+
     const language = window.navigator.userLanguage || window.navigator.language;
     const userLanguage = localStorage.getItem(LANG_PREF_KEY);
 
@@ -279,7 +280,7 @@ export function App({gmApiKey}) {
 
   useEffect(() => {
     const load = async () => {
-      const REFILL_SPOT_ROUTE = "/refill_spots/"; // TODO: constants
+      const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
       const slug = getSlug(REFILL_SPOT_ROUTE);
       if (slug) {
         const res = await axios.get(`/get-refill-spot/${slug}`);
@@ -288,8 +289,10 @@ export function App({gmApiKey}) {
           lat: res?.data?.latitude ?? gmDefaultProps.center.lng,
           lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
         });
+        setZoom(8)
       }
     };
+    load();
   }, []);
 
   return (

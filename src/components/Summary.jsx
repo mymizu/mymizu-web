@@ -16,7 +16,7 @@ export const Summary = ({data}) => {
       <div className="description">
         {data.description !== null && Object.keys(data.description).map((name, index) => {
           return (
-            <p>{Object.values(data.description[name].join(" • "))}</p>
+            <p key={index}>{Object.values(data.description[name].join(" • "))}</p>
           );
         })}
       </div>

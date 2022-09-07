@@ -64,7 +64,7 @@ app.get("/community", async (_, res) => {
 
 app.get("/get-refill-spot/:slug", async (req, res) => {
   try {
-    const info = await myMizuClient.get(`/api/taps/${req.params.slug}?l=${getLanguage(req)}`);
+    const info = await myMizuClient.get(`/api/taps/${req.params.slug}/`, {l: getLanguage(req)});
     res.status(200).send(info);
   } catch (e) {
     res.status(400).json({
@@ -74,13 +74,12 @@ app.get("/get-refill-spot/:slug", async (req, res) => {
   }
 });
 
-app.get("/refill_spots/:slug", (req, res) => {
+app.get("/refill/:language/:slug", (req, res) => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
     if (err) {
       console.error(err);
       return res.status(500).send("An error occurred");
     }
-
     // @NOTE:
     // You can inject SEO headers to the <head> tag as well
     return res.send(
@@ -91,7 +90,7 @@ app.get("/refill_spots/:slug", (req, res) => {
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
         <div id="root">${ReactDOMServer.renderToString(
-          <App gmApiKey={gmapApiKey}/>
+          <App gmApiKey={gmapApiKey} />
         )}</div>
         `
       )
