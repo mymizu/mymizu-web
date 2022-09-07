@@ -5,12 +5,23 @@ import ReactDOMServer from "react-dom/server";
 import express from "express";
 
 import config from "./config";
-import { App } from "../src/App";
-import { myMizuClient } from "./myMizuClient";
+import {App} from "../src/App";
+import {myMizuClient} from "./myMizuClient";
+import i18nConfig from "../src/i18nConfig";
 
 const PORT = process.env.PORT || 3000;
 const gmapApiKey = config.gmApiKey;
 const app = express();
+
+const getLanguage = (req) => {
+  const lang = req.acceptsLanguages('en', 'ja')
+  if (lang) {
+    return lang
+  }
+  return "en"
+
+};
+
 
 app.get("/bundle.js", (req, res) => {
   res.sendFile(path.join(__dirname, "../dist/bundle.js"));
@@ -24,6 +35,7 @@ app.get("/get-initial-markers", async (req, res) => {
     c2: 39.73655447363853,
     c3: 32.64245244856602,
     c4: 150.75432142615318,
+    l: getLanguage(req),
   };
 
   try {
@@ -52,7 +64,7 @@ app.get("/community", async (_, res) => {
 
 app.get("/get-refill-spot/:slug", async (req, res) => {
   try {
-    const info = await myMizuClient.get(`/api/taps/${req.params.slug}`);
+    const info = await myMizuClient.get(`/api/taps/${req.params.slug}?l=${getLanguage(req)}`);
     res.status(200).send(info);
   } catch (e) {
     res.status(400).json({
@@ -79,7 +91,7 @@ app.get("/refill_spots/:slug", (req, res) => {
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
         <div id="root">${ReactDOMServer.renderToString(
-          <App gmApiKey={gmapApiKey} />
+          <App gmApiKey={gmapApiKey}/>
         )}</div>
         `
       )
@@ -104,7 +116,7 @@ app.get("/", (req, res) => {
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
         <div id="root">${ReactDOMServer.renderToString(
-          <App gmApiKey={gmapApiKey} />
+          <App gmApiKey={gmapApiKey}/>
         )}</div>
         `
       )
@@ -114,13 +126,14 @@ app.get("/", (req, res) => {
 
 app.get("/get-marker-moving-map?", async (req, res) => {
   try {
-    const { c1, c2, c3, c4 } = req.query;
+    const {c1, c2, c3, c4} = req.query;
 
     const pos = {
       c1,
       c2,
       c3,
       c4,
+      l: getLanguage(req),
     };
 
     const markers = await myMizuClient.get("/api/taps/nearby", pos);

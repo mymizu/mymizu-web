@@ -91,6 +91,11 @@ export function App({gmApiKey}) {
 
   const LANG_PREF_KEY = "userLanguage";
 
+  const updateLanguage = (language) => {
+    setLocale(language)
+    axios.defaults.headers.common['Accept-Language'] = language;
+  }
+
   const topNav = [
     {
       id: "topnav.map",
@@ -231,18 +236,6 @@ export function App({gmApiKey}) {
   };
 
   useEffect(() => {
-    if (!taps.length && !initialLoad) {
-      getInitialTaps();
-    }
-  }, [taps, setInitialLoad, initialLoad, setTaps]);
-
-  useEffect(() => {
-    if (Object.keys(coordinate).length > 0) {
-      getTapsWhenMapsMoved(coordinate);
-    }
-  }, [coordinate]);
-
-  useEffect(() => {
     const language = window.navigator.userLanguage || window.navigator.language;
     const userLanguage = localStorage.getItem(LANG_PREF_KEY);
 
@@ -250,17 +243,29 @@ export function App({gmApiKey}) {
     // particular cases such as en-GB, en-US, etc.
 
     if (userLanguage) {
-      setLocale(userLanguage);
+      updateLanguage(userLanguage);
     } else {
       if (language.includes("en")) {
-        setLocale("en");
+        updateLanguage("en");
       } else if (language.includes("ja")) {
-        setLocale("ja");
+        updateLanguage("ja");
       } else {
-        setLocale(i18nConfig.defaultLocale);
+        updateLanguage(i18nConfig.defaultLocale);
       }
     }
   }, []);
+
+  useEffect(() => {
+    if (!taps.length && !initialLoad && locale) {
+      getInitialTaps();
+    }
+  }, [taps, setInitialLoad, initialLoad, setTaps, locale]);
+
+  useEffect(() => {
+    if (Object.keys(coordinate).length > 0) {
+      getTapsWhenMapsMoved(coordinate);
+    }
+  }, [coordinate]);
 
   useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
@@ -314,7 +319,7 @@ export function App({gmApiKey}) {
                   <a
                     className="nav-link"
                     href="#"
-                    onClick={() => setLocale("ja")}
+                    onClick={() => updateLanguage("ja")}
                   >
                     JP
                   </a>{" "}
@@ -322,7 +327,7 @@ export function App({gmApiKey}) {
                   <a
                     className="nav-link"
                     href="#"
-                    onClick={() => setLocale("en")}
+                    onClick={() => updateLanguage("en")}
                   >
                     EN
                   </a>

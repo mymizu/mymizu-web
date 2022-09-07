@@ -30,7 +30,7 @@ export const Details = ({ data }) => {
       {data.link && (
         <div className="detail-section">
           <img src="/public/images/globe.svg" alt="" />
-          <div>{data.link}</div>
+          <div><a href={data.link} target="_new">{data.link}</a></div>
         </div>
       )}
       {data.address && (

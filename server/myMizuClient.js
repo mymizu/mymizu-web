@@ -15,10 +15,9 @@ function createMyMizuClient({ apiBaseUrl, apiKey, userToken }) {
   const baseQuery = queryString.stringify({
     api_key: apiKey,
     user_token: userToken,
-    l: "en",
     v: 1,
   });
-  
+
   const get = async (
     url,
     data, // Position data

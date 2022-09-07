@@ -15,10 +15,8 @@ export const Summary = ({ data }) => {
       </div>
       <div className="description">
         <div>Type of water: {data.description.Water}</div>
-        <div>Opening Hours: {data?.description?.opening_hours ?? "-"}</div>
         <div>Facilities:</div>
       </div>
-      {/* route and share buttons go here */}
       <div className="actionbuttons">
         <RouteButton latitude={data.latitude} longitude={data.longitude} />
         <ShareButton setShareModal={setShareModal} shareModal={shareModal} />
