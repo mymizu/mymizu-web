@@ -285,8 +285,8 @@ footer .nav-link i {
   position: absolute;
   top: 0;
   left: 0;
-  height: 64px;
-  width: 64px;
+  height: 32px;
+  width: 32px;
   flex-shrink: 0;
 
   margin-top: 10px;

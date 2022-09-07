@@ -36,6 +36,7 @@ export function App({gmApiKey}) {
   const [taps, setTaps] = useState([]);
   const [coordinate, setCoordinate] = useState({});
   const [locale, setLocale] = useState("ja");
+  const [detectedLocale, setDetectedLocale] = useState(false);
   const [language] = useLang();
   const [center, setCenter] = useState(gmDefaultProps.center);
   const [cardData, setCardData] = useState(null);
@@ -92,6 +93,7 @@ export function App({gmApiKey}) {
   const LANG_PREF_KEY = "userLanguage";
 
   const updateLanguage = (language) => {
+    setDetectedLocale(true)
     setLocale(language)
     axios.defaults.headers.common['Accept-Language'] = language;
   }
@@ -344,7 +346,7 @@ export function App({gmApiKey}) {
         </nav>
 
         <div style={{height: "70vh", width: "100%", position: "relative"}}>
-          <GoogleMapReact
+          {detectedLocale && <GoogleMapReact
             bootstrapURLKeys={{
               key: gmApiKey,
               language: locale,
@@ -372,7 +374,7 @@ export function App({gmApiKey}) {
                 />
               ))
               : null}
-          </GoogleMapReact>
+          </GoogleMapReact>}
           {cardData && (
             <div
               style={{
