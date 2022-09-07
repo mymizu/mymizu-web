@@ -92,10 +92,14 @@ export function App({gmApiKey}) {
 
   const LANG_PREF_KEY = "userLanguage";
 
-  const updateLanguage = (language) => {
+  const updateLanguage = (language, reload = false) => {
     setDetectedLocale(true)
     setLocale(language)
     axios.defaults.headers.common['Accept-Language'] = language;
+    if (reload) {
+      // todo: remove if can get map to reload with new language
+      location.reload();
+    }
   }
 
   const topNav = [
@@ -321,7 +325,7 @@ export function App({gmApiKey}) {
                   <a
                     className="nav-link"
                     href="#"
-                    onClick={() => updateLanguage("ja")}
+                    onClick={() => updateLanguage("ja", true)}
                   >
                     JP
                   </a>{" "}
@@ -329,7 +333,7 @@ export function App({gmApiKey}) {
                   <a
                     className="nav-link"
                     href="#"
-                    onClick={() => updateLanguage("en")}
+                    onClick={() => updateLanguage("en", true)}
                   >
                     EN
                   </a>

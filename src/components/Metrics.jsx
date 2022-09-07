@@ -1,25 +1,6 @@
 import React, { useEffect, useState } from "react";
+import {FormattedMessage} from "react-intl";
 
-const lang = "ja"; // TODO: remove when i18n is supported
-
-const labels = {
-  metricsCommunity: {
-    ja: "mymizuコミュニティとして約",
-    en: "together, we’ve saved",
-  },
-  metricsBottle: {
-    ja: "本のペットボトルを消滅しました！",
-    en: "plastic bottles!",
-  },
-  metricsCO2: {
-    ja: "トンのCO²を消滅しました！",
-    en: "kg of CO²!",
-  },
-  metricsMoney: {
-    ja: "を節約しました！",
-    en: "",
-  },
-};
 
 const Metrics = () => {
   const [stats, setStats] = useState(null);
@@ -53,17 +34,17 @@ const Metrics = () => {
     <div className="metrics">
       <Metric
         background="ocean"
-        label={labels.metricsBottle[lang]}
+        label={"metrics.community"}
         value={numberFormatter.format(bottle)}
       />
       <Metric
         background="forest"
-        label={labels.metricsCO2[lang]}
+        label={"metrics.co2"}
         value={numberFormatter.format(co2)}
       />
       <Metric
         background="money"
-        label={labels.metricsMoney[lang]}
+        label={"metrics.money"}
         value={"¥" + numberFormatter.format(money)}
       />
     </div>
@@ -78,9 +59,15 @@ const Metric = ({ background, label, value }) => {
   return (
     <div className="metric" style={{ "--background": backgroundUrl }}>
       <div className="metric__overlay" />
-      <div className="metric__top-label">{labels.metricsCommunity[lang]}</div>
+      <div className="metric__top-label">
+        <FormattedMessage
+        id="metrics.community"
+      /></div>
       <div className="metric__value">{value}</div>
-      <div className="metric__bottom-label">{label}</div>
+      <div className="metric__bottom-label"> <FormattedMessage
+        id={label}
+        defaultMessage={""}
+      /></div>
     </div>
   );
 };
