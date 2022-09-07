@@ -1,5 +1,4 @@
 export const transformCardData = (data) => {
-  console.log(data.grouped_tags)
   return {
     carouselImg: data.photos,
     title: data.name,
