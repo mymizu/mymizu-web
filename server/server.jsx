@@ -48,7 +48,6 @@ app.get("/get-initial-markers", async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
 app.get("/community", async (_, res) => {
   try {
     const data = await myMizuClient.get("/api/community");
@@ -61,8 +60,6 @@ app.get("/community", async (_, res) => {
   }
 });
 
-=======
->>>>>>> f1ae5c592755a05d3214d168642b74656bc8a601
 app.get("/get-marker-moving-map?", async (req, res) => {
   try {
     const { c1, c2, c3, c4 } = req.query;
