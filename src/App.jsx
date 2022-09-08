@@ -1,27 +1,29 @@
-import React, {useState, useEffect, useMemo} from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import GoogleMapReact from "google-map-react";
 import debounce from "lodash.debounce";
 import axios from "axios";
 
-import {FormattedMessage, IntlProvider} from "react-intl";
+import { FormattedMessage, IntlProvider } from "react-intl";
 import i18nConfig from "./i18nConfig";
-import {FunFacts} from "./components";
-import Metrics from './components/Metrics';
-import {transformCardData} from "./utils/transformCardData";
-import {Modal} from "./components/Modal";
-import {useLang} from "./utils/useLang";
+import { FunFacts } from "./components";
+import Metrics from "./components/Metrics";
+import { transformCardData } from "./utils/transformCardData";
+import { Modal } from "./components/Modal";
+import { useLang } from "./utils/useLang";
 import getSlug from "./utils/getSlug";
-import {Marker} from "./components/Marker";
-import {Search} from "./components/Search";
-import {SearchResults} from "./components/SearchResults";
+import { Marker } from "./components/Marker";
+import { Search } from "./components/Search";
+import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
+import * as turf from "@turf/turf";
+import debounce from "lodash.debounce";
 
 const translations = {
   en: require("./translations/en.json"),
   ja: require("./translations/ja.json"),
 };
 
-export function App({gmApiKey}) {
+export function App({ gmApiKey }) {
   const gmDefaultProps = {
     center: {
       lat: 35.662,
@@ -60,7 +62,7 @@ export function App({gmApiKey}) {
   };
 
   const handleResultClick = (result) => {
-    const {location} = result.geometry;
+    const { location } = result.geometry;
 
     const resultLat = String(location.lat()).slice(0, 6);
     const resultLng = String(location.lng()).slice(0, 7);
@@ -95,14 +97,14 @@ export function App({gmApiKey}) {
   const LANG_PREF_KEY = "userLanguage";
 
   const updateLanguage = (language, reload = false) => {
-    setDetectedLocale(true)
-    setLocale(language)
-    axios.defaults.headers.common['Accept-Language'] = language;
+    setDetectedLocale(true);
+    setLocale(language);
+    axios.defaults.headers.common["Accept-Language"] = language;
     if (reload) {
       // todo: remove if can get map to reload with new language
       location.reload();
     }
-  }
+  };
 
   const topNav = [
     {
@@ -133,9 +135,9 @@ export function App({gmApiKey}) {
   ];
 
   const socialNav = [
-    {href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram"},
-    {href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook"},
-    {href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter"},
+    { href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram" },
+    { href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook" },
+    { href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter" },
   ];
 
   const footerNav = [
@@ -171,22 +173,22 @@ export function App({gmApiKey}) {
   };
 
   const getInitialTaps = async () => {
-    const reqRef = getRequestRef()
-    startedRequest(reqRef)
+    const reqRef = getRequestRef();
+    startedRequest(reqRef);
     try {
       setLoading(true);
 
       const res = await axios.get("/get-initial-markers");
 
-      const {taps} = res.data;
+      const { taps } = res.data;
 
       const newTaps = taps
         ? taps.map((tap) => {
-          return {
-            ...tap,
-            isSearch: false,
-          };
-        })
+            return {
+              ...tap,
+              isSearch: false,
+            };
+          })
         : [];
 
       setInitialLoad(true);
@@ -197,21 +199,21 @@ export function App({gmApiKey}) {
       setInitialLoad(true);
       console.log("error", e);
     }
-    finishedRequest(reqRef)
+    finishedRequest(reqRef);
   };
 
   const getTapsWhenMapsMoved = async (value) => {
     const reqRef = getRequestRef();
     try {
       if (initialLoad) {
-        const {nw, se} = value;
+        const { nw, se } = value;
 
         startedRequest(reqRef);
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
         );
 
-        const {taps: resTaps} = res.data;
+        const { taps: resTaps } = res.data;
 
         const newTaps = [];
 
@@ -254,15 +256,18 @@ export function App({gmApiKey}) {
   };
 
   const startedRequest = (randomRef) => {
-    setRequestsInProgress([requestsInProgress, randomRef])
-  }
+    setRequestsInProgress([requestsInProgress, randomRef]);
+  };
 
   const finishedRequest = (randomRef) => {
-    Array.isArray(requestsInProgress) ? setRequestsInProgress(requestsInProgress.filter(item => item !== randomRef)) : null
-  }
+    Array.isArray(requestsInProgress)
+      ? setRequestsInProgress(
+          requestsInProgress.filter((item) => item !== randomRef)
+        )
+      : null;
+  };
 
   useEffect(() => {
-
     const language = window.navigator.userLanguage || window.navigator.language;
     const userLanguage = localStorage.getItem(LANG_PREF_KEY);
 
@@ -299,12 +304,18 @@ export function App({gmApiKey}) {
   }, [locale]);
 
   useEffect(() => {
+    if (Object.keys(coordinate).length > 0) {
+      getTapsWhenMapsMoved(coordinate);
+    }
+  }, [coordinate]);
+
+  useEffect(() => {
     const load = async () => {
       const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
       const slug = getSlug(REFILL_SPOT_ROUTE);
       if (slug) {
-        const reqRef = getRequestRef()
-        startedRequest(reqRef)
+        const reqRef = getRequestRef();
+        startedRequest(reqRef);
 
         const res = await axios.get(`/get-refill-spot/${slug}`);
         setCardData(transformCardData(res.data));
@@ -328,9 +339,9 @@ export function App({gmApiKey}) {
           lat: res?.data?.latitude ?? gmDefaultProps.center.lng,
           lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
         });
-        setZoom(16)
+        setZoom(16);
 
-        finishedRequest(reqRef)
+        finishedRequest(reqRef);
       }
     };
     load();
@@ -357,11 +368,11 @@ export function App({gmApiKey}) {
               className="collapse navbar-collapse justify-content-end"
               id="navbarNav"
             >
-              <ul className="nav" style={{marginTop: 10}}>
+              <ul className="nav" style={{ marginTop: 10 }}>
                 {topNav.map((el, i) => (
                   <li className="nav-item" key={i}>
                     <a className="nav-link" href={el.href} key={i}>
-                      <FormattedMessage id={el.id} defaultMessage=""/>
+                      <FormattedMessage id={el.id} defaultMessage="" />
                     </a>
                   </li>
                 ))}
@@ -392,28 +403,25 @@ export function App({gmApiKey}) {
             </span>
           </div>
         </nav>
-
-        <div style={{height: "70vh", width: "100%", position: "relative"}}>
-          {detectedLocale && <GoogleMapReact
-            bootstrapURLKeys={{
-              key: gmApiKey,
-              language: locale,
-              region: locale,
-              libraries: ["places"],
-            }}
-            onChange={handleDebounce}
-            center={center}
-            defaultCenter={gmDefaultProps.center}
-            defaultZoom={gmDefaultProps.zoom}
-            zoom={zoom}
-            onChildClick={onMarkerClick}
-            onGoogleApiLoaded={({map, maps}) => {
-              setGoogleMapFn(googleMapAPI(map, maps));
-            }}
-            yesIWantToUseGoogleMapApiInternals
-          >
-            {!loading && taps.length
-              ? taps.map((tap) => (
+      </div>
+      <div className="maps-container">
+        <GoogleMapReact
+          bootstrapURLKeys={{
+            key: gmApiKey,
+            libraries: ["places"],
+          }}
+          center={center}
+          onChange={(value) => handleDebounce(value)}
+          defaultCenter={gmDefaultProps.center}
+          defaultZoom={gmDefaultProps.zoom}
+          onGoogleApiLoaded={({ map, maps }) => {
+            setGoogleMapFn(googleMapAPI(map, maps));
+          }}
+          yesIWantToUseGoogleMapApiInternals
+          onChildClick={onMarkerClick}
+        >
+          {!loading && taps.length
+            ? taps.map((tap) => (
                 <Marker
                   key={tap.id}
                   lat={tap.latitude}
@@ -422,75 +430,75 @@ export function App({gmApiKey}) {
                   tap={tap}
                 />
               ))
-              : null}
-          </GoogleMapReact>}
-          {cardData && (
-            <div
-              style={{
-                height: "calc(70vh - 64px)",
-                position: "absolute",
-                zIndex: 999,
-                top: 32,
-                left: 32,
-              }}
-            >
-              {/* TODO: properly calculate height */}
-              <Modal cardData={cardData} onClose={handleCloseModal}/>
-            </div>
-          )}
-          {taps.length > 0 && (
-            <>
-              <Search
-                results={results}
-                onSearch={handleSearchQuery}
-                onReset={handleReset}
-              />
-              <SearchResults
-                results={results}
-                onSearchResultClick={handleResultClick}
-              />
-            </>
-          )}
-        </div>
-        <div className="loading-container">
-          {requestsInProgress.length > 0 && (
-            <div className="loading-indicator">
-              &nbsp;
-            </div>
-          )}
-        </div>
-        <div className="container-lg">
-          <Metrics/>
-
-          <FunFacts/>
-
-          <div className="footer">
-            <div className="container-lg">
-              <footer>
-                <ul className="nav justify-content-center">
-                  {socialNav.map((el, i) => (
-                    <li className="nav-item" key={i}>
-                      <a href={el.href} className="nav-link px-2 text-muted">
-                        <i className={`bi ${el.iconName}`}/>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-                <ul className="nav justify-content-center">
-                  {footerNav.map((el, i) => (
-                    <li className="nav-item" key={i}>
-                      <a href={el.href} className="nav-link px-2">
-                        <FormattedMessage id={el.id} defaultMessage=""/>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </footer>
-            </div>
+            : null}
+        </GoogleMapReact>
+        {cardData && (
+          <div
+            style={{
+              height: "calc(70vh - 64px)",
+              position: "absolute",
+              zIndex: 999,
+              top: 32,
+              left: 32,
+            }}
+          >
+            {/* TODO: properly calculate height */}
+            <Modal cardData={cardData} onClose={handleCloseModal} />
+          </div>
+        )}
+        {taps.length > 0 && (
+          <>
+            <Search
+              results={results}
+              onSearch={handleSearchQuery}
+              onReset={handleReset}
+            />
+            <SearchResults
+              results={results}
+              onSearchResultClick={handleResultClick}
+            />
+          </>
+        )}
+      </div>
+      <div className="loading-container">
+        {requestsInProgress.length > 0 && (
+          <div className="loading-indicator">&nbsp;</div>
+        )}
+      </div>
+      //{" "}
+      <div className="container-lg">
+        // <Metrics />
+        // <FunFacts />
+        //{" "}
+        <div className="footer">
+          //{" "}
+          <div className="container-lg">
+            //{" "}
+            <footer>
+              //{" "}
+              <ul className="nav justify-content-center">
+                //{" "}
+                {socialNav.map((el, i) => (
+                  <li className="nav-item" key={i}>
+                    <a href={el.href} className="nav-link px-2 text-muted">
+                      <i className={`bi ${el.iconName}`} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <ul className="nav justify-content-center">
+                {footerNav.map((el, i) => (
+                  <li className="nav-item" key={i}>
+                    <a href={el.href} className="nav-link px-2">
+                      <FormattedMessage id={el.id} defaultMessage="" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </footer>
           </div>
         </div>
       </div>
-
     </IntlProvider>
   );
 }
