@@ -16,11 +16,14 @@ import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
 import * as turf from "@turf/turf";
 import debounce from "lodash.debounce";
+<<<<<<< HEAD
 
 const translations = {
   en: require("./translations/en.json"),
   ja: require("./translations/ja.json"),
 };
+=======
+>>>>>>> f1ae5c592755a05d3214d168642b74656bc8a601
 
 export function App({ gmApiKey }) {
   const gmDefaultProps = {
@@ -42,6 +45,7 @@ export function App({ gmApiKey }) {
   const [center, setCenter] = useState(gmDefaultProps.center);
   const [zoom, setZoom] = useState(gmDefaultProps.zoom);
   const [cardData, setCardData] = useState(null);
+  const [coordinate, setCoordinate] = useState({});
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [googleMapFn, setGoogleMapFn] = useState();
@@ -202,12 +206,18 @@ export function App({ gmApiKey }) {
   };
 
   const getTapsWhenMapsMoved = async (value) => {
+<<<<<<< HEAD
     const reqRef = getRequestRef();
+=======
+>>>>>>> f1ae5c592755a05d3214d168642b74656bc8a601
     try {
       if (initialLoad) {
         const { nw, se } = value;
 
+<<<<<<< HEAD
         startedRequest(reqRef);
+=======
+>>>>>>> f1ae5c592755a05d3214d168642b74656bc8a601
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
         );
@@ -234,7 +244,10 @@ export function App({ gmApiKey }) {
     } catch (e) {
       console.log(e);
     }
+<<<<<<< HEAD
     finishedRequest(reqRef);
+=======
+>>>>>>> f1ae5c592755a05d3214d168642b74656bc8a601
   };
 
   const handleDebounce = useMemo(() => {
@@ -301,6 +314,12 @@ export function App({ gmApiKey }) {
   useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
   }, [locale]);
+
+  useEffect(() => {
+    if (Object.keys(coordinate).length > 0) {
+      getTapsWhenMapsMoved(coordinate);
+    }
+  }, [coordinate]);
 
   useEffect(() => {
     if (Object.keys(coordinate).length > 0) {
