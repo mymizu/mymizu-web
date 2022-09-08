@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 import { transformCardData } from "./utils/transformCardData";
@@ -9,6 +9,8 @@ import { Marker } from "./components/Marker";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
+import * as turf from "@turf/turf";
+import debounce from "lodash.debounce";
 
 export function App({ gmApiKey }) {
   const gmDefaultProps = {
@@ -26,6 +28,7 @@ export function App({ gmApiKey }) {
   const [language] = useLang();
   const [center, setCenter] = useState(gmDefaultProps.center);
   const [cardData, setCardData] = useState(null);
+  const [coordinate, setCoordinate] = useState({});
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [googleMapFn, setGoogleMapFn] = useState();
@@ -125,6 +128,43 @@ export function App({ gmApiKey }) {
     }
   };
 
+  const getTapsWhenMapsMoved = async (value) => {
+    try {
+      if (initialLoad) {
+        const { nw, se } = value;
+
+        const res = await axios.get(
+          `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
+        );
+
+        const { taps: resTaps } = res.data;
+
+        const newTaps = [];
+
+        for (let i = 0; i < resTaps.length; i++) {
+          let flag = false;
+          for (let j = 0; j < taps.length; j++) {
+            if (resTaps[i].id === taps[j].id) {
+              flag = true;
+              break;
+            }
+          }
+          if (!flag) {
+            newTaps.push(resTaps[i]);
+          }
+        }
+
+        setTaps([...taps, ...newTaps]);
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  };
+
+  const handleDebounce = useMemo(() => {
+    return debounce((value) => setCoordinate(value.bounds), 1500);
+  }, []);
+
   const onMarkerClick = (key, childProps) => {
     const markerData = childProps.tap;
     setCardData(transformCardData(markerData));
@@ -139,6 +179,12 @@ export function App({ gmApiKey }) {
       getInitialTaps();
     }
   }, [taps, setInitialLoad, initialLoad, setTaps]);
+
+  useEffect(() => {
+    if (Object.keys(coordinate).length > 0) {
+      getTapsWhenMapsMoved(coordinate);
+    }
+  }, [coordinate]);
 
   useEffect(() => {
     const load = async () => {
@@ -226,6 +272,7 @@ export function App({ gmApiKey }) {
             libraries: ["places"],
           }}
           center={center}
+          onChange={(value) => handleDebounce(value)}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
           onGoogleApiLoaded={({ map, maps }) => {

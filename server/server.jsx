@@ -38,6 +38,28 @@ app.get("/get-initial-markers", async (req, res) => {
   }
 });
 
+app.get("/get-marker-moving-map?", async (req, res) => {
+  try {
+    const { c1, c2, c3, c4 } = req.query;
+
+    const pos = {
+      c1,
+      c2,
+      c3,
+      c4,
+    };
+
+    const markers = await myMizuClient.get("/api/taps/nearby", pos);
+
+    res.status(200).send(markers);
+  } catch (e) {
+    res.status(400).json({
+      message: "Unable to fetch initial markers",
+      error: e,
+    });
+  }
+});
+
 app.get("/get-refill-spot/:slug", async (req, res) => {
   try {
     const info = await myMizuClient.get(`/api/taps/${req.params.slug}`);

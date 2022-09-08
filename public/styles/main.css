@@ -95,6 +95,7 @@ img#logo {
   height: 70vh;
   width: 100%;
   position: relative;
+  padding: 0;
 }
 
 .maps-location-search-container {
@@ -251,6 +252,12 @@ footer .nav-link i {
 
 .marker {
   color: #2F97D1;
+  position: relative;
+}
+
+.marker img {
+  position: absolute;
+  transform: translate(-50%,-100%);
 }
 
 .marker img.pin {
@@ -259,7 +266,7 @@ footer .nav-link i {
 }
 
 .marker img.pin-large {
-  height: 50px
+  height: 50px;
 }
 
 .info-card {

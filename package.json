@@ -13,12 +13,14 @@
     "start": "node ./build/server.js"
   },
   "dependencies": {
+    "@turf/turf": "^6.5.0",
     "axios": "^0.27.2",
     "classnames": "^2.3.1",
     "dotenv": "^16.0.1",
     "esbuild": "0.14.13",
     "express": "4.17.2",
     "google-map-react": "^2.1.10",
+    "lodash.debounce": "^4.0.8",
     "query-string": "^7.1.1",
     "react": "17.0.2",
     "react-dom": "17.0.2",
