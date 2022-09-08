@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {FormattedMessage} from "react-intl";
-
+import { FormattedMessage } from "react-intl";
 
 const Metrics = () => {
   const [stats, setStats] = useState(null);
@@ -60,14 +59,13 @@ const Metric = ({ background, label, value }) => {
     <div className="metric" style={{ "--background": backgroundUrl }}>
       <div className="metric__overlay" />
       <div className="metric__top-label">
-        <FormattedMessage
-        id="metrics.community"
-      /></div>
+        <FormattedMessage id="metrics.community" />
+      </div>
       <div className="metric__value">{value}</div>
-      <div className="metric__bottom-label"> <FormattedMessage
-        id={label}
-        defaultMessage={""}
-      /></div>
+      <div className="metric__bottom-label">
+        {" "}
+        <FormattedMessage id={label} defaultMessage={""} />
+      </div>
     </div>
   );
 };
