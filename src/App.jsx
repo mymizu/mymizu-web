@@ -39,10 +39,12 @@ export function App({gmApiKey}) {
   const [detectedLocale, setDetectedLocale] = useState(false);
   const [language] = useLang();
   const [center, setCenter] = useState(gmDefaultProps.center);
+  const [zoom, setZoom] = useState(gmDefaultProps.zoom);
   const [cardData, setCardData] = useState(null);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [googleMapFn, setGoogleMapFn] = useState();
+  const [requestsInProgress, setRequestsInProgress] = useState([]);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -169,6 +171,8 @@ export function App({gmApiKey}) {
   };
 
   const getInitialTaps = async () => {
+    const reqRef = getRequestRef()
+    startedRequest(reqRef)
     try {
       setLoading(true);
 
@@ -193,13 +197,16 @@ export function App({gmApiKey}) {
       setInitialLoad(true);
       console.log("error", e);
     }
+    finishedRequest(reqRef)
   };
 
   const getTapsWhenMapsMoved = async (value) => {
+    const reqRef = getRequestRef();
     try {
       if (initialLoad) {
         const {nw, se} = value;
 
+        startedRequest(reqRef);
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
         );
@@ -226,6 +233,7 @@ export function App({gmApiKey}) {
     } catch (e) {
       console.log(e);
     }
+    finishedRequest(reqRef);
   };
 
   const handleDebounce = useMemo(() => {
@@ -240,6 +248,18 @@ export function App({gmApiKey}) {
   const handleCloseModal = () => {
     setCardData(null);
   };
+
+  const getRequestRef = () => {
+    return (Math.random() + 1).toString(36).substring(7);
+  };
+
+  const startedRequest = (randomRef) => {
+    setRequestsInProgress([requestsInProgress, randomRef])
+  }
+
+  const finishedRequest = (randomRef) => {
+    Array.isArray(requestsInProgress) ? setRequestsInProgress(requestsInProgress.filter(item => item !== randomRef)) : null
+  }
 
   useEffect(() => {
 
@@ -283,13 +303,34 @@ export function App({gmApiKey}) {
       const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
       const slug = getSlug(REFILL_SPOT_ROUTE);
       if (slug) {
+        const reqRef = getRequestRef()
+        startedRequest(reqRef)
+
         const res = await axios.get(`/get-refill-spot/${slug}`);
         setCardData(transformCardData(res.data));
+        const newTaps = [];
+        let flag = false;
+        for (let j = 0; j < taps.length; j++) {
+          if (res.data.id === taps[j].id) {
+            flag = true;
+            break;
+          }
+        }
+        if (!flag) {
+          newTaps.push(res.data);
+        }
+        setTaps([...taps, ...newTaps]);
+
+        setInitialLoad(true);
+        setTaps(newTaps);
+
         setCenter({
           lat: res?.data?.latitude ?? gmDefaultProps.center.lng,
           lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
         });
-        setZoom(8)
+        setZoom(16)
+
+        finishedRequest(reqRef)
       }
     };
     load();
@@ -364,8 +405,9 @@ export function App({gmApiKey}) {
             center={center}
             defaultCenter={gmDefaultProps.center}
             defaultZoom={gmDefaultProps.zoom}
+            zoom={zoom}
             onChildClick={onMarkerClick}
-            onGoogleApiLoaded={({ map, maps }) => {
+            onGoogleApiLoaded={({map, maps}) => {
               setGoogleMapFn(googleMapAPI(map, maps));
             }}
             yesIWantToUseGoogleMapApiInternals
@@ -392,7 +434,7 @@ export function App({gmApiKey}) {
                 left: 32,
               }}
             >
-                {/* TODO: properly calculate height */}
+              {/* TODO: properly calculate height */}
               <Modal cardData={cardData} onClose={handleCloseModal}/>
             </div>
           )}
@@ -410,9 +452,15 @@ export function App({gmApiKey}) {
             </>
           )}
         </div>
-
+        <div className="loading-container">
+          {requestsInProgress.length > 0 && (
+            <div className="loading-indicator">
+              &nbsp;
+            </div>
+          )}
+        </div>
         <div className="container-lg">
-          <Metrics />
+          <Metrics/>
 
           <FunFacts/>
 

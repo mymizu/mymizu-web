@@ -5,7 +5,7 @@ export const transformCardData = (data) => {
     description: data.grouped_tags,
     action: {
       route: "",
-      share: data.website, // button to a link (href)
+      share: `https://map.mymizu.co/refill/en/${data.slug}`, // button to a link (href)
     },
     refillMethod: data.refill_instruction,
     openingHours: data.opening_hours,
