@@ -424,6 +424,9 @@ export function App({ gmApiKey }) {
           }}
           yesIWantToUseGoogleMapApiInternals
           onChildClick={onMarkerClick}
+          options={{
+            fullscreenControl: false,
+          }}
         >
           {!loading && taps.length
             ? taps.map((tap) => (
