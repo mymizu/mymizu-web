@@ -519,3 +519,26 @@ footer .nav-link i {
 .summary .description {
   padding: 10px 0;
 }
+
+.loading-container {
+  height: 5px;
+  width: 100%;
+}
+
+.loading-indicator {
+  width: 100%;
+  height: 5px;
+  background: #2F97D1;
+  left: -100%;
+  animation: load 3s linear infinite;
+  position: absolute;
+}
+
+@keyframes load{
+  0%{
+    left: -100%;
+  }
+  100%{
+    left: 100%;
+  }
+}
