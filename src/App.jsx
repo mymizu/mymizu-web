@@ -438,15 +438,7 @@ export function App({ gmApiKey }) {
             : null}
         </GoogleMapReact>
         {cardData && (
-          <div
-            style={{
-              height: "calc(70vh - 64px)",
-              position: "absolute",
-              zIndex: 999,
-              top: 32,
-              left: 32,
-            }}
-          >
+          <div className="modal-container">
             {/* TODO: properly calculate height */}
             <Modal cardData={cardData} onClose={handleCloseModal} />
           </div>
