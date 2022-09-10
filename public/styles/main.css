@@ -616,12 +616,10 @@ and (max-device-width: 812px) {
     position: absolute;
     bottom: 0;
     height: fit-content;
-    -webkit-transition: height .3s ease;
   }
 
   .info-card-slide-up {
     height: 100%;
-    -webkit-transition: height .3s ease;
     border-top-right-radius: 0px;
     border-top-left-radius: 0px;
   }
