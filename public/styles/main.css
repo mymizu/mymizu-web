@@ -569,9 +569,8 @@ footer .nav-link i {
 .summary .title h6 {
   font-size: 20px;
   color: #2F97D1;
+  margin: 0;
 }
-
-
 
 .summary .description {
   padding: 10px 0;
@@ -599,10 +598,12 @@ and (max-device-width: 812px) {
   }
 
   .modal-container {
-    height: fit-content;
+    height: 100%;
     width: 100%;
     left: 0;
-    top: 366px;
+    top: 0;
+    position: absolute;
+    cursor: pointer;
   }
 
   .info-card {
@@ -612,14 +613,44 @@ and (max-device-width: 812px) {
     border-bottom-right-radius: 0px;
     width: 100%;
     box-shadow: none;
+    position: absolute;
+    bottom: 0;
+    height: fit-content;
+    -webkit-transition: height .3s ease;
+  }
+
+  .info-card-slide-up {
+    height: 100%;
+    -webkit-transition: height .3s ease;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
   }
 
   .carousel {
-    height: 120px;
+    height: 100px;
   }
 
+  .carousel-slide-up {
+    height: 220px
+  }
 
-  .details {
-    display: none;
+  .description p {
+    font-size: 0.875rem;
+  }
+
+  .route-button {
+    padding: 0.375rem 1.125rem;
+  }
+
+  .share-button {
+    padding: 0.375rem 1.125rem;
+  }
+
+  .info-card .details {
+   display: none;
+  }
+
+  .info-card .details-slide-up {
+    display: block;
   }
 } 
