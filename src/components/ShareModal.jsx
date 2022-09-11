@@ -7,7 +7,7 @@ export const ShareModal = ({ data, setShareModal }) => {
     }, () => {
       /* clipboard write failed */
     });
-   
+
   };
   const closeFunc = () => {
     setShareModal(false);

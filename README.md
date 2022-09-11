@@ -1,3 +1,5 @@
+<center><img  src="https://map.mymizu.co/public/images/logo.svg" width="400" alt="mymizu logo" align="center" /></center>
+
 # 1. **What is this project**
 
 **mymizu Open-Source Web App**
