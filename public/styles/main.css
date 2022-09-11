@@ -111,6 +111,7 @@ img#logo {
   flex-wrap: wrap;
   justify-content: center;
   line-height: 20px;
+  z-index: 2;
 }
 
 .maps-location-search-container {
@@ -312,7 +313,7 @@ footer .nav-link i {
 .modal-container {
   height: 75vh;
   position: absolute;
-  z-index: 999;
+  z-index: 1;
   top: 32px;
   left: 25px;
 }
@@ -606,6 +607,10 @@ and (max-device-width: 812px) {
     cursor: pointer;
   }
 
+  .modal-container-slide-up {
+    z-index: 3
+  }
+
   .info-card {
     border-top-right-radius: 20px;
     border-top-left-radius: 20px;
@@ -616,12 +621,14 @@ and (max-device-width: 812px) {
     position: absolute;
     bottom: 0;
     height: fit-content;
+    overflow-y: hidden;
   }
 
   .info-card-slide-up {
     height: 100%;
     border-top-right-radius: 0px;
     border-top-left-radius: 0px;
+    overflow-y: scroll;
   }
 
   .carousel {

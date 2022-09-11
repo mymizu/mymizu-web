@@ -6,10 +6,8 @@ import BackButton from "./Buttons/BackButton";
 import { checkViewPort } from "../helpers";
 import classnames from "classnames";
 
-export const Modal = ({ onClose, cardData }) => {
+export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp }) => {
   const { group } = checkViewPort();
-
-  const [isSlideUp, setIsSlideUp] = useState(false);
 
   const showDetails = () => {
     if (group.title === "mobile") {
