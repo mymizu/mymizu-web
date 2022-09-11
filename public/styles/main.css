@@ -1,3 +1,8 @@
+.navbar {
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  z-index: 1;
+}
+
 .overlay {
   height: 100%;
   left: -100%;
@@ -98,27 +103,70 @@ img#logo {
   padding: 0;
 }
 
-.maps-location-search-container {
+.map-location-search {
   position: absolute;
-  max-width: 640px;
   top: 16px;
-  left: calc(50vw - 640px / 2);
-  /* 50vw - 1/2 max-width */
   width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   line-height: 20px;
+  z-index: 2;
+}
+
+.maps-location-search-container {
+  max-width: 640px;
+  width: 100%;
+}
+
+.maps-location-search-content {
+  background-color: white;
+  display: flex;
+  flex-wrap: wrap;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+}
+
+.maps-location-search-content-with-result {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: 1px solid #DDDDDD;
+}
+
+.input-icon-search-container {
+  background-color: white;
+  padding: 18px 0 18px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
 }
 
 .maps-location-search-input {
   background: #FFFFFF;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  border-radius: 30px;
-  padding-top: 20px;
-  padding-bottom: 20px;
-  padding-left: calc(2 * 20px + 18px);
-  /* 20px + icon width + 20px */
-  padding-right: calc(2 * 20px + 20px);
   border: none;
-  width: 100%;
+  width: 88%;
+  padding-left: 15px;
+  font-size: 1.05rem;
+}
+
+.input-icon-reset-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.maps-location-reset-icon {
+  /* relative to search container */
+  width: 24px;
+  cursor: pointer;
+  height: 24px;
 }
 
 .maps-location-search-input:focus {
@@ -134,24 +182,14 @@ img#logo {
   outline: none
 }
 
-.maps-location-search-icon {
+.map-results {
+  width: 100%;
+  display: flex;
+  justify-content: center;
   position: absolute;
-  /* relative to search container */
-  top: 20px;
-  left: 20px;
-  width: 20px;
-  height: 20px;
+  top: calc(10px + 60px);
 }
 
-.maps-location-reset-icon {
-  position: absolute;
-  /* relative to search container */
-  top: 20px;
-  right: 20px;
-  width: 20px;
-  height: 20px;
-  cursor: pointer;
-}
 
 .maps-location-search-results-container {
   background: #FFFFFF;
@@ -161,10 +199,7 @@ img#logo {
   border: none;
 
   /* positioning in the center top */
-  position: absolute;
   max-width: 640px;
-  top: calc(16px + 60px);
-  left: calc(50vw - 640px / 2);
   /* 50vw - 1/2 max-width */
   width: 100%;
 
@@ -278,7 +313,7 @@ footer .nav-link i {
 .modal-container {
   height: 75vh;
   position: absolute;
-  z-index: 999;
+  z-index: 1;
   top: 32px;
   left: 25px;
 }
@@ -535,10 +570,92 @@ footer .nav-link i {
 .summary .title h6 {
   font-size: 20px;
   color: #2F97D1;
+  margin: 0;
 }
-
-
 
 .summary .description {
   padding: 10px 0;
 }
+
+/* Portrait and Landscape */
+@media only screen 
+and (min-device-width: 375px) 
+and (max-device-width: 812px) {
+
+  .maps-container {
+    height: 91vh;
+  }
+
+  .maps-location-search-container {
+    padding-inline: 0.5rem;
+  }
+
+  .maps-location-search-input {
+    width: 80%;
+  }
+
+  .map-results {
+    padding-inline: 0.5rem;
+  }
+
+  .modal-container {
+    height: 100%;
+    width: 100%;
+    left: 0;
+    top: 0;
+    position: absolute;
+    cursor: pointer;
+  }
+
+  .modal-container-slide-up {
+    z-index: 3
+  }
+
+  .info-card {
+    border-top-right-radius: 20px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+    width: 100%;
+    box-shadow: none;
+    position: absolute;
+    bottom: 0;
+    height: fit-content;
+    overflow-y: hidden;
+  }
+
+  .info-card-slide-up {
+    height: 100%;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+    overflow-y: scroll;
+  }
+
+  .carousel {
+    height: 100px;
+  }
+
+  .carousel-slide-up {
+    height: 220px
+  }
+
+  .description p {
+    font-size: 0.875rem;
+  }
+
+  .route-button {
+    padding: 0.375rem 1.125rem;
+  }
+
+  .share-button {
+    padding: 0.375rem 1.125rem;
+  }
+
+  .info-card .details {
+   display: none;
+  }
+
+  .info-card .details-slide-up {
+    display: block;
+  }
+} 

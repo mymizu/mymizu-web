@@ -1,7 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 import { SearchResults } from "./SearchResults";
 import googleMapsInstanceAPI from "../../utils/googlemaps";
+import classnames from "classnames";
 
 export function Search({ results, onSearch, onReset }) {
   const inputRef = useRef();
@@ -14,29 +15,39 @@ export function Search({ results, onSearch, onReset }) {
     onReset();
   };
 
+  useEffect(() => {
+    console.log(inputRef.current.value);
+  }, [inputRef.current]);
+
   return (
-    <>
+    <div className="map-location-search">
       <div className="maps-location-search-container">
-        <input
-          ref={inputRef}
-          className={`maps-location-search-input ${showResultInputs}`}
-          placeholder="Search"
-          onChange={(e) => debounced(e.target.value)}
-        />
-        <img
-          className="maps-location-search-icon"
-          src="../../public/images/search.svg"
-        />
-        <img
-          className="maps-location-reset-icon"
-          src="../../public/images/reset.svg"
-        />
-        <img
-          className="maps-location-reset-icon"
-          src="/public/images/reset.svg"
-          onClick={handleReset}
-        />
+        <div
+          className={classnames("maps-location-search-content", {
+            ["maps-location-search-content-with-result"]: results.length > 0,
+          })}
+        >
+          <div className="input-icon-search-container">
+            <img
+              className="maps-location-search-icon"
+              src="../../public/images/search.svg"
+            />
+          </div>
+          <input
+            ref={inputRef}
+            className={`maps-location-search-input ${showResultInputs}`}
+            placeholder="Search"
+            onChange={(e) => debounced(e.target.value)}
+          />
+          <div className="input-icon-reset-container">
+            <img
+              className="maps-location-reset-icon"
+              src="/public/images/reset.svg"
+              onClick={handleReset}
+            />
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 }

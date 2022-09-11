@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import ArrowButton from "./Buttons/ArrowButton";
+import classnames from "classnames";
 
 export const Carousel = (props) => {
   const images = props?.carouselImg;
@@ -37,7 +38,11 @@ export const Carousel = (props) => {
   };
 
   return (
-    <div className="carousel">
+    <div
+      className={classnames("carousel", {
+        ["carousel-slide-up"]: props.isSlideUp,
+      })}
+    >
       <ArrowButton
         onClick={previousSlide}
         direction="back"

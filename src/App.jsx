@@ -16,6 +16,7 @@ import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
 import * as turf from "@turf/turf";
 import debounce from "lodash.debounce";
+import classnames from "classnames";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -46,6 +47,7 @@ export function App({ gmApiKey }) {
   const [results, setResults] = useState([]);
   const [googleMapFn, setGoogleMapFn] = useState();
   const [requestsInProgress, setRequestsInProgress] = useState([]);
+  const [isSlideUp, setIsSlideUp] = useState(false);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -424,6 +426,9 @@ export function App({ gmApiKey }) {
           }}
           yesIWantToUseGoogleMapApiInternals
           onChildClick={onMarkerClick}
+          options={{
+            fullscreenControl: false,
+          }}
         >
           {!loading && taps.length
             ? taps.map((tap) => (
@@ -438,9 +443,18 @@ export function App({ gmApiKey }) {
             : null}
         </GoogleMapReact>
         {cardData && (
-          <div className="modal-container">
+          <div
+            className={classnames("modal-container", {
+              ["modal-container-slide-up"]: isSlideUp,
+            })}
+          >
             {/* TODO: properly calculate height */}
-            <Modal cardData={cardData} onClose={handleCloseModal} />
+            <Modal
+              cardData={cardData}
+              onClose={handleCloseModal}
+              isSlideUp={isSlideUp}
+              setIsSlideUp={setIsSlideUp}
+            />
           </div>
         )}
         {taps.length > 0 && (
