@@ -399,7 +399,7 @@ export function App({ gmApiKey }) {
                     href="#"
                     onClick={() => updateLanguage("en", true)}
                   >
-                    EN
+                     EN
                   </a>
                 </li>
               </ul>
@@ -414,9 +414,11 @@ export function App({ gmApiKey }) {
         </nav>
       </div>
       <div className="maps-container">
-        <GoogleMapReact
+        {detectedLocale &&  <GoogleMapReact
           bootstrapURLKeys={{
             key: gmApiKey,
+            language: locale,
+            region: locale,
             libraries: ["places"],
           }}
           center={center}
@@ -443,7 +445,7 @@ export function App({ gmApiKey }) {
                 />
               ))
             : null}
-        </GoogleMapReact>
+        </GoogleMapReact>}
         {cardData && (
           <div
             className={classnames("modal-container", {

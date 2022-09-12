@@ -1,4 +1,5 @@
 import React from "react";
+import {FormattedMessage} from "react-intl";
 
 export const RouteButton = ({
   latitude,
@@ -15,7 +16,7 @@ export const RouteButton = ({
 
   return (
     <div>
-      <button className="route-button" onClick={onClickRoute}>Route</button>
+      <button className="route-button" onClick={onClickRoute}><FormattedMessage id="spot.route" /></button>
     </div>
   );
 };

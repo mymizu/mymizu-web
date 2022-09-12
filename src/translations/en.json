@@ -23,5 +23,11 @@
   "metrics.community": "together, we’ve saved",
   "metrics.bottle": "plastic bottles!",
   "metrics.co2": "kg of CO²!",
-  "metrics.money": " "
+  "metrics.money": " ",
+  "spot.route": "Route",
+  "spot.share": "Share",
+  "spot.report": "Report issue/suggest changes",
+  "spot.share.copy": "Copy",
+  "spot.share.title": "Share this refill spot",
+  "search": "Search"
 }
