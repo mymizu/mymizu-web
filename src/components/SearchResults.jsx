@@ -1,9 +1,10 @@
 import React from "react";
+import classnames from "classnames";
 
 export function SearchResults({ results, onSearchResultClick }) {
   return (
-    <>
-      <div className="maps-location-search-results-container">
+    <div className="map-results">
+      <div className={classnames("maps-location-search-results-container")}>
         {results.filter(Boolean).map((result) => {
           return (
             <div
@@ -30,6 +31,6 @@ export function SearchResults({ results, onSearchResultClick }) {
           );
         })}
       </div>
-    </>
+    </div>
   );
 }
