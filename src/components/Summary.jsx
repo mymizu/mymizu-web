@@ -4,8 +4,8 @@ import { ShareButton } from "./Buttons/ShareButton";
 import { RouteButton } from "./Buttons/RouteButton";
 import { Marker } from "./Marker";
 
-export const Summary = ({ data }) => {
-  const [shareModal, setShareModal] = useState(false);
+export const Summary = ({ data, setShareModal }) => {
+
 
   return (
     <div className="summary">
@@ -29,15 +29,8 @@ export const Summary = ({ data }) => {
       </div>
       <div className="actionbuttons">
         <RouteButton latitude={data.latitude} longitude={data.longitude} />
-        <ShareButton setShareModal={setShareModal} shareModal={shareModal} />
+        <ShareButton setShareModal={setShareModal} />
       </div>
-      {shareModal ? (
-        <div className="modal-container">
-          <ShareModal data={data} setShareModal={setShareModal} />
-        </div>
-      ) : (
-        ""
-      )}
     </div>
   );
 };
