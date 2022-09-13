@@ -665,6 +665,7 @@ and (max-device-width: 812px) {
 .loading-container {
   height: 5px;
   width: 100%;
+  overflow: hidden;
 }
 
 .loading-indicator {
