@@ -22,12 +22,12 @@
   "fact11": "2050年には、海の中の魚の数よりプラスチックの方が多くなると言われています。",
   "metrics.community": "mymizuコミュニティとして約",
   "metrics.bottle": "本のペットボトルを消滅しました！",
-  "metrics.co2": "トンのCO²を消滅しました！",
+  "metrics.co2": "kgのCO²を消滅しました！",
   "metrics.money": "を節約しました！",
   "spot.route": "ルート",
   "spot.share": "シェア",
   "spot.share.title": "給水スポットをシェア ",
   "spot.share.copy": "コピー",
-  "spot.report": "フィードバックをする",
+  "spot.report": "給水スポット情報の修正依頼",
   "search": "品川駅"
 }

@@ -519,6 +519,7 @@ footer .nav-link i {
   color: #2F97D1;
   border: none;
   background-color: rgb(232, 228, 228);
+  width: 150px;
 }
 
 .share-modal .close-share-modal {
@@ -549,6 +550,7 @@ footer .nav-link i {
 .image-slide {
   height: 100%;
   width: 100%;
+  background-position: center center;
 }
 
 .summary {

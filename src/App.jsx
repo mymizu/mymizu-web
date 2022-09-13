@@ -14,7 +14,6 @@ import { Marker } from "./components/Marker";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
-import * as turf from "@turf/turf";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
 import {ShareModal} from "./components/ShareModal";
@@ -247,7 +246,7 @@ export function App({ gmApiKey }) {
 
   const onMarkerClick = (key, childProps) => {
     const markerData = childProps.tap;
-    setCardData(transformCardData(markerData));
+    setCardData(transformCardData(markerData, locale));
   };
 
   const handleCloseModal = () => {
@@ -327,7 +326,7 @@ export function App({ gmApiKey }) {
         startedRequest(reqRef);
 
         const res = await axios.get(`/get-refill-spot/${slug}`);
-        setCardData(transformCardData(res.data));
+        setCardData(transformCardData(res.data, locale));
         const newTaps = [];
         let flag = false;
         for (let j = 0; j < taps.length; j++) {
