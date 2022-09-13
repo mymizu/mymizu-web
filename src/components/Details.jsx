@@ -9,10 +9,10 @@ export const Details = ({ data }) => {
     <div>
       <div className="border-blue"></div>
       {data.refillMethod && (
-      <div className="detail-section">
-        <img src="/public/images/cup.svg" alt="" />
-        <div>{data.refillMethod}</div>
-      </div>
+        <div className="detail-section">
+          <img src="/public/images/cup.svg" alt="" />
+          <div>{data.refillMethod}</div>
+        </div>
       )}
       {data.openingHours && (
         <div className="detail-section">
@@ -30,7 +30,11 @@ export const Details = ({ data }) => {
       {data.link && (
         <div className="detail-section">
           <img src="/public/images/globe.svg" alt="" />
-          <div><a href={data.link} target="_new">{data.link}</a></div>
+          <div>
+            <a href={data.link} target="_new">
+              {data.link}
+            </a>
+          </div>
         </div>
       )}
       {data.address && (
@@ -45,7 +49,7 @@ export const Details = ({ data }) => {
       </div>
       <div className="detail-section">
         <img src="/public/images/edit.svg" alt="" />
-        <div>Feedback: {data.description.feedback}</div>
+        <div>フィードバック: {data.description.feedback}</div>
       </div>
     </div>
   );
