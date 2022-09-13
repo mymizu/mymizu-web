@@ -6,7 +6,7 @@ import BackButton from "./Buttons/BackButton";
 import { checkViewPort } from "../helpers";
 import classnames from "classnames";
 
-export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp }) => {
+export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp, setShareModal }) => {
   const { group } = checkViewPort();
 
   const showDetails = () => {
@@ -33,7 +33,7 @@ export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp }) => {
 
       <Carousel carouselImg={cardData?.carouselImg} isSlideUp={isSlideUp} />
       <div></div>
-      <Summary data={cardData} />
+      <Summary data={cardData} setShareModal={setShareModal} />
 
       <div
         className={classnames("details", {

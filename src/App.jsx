@@ -17,6 +17,7 @@ import googleMapAPI from "../utils/googlemaps";
 import * as turf from "@turf/turf";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
+import {ShareModal} from "./components/ShareModal";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -43,6 +44,7 @@ export function App({ gmApiKey }) {
   const [center, setCenter] = useState(gmDefaultProps.center);
   const [zoom, setZoom] = useState(gmDefaultProps.zoom);
   const [cardData, setCardData] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [googleMapFn, setGoogleMapFn] = useState();
@@ -397,7 +399,7 @@ export function App({ gmApiKey }) {
                     href="#"
                     onClick={() => updateLanguage("en", true)}
                   >
-                    EN
+                     EN
                   </a>
                 </li>
               </ul>
@@ -412,9 +414,11 @@ export function App({ gmApiKey }) {
         </nav>
       </div>
       <div className="maps-container">
-        <GoogleMapReact
+        {detectedLocale &&  <GoogleMapReact
           bootstrapURLKeys={{
             key: gmApiKey,
+            language: locale,
+            region: locale,
             libraries: ["places"],
           }}
           center={center}
@@ -441,7 +445,7 @@ export function App({ gmApiKey }) {
                 />
               ))
             : null}
-        </GoogleMapReact>
+        </GoogleMapReact>}
         {cardData && (
           <div
             className={classnames("modal-container", {
@@ -454,7 +458,13 @@ export function App({ gmApiKey }) {
               onClose={handleCloseModal}
               isSlideUp={isSlideUp}
               setIsSlideUp={setIsSlideUp}
+              setShareModal={setShowShareModal}
             />
+            {showShareModal ? (
+                <ShareModal data={cardData} setShareModal={setShowShareModal} />
+            ) : (
+              ""
+            )}
           </div>
         )}
         {taps.length > 0 && (

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
-import { SearchResults } from "./SearchResults";
-import googleMapsInstanceAPI from "../../utils/googlemaps";
+import { IntlProvider, useIntl } from 'react-intl';
 import classnames from "classnames";
 
 export function Search({ results, onSearch, onReset, isSlideUp }) {
@@ -18,6 +17,8 @@ export function Search({ results, onSearch, onReset, isSlideUp }) {
   useEffect(() => {
     console.log(inputRef.current.value);
   }, [inputRef.current]);
+
+  const intl = useIntl();
 
   return (
     <div
@@ -40,7 +41,7 @@ export function Search({ results, onSearch, onReset, isSlideUp }) {
           <input
             ref={inputRef}
             className={`maps-location-search-input ${showResultInputs}`}
-            placeholder="Search"
+            placeholder={intl.formatMessage({ id: 'search' })}
             onChange={(e) => debounced(e.target.value)}
           />
           <div className="input-icon-reset-container">

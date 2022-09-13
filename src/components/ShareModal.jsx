@@ -1,4 +1,5 @@
 import React from "react";
+import {FormattedMessage} from "react-intl";
 
 export const ShareModal = ({ data, setShareModal }) => {
   const copyFunc = (data) => {
@@ -14,12 +15,12 @@ export const ShareModal = ({ data, setShareModal }) => {
   };
   return (
     <div className="share-modal">
-      <a className="share-modal-title">Share this Refill spot</a>
+      <a className="share-modal-title"><FormattedMessage id="spot.share.title" /></a>
       <div className="share-link">{data.title}</div>
       <div className="link-copy">
         <div>{data.action.share}</div>
         <button className="copy-button" onClick={() => copyFunc(data)}>
-          Copy
+          <FormattedMessage id="spot.share.copy" />
         </button>
       </div>
 

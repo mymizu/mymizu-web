@@ -456,7 +456,7 @@ footer .nav-link i {
 }
 
 
-.info-card .share-modal {
+.share-modal {
   padding-top: 10px;
   height: 144px;
   width: 358px;
@@ -578,8 +578,8 @@ footer .nav-link i {
 }
 
 /* Portrait and Landscape */
-@media only screen 
-and (min-device-width: 375px) 
+@media only screen
+and (min-device-width: 375px)
 and (max-device-width: 812px) {
 
   .maps-container {
@@ -662,7 +662,7 @@ and (max-device-width: 812px) {
   .info-card .details-slide-up {
     display: block;
   }
-} 
+}
 
 .loading-container {
   height: 5px;

@@ -23,5 +23,11 @@
   "metrics.community": "mymizuコミュニティとして約",
   "metrics.bottle": "本のペットボトルを消滅しました！",
   "metrics.co2": "トンのCO²を消滅しました！",
-  "metrics.money": "を節約しました！"
+  "metrics.money": "を節約しました！",
+  "spot.route": "ルート",
+  "spot.share": "シェア",
+  "spot.share.title": "給水スポットをシェア ",
+  "spot.share.copy": "コピー",
+  "spot.report": "フィードバックをする",
+  "search": "品川駅"
 }
