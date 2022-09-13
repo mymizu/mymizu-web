@@ -1,9 +1,8 @@
 import React from "react";
-import {FormattedMessage} from "react-intl";
+import {FormattedMessage, useIntl} from "react-intl";
 
 export const Details = ({ data }) => {
-  const commentArray = data.comment ? data.comment.split("\n") : [];
-
+  const intl = useIntl()
   return (
     <div>
       <div className="border-blue"></div>
@@ -24,6 +23,9 @@ export const Details = ({ data }) => {
               </div>
             ))}
           </div>
+          {data.comment && (<div>
+            <p>{data.comment}</p>
+          </div>)}
         </div>
       )}
       {data.link && (
@@ -40,7 +42,7 @@ export const Details = ({ data }) => {
       )}
       <div className="detail-section">
         <img src="/public/images/info.svg" alt="" />
-        <div><a href={`https://docs.google.com/forms/d/e/1FAIpQLSeRNzWZhQ7jBGzZQOJS4sHt1s4MUR6cf2AinT5ujioLJChPYQ/viewform?usp=pp_url&entry.2092238618=${data.id}`} target="_new"><FormattedMessage id="spot.report" /></a></div>
+        <div><a href={intl.locale === "en" ? `https://docs.google.com/forms/d/e/1FAIpQLSeRNzWZhQ7jBGzZQOJS4sHt1s4MUR6cf2AinT5ujioLJChPYQ/viewform?usp=pp_url&entry.2092238618=${data.id}` : `https://docs.google.com/forms/d/e/1FAIpQLSe0sjbGYk-jJAOxhTFd6eWGWxLbsidYWK4VMPyVmDPx7UGlFQ/viewform?usp=pp_url&entry.2092238618=${data.id}`} target="_new"><FormattedMessage id="spot.report" /></a></div>
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-export const transformCardData = (data) => {
+export const transformCardData = (data, locale) => {
   return {
     id: data.id,
     carouselImg: data.photos,
@@ -6,7 +6,7 @@ export const transformCardData = (data) => {
     description: data.grouped_tags,
     action: {
       route: "",
-      share: `https://map.mymizu.co/refill/en/${data.slug}`, // button to a link (href)
+      share: `https://map.mymizu.co/refill/${locale}/${data.slug}`, // button to a link (href)
     },
     refillMethod: data.refill_instruction,
     openingHours: data.opening_hours,

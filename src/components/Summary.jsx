@@ -1,8 +1,6 @@
 import React, { useState } from "react";
-import { ShareModal } from "./ShareModal";
 import { ShareButton } from "./Buttons/ShareButton";
 import { RouteButton } from "./Buttons/RouteButton";
-import { Marker } from "./Marker";
 
 export const Summary = ({ data, setShareModal }) => {
 
@@ -22,7 +20,7 @@ export const Summary = ({ data, setShareModal }) => {
           Object.keys(data.description).map((name, index) => {
             return (
               <p key={index}>
-                {Object.values(data.description[name].join(" • "))}
+                {name}: {Object.values(data.description[name].join(" • "))}
               </p>
             );
           })}
