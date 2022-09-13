@@ -23,9 +23,6 @@ export const Details = ({ data }) => {
               </div>
             ))}
           </div>
-          {data.comment && (<div>
-            <p>{data.comment}</p>
-          </div>)}
         </div>
       )}
       {data.link && (

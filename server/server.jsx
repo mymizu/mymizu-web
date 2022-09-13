@@ -69,6 +69,7 @@ app.get("/get-marker-moving-map?", async (req, res) => {
       c2,
       c3,
       c4,
+      l: getLanguage(req),
     };
 
     const markers = await myMizuClient.get("/api/taps/nearby", pos);
