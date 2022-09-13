@@ -24,6 +24,7 @@
   "metrics.bottle": "plastic bottles!",
   "metrics.co2": "kg of CO²!",
   "metrics.money": " ",
+  "metrics.money_suffix": "K",
   "spot.route": "Route",
   "spot.share": "Share",
   "spot.report": "Report issue/suggest changes",

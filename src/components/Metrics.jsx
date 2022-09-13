@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { FormattedMessage } from "react-intl";
+import React, {useEffect, useState} from "react";
+import {FormattedMessage, useIntl} from "react-intl";
 
 const Metrics = () => {
   const [stats, setStats] = useState(null);
-
+  const intl = useIntl()
   useEffect(() => {
     const fetchCommunityStats = async () => {
       try {
@@ -26,7 +26,7 @@ const Metrics = () => {
     const refill = stats.refill_amount; // ml
     bottle = Math.floor(refill / 500);
     co2 = Math.floor(bottle * 0.3333);
-    money = Math.floor(bottle * 110);
+    money = Math.floor((bottle * 110) / 1000);
   }
 
   return (
@@ -44,27 +44,27 @@ const Metrics = () => {
       <Metric
         background="money"
         label={"metrics.money"}
-        value={"¥" + numberFormatter.format(money)}
+        value={"¥" + numberFormatter.format(money) + intl.formatMessage({id: 'metrics.money_suffix'})}
       />
     </div>
   );
 };
 export default Metrics;
 
-const Metric = ({ background, label, value }) => {
+const Metric = ({background, label, value}) => {
   // TODO: use an optimized webp image and fallback to jpg
   const backgroundUrl = `url(../images/metrics/${background}.jpg)`;
 
   return (
-    <div className="metric" style={{ "--background": backgroundUrl }}>
-      <div className="metric__overlay" />
+    <div className="metric" style={{"--background": backgroundUrl}}>
+      <div className="metric__overlay"/>
       <div className="metric__top-label">
-        <FormattedMessage id="metrics.community" />
+        <FormattedMessage id="metrics.community"/>
       </div>
       <div className="metric__value">{value}</div>
       <div className="metric__bottom-label">
         {" "}
-        <FormattedMessage id={label} defaultMessage={""} />
+        <FormattedMessage id={label} defaultMessage={""}/>
       </div>
     </div>
   );

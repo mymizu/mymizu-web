@@ -24,6 +24,7 @@
   "metrics.bottle": "本のペットボトルを消滅しました！",
   "metrics.co2": "kgのCO²を消滅しました！",
   "metrics.money": "を節約しました！",
+  "metrics.money_suffix": "万",
   "spot.route": "ルート",
   "spot.share": "シェア",
   "spot.share.title": "給水スポットをシェア ",
