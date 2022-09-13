@@ -463,6 +463,7 @@ export function App({ gmApiKey }) {
               results={results}
               onSearch={handleSearchQuery}
               onReset={handleReset}
+              isSlideUp={isSlideUp}
             />
             <SearchResults
               results={results}

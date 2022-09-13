@@ -313,7 +313,7 @@ footer .nav-link i {
 .modal-container {
   height: 75vh;
   position: absolute;
-  z-index: 1;
+  z-index: 3;
   top: 32px;
   left: 25px;
 }
@@ -598,6 +598,10 @@ and (max-device-width: 812px) {
     padding-inline: 0.5rem;
   }
 
+  .map-location-search-slide-up {
+    z-index: 1;
+  }
+
   .modal-container {
     height: 100%;
     width: 100%;
@@ -608,7 +612,7 @@ and (max-device-width: 812px) {
   }
 
   .modal-container-slide-up {
-    z-index: 3
+    z-index: 1
   }
 
   .info-card {

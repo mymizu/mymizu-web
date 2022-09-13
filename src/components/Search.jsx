@@ -4,7 +4,7 @@ import { SearchResults } from "./SearchResults";
 import googleMapsInstanceAPI from "../../utils/googlemaps";
 import classnames from "classnames";
 
-export function Search({ results, onSearch, onReset }) {
+export function Search({ results, onSearch, onReset, isSlideUp }) {
   const inputRef = useRef();
   const debounced = useDebouncedCallback(onSearch, 500, { leading: true });
   const showResultInputs =
@@ -20,7 +20,11 @@ export function Search({ results, onSearch, onReset }) {
   }, [inputRef.current]);
 
   return (
-    <div className="map-location-search">
+    <div
+      className={classnames("map-location-search", {
+        ["map-location-search-slide-up"]: isSlideUp,
+      })}
+    >
       <div className="maps-location-search-container">
         <div
           className={classnames("maps-location-search-content", {
