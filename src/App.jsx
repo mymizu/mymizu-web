@@ -1,18 +1,18 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, {useState, useEffect, useMemo} from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 
-import { FormattedMessage, IntlProvider } from "react-intl";
+import {FormattedMessage, IntlProvider} from "react-intl";
 import i18nConfig from "./i18nConfig";
-import { FunFacts } from "./components";
+import {FunFacts} from "./components";
 import Metrics from "./components/Metrics";
-import { transformCardData } from "./utils/transformCardData";
-import { Modal } from "./components/Modal";
-import { useLang } from "./utils/useLang";
+import {transformCardData} from "./utils/transformCardData";
+import {Modal} from "./components/Modal";
+import {useLang} from "./utils/useLang";
 import getSlug from "./utils/getSlug";
-import { Marker } from "./components/Marker";
-import { Search } from "./components/Search";
-import { SearchResults } from "./components/SearchResults";
+import {Marker} from "./components/Marker";
+import {Search} from "./components/Search";
+import {SearchResults} from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
@@ -23,7 +23,7 @@ const translations = {
   ja: require("./translations/ja.json"),
 };
 
-export function App({ gmApiKey }) {
+export function App({gmApiKey}) {
   const gmDefaultProps = {
     center: {
       lat: 35.662,
@@ -64,7 +64,7 @@ export function App({ gmApiKey }) {
   };
 
   const handleResultClick = (result) => {
-    const { location } = result.geometry;
+    const {location} = result.geometry;
 
     const resultLat = String(location.lat()).slice(0, 6);
     const resultLng = String(location.lng()).slice(0, 7);
@@ -111,62 +111,82 @@ export function App({ gmApiKey }) {
   const topNav = [
     {
       id: "topnav.map",
-      href: "https://mymizu.co/en/how-to",
-      title: "給水MAPの使い方",
+      href: {
+        en: "https://mymizu.co/en/mymizu-web",
+        ja: "https://mymizu.co/ja/mymizu-web",
+      },
     },
     {
       id: "topnav.about",
-      href: "https://mymizu.co/en-home",
-      title: "mymizuについて",
+      href: {
+        en: "https://mymizu.co/en-home",
+        ja: "https://mymizu.co",
+      },
     },
     {
       id: "topnav.community",
-      href: "https://www.mymizu.co/en/business",
-      title: "コミュニティに参加",
+      href: {
+        en: "https://www.mymizu.co/en/business",
+        ja: "https://www.mymizu.co/business"
+      }
     },
     {
       id: "topnav.partners",
-      href: "https://github.com/mymizu/mymizu-web",
-      title: "mymizuについて",
+      href: {
+        en: "https://github.com/mymizu/mymizu-web",
+        ja: "https://github.com/mymizu/mymizu-web/"
+      }
     },
     {
       id: "topnav.feedback",
-      href: "https://sij3.typeform.com/to/qADeh9",
-      title: "お店にmymizuを紹介",
+      href: {
+        en: "https://go.mymizu.co/web-app-feedback-en",
+        ja: "https://go.mymizu.co/web-app-feedback-ja"
+      }
     },
   ];
 
   const socialNav = [
-    { href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram" },
-    { href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook" },
-    { href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter" },
+    {href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram"},
+    {href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook"},
+    {href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter"},
   ];
 
   const footerNav = [
     {
       id: "footernav.joinus",
-      href: "https://www.mymizu.co/action-app-en",
-      title: "給水MAPの使い方",
+      href: {
+        en:"https://www.mymizu.co/action-app-en",
+        ja:"https://www.mymizu.co/action-app-ja"
+      }
     },
     {
       id: "footernav.supporters",
-      href: "https://www.mymizu.co/partners-en",
-      title: "mymizuについて",
+      href: {
+        en:"https://www.mymizu.co/partners-en",
+        ja:"https://www.mymizu.co/partners-ja"
+      }
     },
     {
       id: "footernav.contact",
-      href: "https://www.mymizu.co/contact-us-en",
-      title: "コミュニティに参加",
+      href: {
+        en: "https://www.mymizu.co/contact-us-en",
+        ja: "https://www.mymizu.co/contact-us-ja"
+      }
     },
     {
       id: "footernav.policy",
-      href: "https://legal.mymizu.co/privacy",
-      title: "mymizuについて",
+      href: {
+        en:"https://legal.mymizu.co/privacy",
+        ja:"https://legal.mymizu.co/privacy",
+      }
     },
     {
       id: "footernav.terms",
-      href: "https://legal.mymizu.co/terms",
-      title: "お店にmymizuを紹介",
+      href: {
+        en:"https://legal.mymizu.co/terms",
+        ja:"https://legal.mymizu.co/terms",
+      }
     },
   ];
 
@@ -182,15 +202,15 @@ export function App({ gmApiKey }) {
 
       const res = await axios.get("/get-initial-markers");
 
-      const { taps } = res.data;
+      const {taps} = res.data;
 
       const newTaps = taps
         ? taps.map((tap) => {
-            return {
-              ...tap,
-              isSearch: false,
-            };
-          })
+          return {
+            ...tap,
+            isSearch: false,
+          };
+        })
         : [];
 
       setInitialLoad(true);
@@ -208,14 +228,14 @@ export function App({ gmApiKey }) {
     const reqRef = getRequestRef();
     try {
       if (initialLoad) {
-        const { nw, se } = value;
+        const {nw, se} = value;
 
         startedRequest(reqRef);
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
         );
 
-        const { taps: resTaps } = res.data;
+        const {taps: resTaps} = res.data;
 
         const newTaps = [];
 
@@ -264,8 +284,8 @@ export function App({ gmApiKey }) {
   const finishedRequest = (randomRef) => {
     Array.isArray(requestsInProgress)
       ? setRequestsInProgress(
-          requestsInProgress.filter((item) => item !== randomRef)
-        )
+        requestsInProgress.filter((item) => item !== randomRef)
+      )
       : null;
   };
 
@@ -376,11 +396,11 @@ export function App({ gmApiKey }) {
               className="collapse navbar-collapse justify-content-end"
               id="navbarNav"
             >
-              <ul className="nav" style={{ marginTop: 10 }}>
+              <ul className="nav" style={{marginTop: 10}}>
                 {topNav.map((el, i) => (
                   <li className="nav-item" key={i}>
-                    <a className="nav-link" href={el.href} key={i}>
-                      <FormattedMessage id={el.id} defaultMessage="" />
+                    <a className="nav-link" href={el.href[locale]} key={i}>
+                      <FormattedMessage id={el.id} defaultMessage=""/>
                     </a>
                   </li>
                 ))}
@@ -398,7 +418,7 @@ export function App({ gmApiKey }) {
                     href="#"
                     onClick={() => updateLanguage("en", true)}
                   >
-                     EN
+                    EN
                   </a>
                 </li>
               </ul>
@@ -413,7 +433,7 @@ export function App({ gmApiKey }) {
         </nav>
       </div>
       <div className="maps-container">
-        {detectedLocale &&  <GoogleMapReact
+        {detectedLocale && <GoogleMapReact
           bootstrapURLKeys={{
             key: gmApiKey,
             language: locale,
@@ -424,7 +444,7 @@ export function App({ gmApiKey }) {
           onChange={(value) => handleDebounce(value)}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
-          onGoogleApiLoaded={({ map, maps }) => {
+          onGoogleApiLoaded={({map, maps}) => {
             setGoogleMapFn(googleMapAPI(map, maps));
           }}
           yesIWantToUseGoogleMapApiInternals
@@ -435,14 +455,14 @@ export function App({ gmApiKey }) {
         >
           {!loading && taps.length
             ? taps.map((tap) => (
-                <Marker
-                  key={tap.id}
-                  lat={tap.latitude}
-                  lng={tap.longitude}
-                  category={tap.category_id}
-                  tap={tap}
-                />
-              ))
+              <Marker
+                key={tap.id}
+                lat={tap.latitude}
+                lng={tap.longitude}
+                category={tap.category_id}
+                tap={tap}
+              />
+            ))
             : null}
         </GoogleMapReact>}
         {cardData && (
@@ -460,7 +480,7 @@ export function App({ gmApiKey }) {
               setShareModal={setShowShareModal}
             />
             {showShareModal ? (
-                <ShareModal data={cardData} setShareModal={setShowShareModal} />
+              <ShareModal data={cardData} setShareModal={setShowShareModal}/>
             ) : (
               ""
             )}
@@ -486,8 +506,8 @@ export function App({ gmApiKey }) {
         )}
       </div>
       <div className="container-lg">
-        <Metrics />
-        <FunFacts />
+        <Metrics/>
+        <FunFacts/>
       </div>
       <div className="footer">
         <div className="container-lg">
@@ -496,7 +516,7 @@ export function App({ gmApiKey }) {
               {socialNav.map((el, i) => (
                 <li className="nav-item" key={i}>
                   <a href={el.href} className="nav-link px-2 text-muted">
-                    <i className={`bi ${el.iconName}`} />
+                    <i className={`bi ${el.iconName}`}/>
                   </a>
                 </li>
               ))}
@@ -504,8 +524,8 @@ export function App({ gmApiKey }) {
             <ul className="nav justify-content-center">
               {footerNav.map((el, i) => (
                 <li className="nav-item" key={i}>
-                  <a href={el.href} className="nav-link px-2">
-                    <FormattedMessage id={el.id} defaultMessage="" />
+                  <a href={el.href[locale]} className="nav-link px-2">
+                    <FormattedMessage id={el.id} defaultMessage=""/>
                   </a>
                 </li>
               ))}
