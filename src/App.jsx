@@ -396,7 +396,7 @@ export function App({gmApiKey}) {
               className="collapse navbar-collapse justify-content-end"
               id="navbarNav"
             >
-              <ul className="nav" style={{marginTop: 10}}>
+              <ul className="nav navbar-nav " style={{marginTop: 10}}>
                 {topNav.map((el, i) => (
                   <li className="nav-item" key={i}>
                     <a className="nav-link" href={el.href[locale]} key={i}>
@@ -423,12 +423,13 @@ export function App({gmApiKey}) {
                 </li>
               </ul>
             </div>
-            <span
+            <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav"   aria-expanded="false" aria-label="Toggle navigation">
+              <span
               className="hamburger d-sm-inline d-md-inline d-lg-none"
               onClick={handleNav}
             >
               &#9776;
-            </span>
+            </span></button>
           </div>
         </nav>
       </div>
