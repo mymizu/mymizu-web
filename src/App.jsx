@@ -447,23 +447,22 @@ export function App({gmApiKey}) {
                   </li>
                 ))}
                 <li className="nav-item lang-selector">
-                  <a
+                  {locale !== "ja" && (<a
                     className="nav-link"
                     href="#"
                     onClick={() => updateLanguage("ja", true)}
                     hrefLang="ja"
                   >
                     日本語
-                  </a>{" "}
-                  |
-                  {" "}<a
+                  </a>)}
+                  {locale !== "en" && ( <a
                     className="nav-link"
                     href="#"
                     hrefLang="en"
                     onClick={() => updateLanguage("en", true)}
                   >
                     English
-                  </a>
+                  </a>)}
                 </li>
               </ul>
             </div>

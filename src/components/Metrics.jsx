@@ -22,7 +22,7 @@ const Metrics = () => {
         return
       }
     }
-    
+
     const fetchCommunityStats = async () => {
       try {
         const res = await axios.get("/community");
