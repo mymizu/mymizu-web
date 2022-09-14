@@ -123,7 +123,7 @@ export function App({gmApiKey}) {
     {
       id: "topnav.about",
       href: {
-        en: "https://mymizu.co/en-home",
+        en: "https://www.mymizu.co/home-en",
         ja: "https://mymizu.co",
       },
     },
@@ -451,16 +451,18 @@ export function App({gmApiKey}) {
                     className="nav-link"
                     href="#"
                     onClick={() => updateLanguage("ja", true)}
+                    hrefLang="ja"
                   >
-                    JP
+                    日本語
                   </a>{" "}
                   |
-                  <a
+                  {" "}<a
                     className="nav-link"
                     href="#"
+                    hrefLang="en"
                     onClick={() => updateLanguage("en", true)}
                   >
-                    EN
+                    English
                   </a>
                 </li>
               </ul>
