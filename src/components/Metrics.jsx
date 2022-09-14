@@ -33,7 +33,7 @@ const Metrics = () => {
     <div className="metrics">
       <Metric
         background="ocean"
-        label={"metrics.community"}
+        label={"metrics.bottle"}
         value={numberFormatter.format(bottle)}
       />
       <Metric
