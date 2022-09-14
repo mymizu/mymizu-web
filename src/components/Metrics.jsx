@@ -25,7 +25,7 @@ const Metrics = () => {
   if (stats) {
     const refill = stats.refill_amount; // ml
     bottle = Math.floor(refill / 500);
-    co2 = Math.floor(bottle * 0.3333);
+    co2 = (Math.floor(bottle * 0.3333) / 1000).toFixed(1);
     money = Math.floor((bottle * 110) / 1000);
   }
 
