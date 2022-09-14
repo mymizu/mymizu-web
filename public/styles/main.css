@@ -107,6 +107,11 @@ img#logo {
   position: absolute;
   top: 16px;
   width: 100%;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
+  left: 0;
+  right: 0;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
