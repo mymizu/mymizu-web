@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {FormattedMessage, useIntl} from "react-intl";
+import axios from "axios";
 
 const Metrics = () => {
   const [stats, setStats] = useState(null);
@@ -7,9 +8,8 @@ const Metrics = () => {
   useEffect(() => {
     const fetchCommunityStats = async () => {
       try {
-        const res = await fetch("/community");
-        const json = await res.json();
-        res.status === 200 && setStats(json);
+        const res = await axios.get("/community");
+        res.status === 200 && setStats(res);
       } catch (e) {
         console.error(e);
       }

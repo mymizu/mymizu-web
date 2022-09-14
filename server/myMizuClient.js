@@ -6,7 +6,7 @@ const baseURL = "https://api.mymizu.co";
 
 // @NOTES: I'm not sure how userToken is generated.
 // I assume that we request for a token initially with an API key. But let's leave it as is for now.
-function createMyMizuClient({ apiBaseUrl, apiKey, userToken }) {
+function createMyMizuClient({apiBaseUrl, apiKey, userToken, language}) {
   const httpClient = axios.create({
     baseURL: apiBaseUrl,
     timeout: 50000,
@@ -16,6 +16,7 @@ function createMyMizuClient({ apiBaseUrl, apiKey, userToken }) {
     api_key: apiKey,
     user_token: userToken,
     v: 1,
+    l: language,
   });
 
   const get = async (
@@ -29,7 +30,7 @@ function createMyMizuClient({ apiBaseUrl, apiKey, userToken }) {
     return response.data;
   }
 
-  const post = async(
+  const post = async (
     url,
     data,
     config,
@@ -45,8 +46,11 @@ function createMyMizuClient({ apiBaseUrl, apiKey, userToken }) {
   }
 }
 
-export const myMizuClient = createMyMizuClient({
-  apiBaseUrl: baseURL,
-  apiKey: config.apiKey,
-  userToken: config.userToken,
-});
+export const myMizuClient = (token, language) => {
+  return createMyMizuClient({
+    apiBaseUrl: baseURL,
+    apiKey: config.apiKey,
+    userToken: token,
+    language: language,
+  })
+};
