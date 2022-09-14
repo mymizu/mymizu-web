@@ -210,7 +210,7 @@ export function App({gmApiKey}) {
       localStorage.setItem(USER_TOKEN_KEY, token);
       localStorage.setItem(USER_TOKEN_EXPIRES_AT, new Date(Date.now() + ( 3600 * 1000 * 24 * 365)).toString());
       localStorage.setItem(USER_TOKEN_SET_AT, new Date().toString());
-      
+
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       setInitialLoad(true);
@@ -550,7 +550,7 @@ export function App({gmApiKey}) {
         )}
       </div>
       <div className="container-lg">
-        <Metrics/>
+        {userToken && <Metrics/>}
         <FunFacts/>
       </div>
       <div className="footer">
