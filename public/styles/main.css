@@ -669,7 +669,8 @@ and (max-device-width: 812px) {
 
 .loading-container {
   height: 5px;
-  width: 100vw;
+  width: 100%;
+  position: relative;
   overflow: hidden;
 }
 
