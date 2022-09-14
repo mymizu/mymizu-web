@@ -49,6 +49,7 @@ export function App({gmApiKey}) {
   const [googleMapFn, setGoogleMapFn] = useState();
   const [requestsInProgress, setRequestsInProgress] = useState([]);
   const [isSlideUp, setIsSlideUp] = useState(false);
+  const [userToken, setUserToken] = useState(null);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -97,6 +98,9 @@ export function App({gmApiKey}) {
   };
 
   const LANG_PREF_KEY = "userLanguage";
+  const USER_TOKEN_KEY = "userToken";
+  const USER_TOKEN_SET_AT = "userTokenSetAt";
+  const USER_TOKEN_EXPIRES_AT = "userTokenExpiresAt";
 
   const updateLanguage = (language, reload = false) => {
     setDetectedLocale(true);
@@ -156,15 +160,15 @@ export function App({gmApiKey}) {
     {
       id: "footernav.joinus",
       href: {
-        en:"https://www.mymizu.co/action-app-en",
-        ja:"https://www.mymizu.co/action-app-ja"
+        en: "https://www.mymizu.co/action-app-en",
+        ja: "https://www.mymizu.co/action-app-ja"
       }
     },
     {
       id: "footernav.supporters",
       href: {
-        en:"https://www.mymizu.co/partners-en",
-        ja:"https://www.mymizu.co/partners-ja"
+        en: "https://www.mymizu.co/partners-en",
+        ja: "https://www.mymizu.co/partners-ja"
       }
     },
     {
@@ -177,21 +181,45 @@ export function App({gmApiKey}) {
     {
       id: "footernav.policy",
       href: {
-        en:"https://legal.mymizu.co/privacy",
-        ja:"https://legal.mymizu.co/privacy",
+        en: "https://legal.mymizu.co/privacy",
+        ja: "https://legal.mymizu.co/privacy",
       }
     },
     {
       id: "footernav.terms",
       href: {
-        en:"https://legal.mymizu.co/terms",
-        ja:"https://legal.mymizu.co/terms",
+        en: "https://legal.mymizu.co/terms",
+        ja: "https://legal.mymizu.co/terms",
       }
     },
   ];
 
   const handleNav = () => {
     setNavOpen(!navOpen);
+  };
+
+  const getUserToken = async () => {
+    const reqRef = getRequestRef();
+    startedRequest(reqRef);
+    try {
+      setLoading(true);
+
+      const res = await axios.get("/api/authorize");
+      const token = res.data.new_token;
+      setUserToken(token);
+      localStorage.setItem(USER_TOKEN_KEY, token);
+      localStorage.setItem(USER_TOKEN_EXPIRES_AT, new Date(Date.now() + ( 3600 * 1000 * 24 * 365)).toString());
+      localStorage.setItem(USER_TOKEN_SET_AT, new Date().toString());
+      
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+
+      setInitialLoad(true);
+      setLoading(false);
+    } catch (e) {
+      setLoading(false);
+      console.log("error", e);
+    }
+    finishedRequest(reqRef);
   };
 
   const getInitialTaps = async () => {
@@ -290,6 +318,18 @@ export function App({gmApiKey}) {
   };
 
   useEffect(() => {
+    const token = localStorage.getItem(USER_TOKEN_KEY);
+
+    if (token) {
+      setUserToken(token);
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      return;
+    }
+    getUserToken();
+
+  }, [])
+
+  useEffect(() => {
     const language = window.navigator.userLanguage || window.navigator.language;
     const userLanguage = localStorage.getItem(LANG_PREF_KEY);
 
@@ -310,10 +350,10 @@ export function App({gmApiKey}) {
   }, []);
 
   useEffect(() => {
-    if (!taps.length && !initialLoad && locale) {
+    if (!taps.length && !initialLoad && locale && userToken) {
       getInitialTaps();
     }
-  }, [taps, setInitialLoad, initialLoad, setTaps, locale]);
+  }, [taps, setInitialLoad, initialLoad, setTaps, locale, userToken]);
 
   useEffect(() => {
     if (Object.keys(coordinate).length > 0) {
@@ -338,42 +378,44 @@ export function App({gmApiKey}) {
   }, [coordinate]);
 
   useEffect(() => {
-    const load = async () => {
-      const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
-      const slug = getSlug(REFILL_SPOT_ROUTE);
-      if (slug) {
-        const reqRef = getRequestRef();
-        startedRequest(reqRef);
+    if (userToken) {
+      const load = async () => {
+        const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
+        const slug = getSlug(REFILL_SPOT_ROUTE);
+        if (slug) {
+          const reqRef = getRequestRef();
+          startedRequest(reqRef);
 
-        const res = await axios.get(`/get-refill-spot/${slug}`);
-        setCardData(transformCardData(res.data, locale));
-        const newTaps = [];
-        let flag = false;
-        for (let j = 0; j < taps.length; j++) {
-          if (res.data.id === taps[j].id) {
-            flag = true;
-            break;
+          const res = await axios.get(`/get-refill-spot/${slug}`);
+          setCardData(transformCardData(res.data, locale));
+          const newTaps = [];
+          let flag = false;
+          for (let j = 0; j < taps.length; j++) {
+            if (res.data.id === taps[j].id) {
+              flag = true;
+              break;
+            }
           }
+          if (!flag) {
+            newTaps.push(res.data);
+          }
+          setTaps([...taps, ...newTaps]);
+
+          setInitialLoad(true);
+          setTaps(newTaps);
+
+          setCenter({
+            lat: res?.data?.latitude ?? gmDefaultProps.center.lng,
+            lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
+          });
+          setZoom(16);
+
+          finishedRequest(reqRef);
         }
-        if (!flag) {
-          newTaps.push(res.data);
-        }
-        setTaps([...taps, ...newTaps]);
-
-        setInitialLoad(true);
-        setTaps(newTaps);
-
-        setCenter({
-          lat: res?.data?.latitude ?? gmDefaultProps.center.lng,
-          lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
-        });
-        setZoom(16);
-
-        finishedRequest(reqRef);
       }
-    };
-    load();
-  }, []);
+      load();
+    }
+  }, [userToken]);
 
   return (
     <IntlProvider
@@ -423,18 +465,19 @@ export function App({gmApiKey}) {
                 </li>
               </ul>
             </div>
-            <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav"   aria-expanded="false" aria-label="Toggle navigation">
+            <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-expanded="false" aria-label="Toggle navigation">
               <span
-              className="hamburger d-sm-inline d-md-inline d-lg-none"
-              onClick={handleNav}
-            >
+                className="hamburger d-sm-inline d-md-inline d-lg-none"
+                onClick={handleNav}
+              >
               &#9776;
             </span></button>
           </div>
         </nav>
       </div>
       <div className="maps-container">
-        {detectedLocale && <GoogleMapReact
+        {detectedLocale && userToken && <GoogleMapReact
           bootstrapURLKeys={{
             key: gmApiKey,
             language: locale,
