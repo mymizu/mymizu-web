@@ -15,17 +15,23 @@ export const ShareModal = ({ data, setShareModal }) => {
   };
   return (
     <div className="share-modal">
-      <a className="share-modal-title"><FormattedMessage id="spot.share.title" /></a>
+      <h3 className="share-modal-title"><FormattedMessage id="spot.share.title" /></h3>
       <div className="share-link">{data.title}</div>
       <div className="link-copy">
-        <div>{data.action.share}</div>
+        <input className="link" type="text" disabled="disabled" value={data.action.share} />
         <button className="copy-button" onClick={() => copyFunc(data)}>
           <FormattedMessage id="spot.share.copy" />
         </button>
       </div>
 
       <button className="close-share-modal" onClick={closeFunc}>
-        X
+        <img
+          id="close"
+          src="/public/images/close-button-small.svg"
+          alt="Close"
+          width="16"
+          height="16"
+        />
       </button>
     </div>
   );
