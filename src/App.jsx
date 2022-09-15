@@ -322,6 +322,7 @@ export function App({gmApiKey, gaTag}) {
       action: 'Clicked spot marker',
       label: markerData.id,
     });
+    document.title = `${markerData.name} - mymizu`
     window.history.pushState(`refillSpot${markerData.id}`, "", `/refill/${locale}/${markerData.slug}`);
     setCardData(transformCardData(markerData, locale));
   };
@@ -417,6 +418,7 @@ export function App({gmApiKey, gaTag}) {
 
           const res = await axios.get(`/get-refill-spot/${slug}`);
           setCardData(transformCardData(res.data, locale));
+          document.title = `${res.data.name} - mymizu`
           const newTaps = [];
           let flag = false;
           for (let j = 0; j < taps.length; j++) {
