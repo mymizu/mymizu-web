@@ -315,6 +315,11 @@ export function App({gmApiKey, gaTag}) {
 
   const onMarkerClick = (key, childProps) => {
     const markerData = childProps.tap;
+    ReactGA.event({
+      category: 'Refill Spot',
+      action: 'Clicked spot marker',
+      label: markerData.id,
+    });
     setCardData(transformCardData(markerData, locale));
   };
 

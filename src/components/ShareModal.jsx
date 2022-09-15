@@ -1,8 +1,11 @@
 import React from "react";
-import {FormattedMessage} from "react-intl";
+import {FormattedMessage, useIntl} from "react-intl";
 import ReactGA from "react-ga";
 
+
 export const ShareModal = ({ data, setShareModal }) => {
+  const intl = useIntl()
+
   const copyFunc = (data) => {
     ReactGA.event({
       category: 'Refill Spot',
@@ -10,7 +13,7 @@ export const ShareModal = ({ data, setShareModal }) => {
       label: data.id,
     });
     navigator.clipboard.writeText(data.action.share).then(() => {
-      alert("Copied");
+      alert(intl.formatMessage({ id: 'copied' }));
     }, () => {
       /* clipboard write failed */
     });
