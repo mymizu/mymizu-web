@@ -1,6 +1,6 @@
 import React from "react";
 import {FormattedMessage, useIntl} from "react-intl";
-import ReactGA from "react-ga";
+import ReactGA from "react-ga4";
 
 
 export const ShareModal = ({ data, setShareModal }) => {

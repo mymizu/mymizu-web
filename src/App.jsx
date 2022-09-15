@@ -1,6 +1,6 @@
 import React, {useState, useEffect, useMemo} from "react";
 import GoogleMapReact from "google-map-react";
-import ReactGA from 'react-ga';
+import ReactGA from "react-ga4";
 import axios from "axios";
 
 import {FormattedMessage, IntlProvider} from "react-intl";
@@ -27,7 +27,7 @@ const translations = {
 export function App({gmApiKey, gaTag}) {
   useEffect(() => {
     ReactGA.initialize(gaTag);
-    ReactGA.pageview(window.location.pathname + window.location.search);
+    ReactGA.send("pageview");
   }, [gaTag])
 
   const gmDefaultProps = {
@@ -322,8 +322,10 @@ export function App({gmApiKey, gaTag}) {
       action: 'Clicked spot marker',
       label: markerData.id,
     });
+    const path = `/refill/${locale}/${markerData.slug}`
+    ReactGA.send({ hitType: "pageview", page: path});
     document.title = `${markerData.name} - mymizu`
-    window.history.pushState(`refillSpot${markerData.id}`, "", `/refill/${locale}/${markerData.slug}`);
+    window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
   };
 
