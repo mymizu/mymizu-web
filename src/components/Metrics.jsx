@@ -43,7 +43,8 @@ const Metrics = () => {
       const bottlesNo = refill / 500;
       setBottles(Math.floor(bottlesNo).toString());
       setCo2(Math.floor((bottlesNo * 0.3333) / 1000).toFixed(1).toString());
-      setMoney(Math.floor((bottlesNo * 110) / 1000).toString());
+      const divider = intl.locale === "ja" ? 10000 : 1000;
+      setMoney(Math.floor((bottlesNo * 110) / divider).toString());
     }
   }, [stats]);
 
