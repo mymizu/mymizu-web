@@ -104,3 +104,17 @@ Please create an [issue](https://github.com/mymizu/mymizu-web/issues) on GitHub 
 Please feel free to join our [Slack community](https://docs.google.com/forms/d/1Y87ByAJrkfp2Hk3idfg4bx1t3iDfrO5bEu9zmKv9ewg/prefill)
 You can introduce yourself and share any questions. If you have any ideas for features and / or issues you can also reach out to us here!
 Or reach out to us directly if you have any questions [opensource@mymizu.co](mailto:opensource@mymizu.co)
+
+# 5. Contributors
+
+## Hackathon Contributors
+
+Thank you to all participants in our Summer 2022 Hackathon for their contributions
+
+- [Alexandre Plagnard](https://github.com/alexminden)
+- [Andy Park](https://github.com/atparkweb)
+- Dominic Lowes
+- [Quentin Siutkowski](https://www.linkedin.com/in/qsiutkowski/en)
+- [Juli Boucree](https://github.com/juliwithoutthee)
+
+and many others!
