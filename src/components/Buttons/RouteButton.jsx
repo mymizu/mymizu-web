@@ -1,5 +1,4 @@
 import React from "react";
-import ReactGA from "react-ga4";
 import {FormattedMessage} from "react-intl";
 
 export const RouteButton = ({
@@ -9,11 +8,11 @@ export const RouteButton = ({
                             }) => {
 
   const onClickRoute = () => {
-    ReactGA.event({
+    /*ReactGA.event({
       category: 'Refill Spot',
       action: 'Clicked route button',
       label: id,
-    });
+    });*/
     if (!latitude || !longitude) {
       console.error('Lat long not set')
       return

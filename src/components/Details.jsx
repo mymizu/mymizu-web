@@ -1,15 +1,14 @@
 import React from "react";
-import ReactGA from "react-ga4";
 import {FormattedMessage, useIntl} from "react-intl";
 
 export const Details = ({ data }) => {
   const intl = useIntl()
   const onClickLink = () => {
-    ReactGA.event({
+    /*ReactGA.event({
       category: 'Refill Spot',
       action: 'Clicked spot url',
       label: markerData.id,
-    });
+    });*/
   }
   return (
     <div>

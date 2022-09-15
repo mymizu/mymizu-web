@@ -1,6 +1,5 @@
 import React, {useState, useEffect, useMemo} from "react";
 import GoogleMapReact from "google-map-react";
-import ReactGA from "react-ga4";
 import axios from "axios";
 
 import {FormattedMessage, IntlProvider} from "react-intl";
@@ -25,10 +24,10 @@ const translations = {
 };
 
 export function App({gmApiKey, gaTag}) {
-  useEffect(() => {
+  /*useEffect(() => {
     ReactGA.initialize(gaTag);
     ReactGA.send("pageview");
-  }, [gaTag])
+  }, [gaTag])*/
 
   const gmDefaultProps = {
     center: {
@@ -71,11 +70,11 @@ export function App({gmApiKey, gaTag}) {
   };
 
   const handleResultClick = (result) => {
-    ReactGA.event({
+    /*ReactGA.event({
       category: 'Search',
       action: 'Clicked search result',
       label: result.formatted_address,
-    });
+    });*/
     const {location} = result.geometry;
 
     const resultLat = String(location.lat()).slice(0, 6);
@@ -230,10 +229,10 @@ export function App({gmApiKey, gaTag}) {
     } catch (e) {
       setLoading(false);
       console.log("error", e);
-      ReactGA.exception({
+      /*ReactGA.exception({
         description: 'Error loading user token',
         fatal: true
-      });
+      });*/
     }
     finishedRequest(reqRef);
   };
@@ -264,9 +263,9 @@ export function App({gmApiKey, gaTag}) {
       setLoading(false);
       setInitialLoad(true);
       console.log("error", e);
-      ReactGA.exception({
+      /*ReactGA.exception({
         description: 'Error loading initial taps',
-      });
+      });*/
     }
     finishedRequest(reqRef);
   };
@@ -304,9 +303,9 @@ export function App({gmApiKey, gaTag}) {
     } catch (e) {
       console.log(e);
 
-      ReactGA.exception({
+    /*  ReactGA.exception({
         description: 'Error loading secondary taps',
-      });
+      });*/
     }
     finishedRequest(reqRef);
   };
@@ -317,13 +316,13 @@ export function App({gmApiKey, gaTag}) {
 
   const onMarkerClick = (key, childProps) => {
     const markerData = childProps.tap;
-    ReactGA.event({
+    /*ReactGA.event({
       category: 'Refill Spot',
       action: 'Clicked spot marker',
       label: markerData.id,
-    });
+    });*/
     const path = `/refill/${locale}/${markerData.slug}`
-    ReactGA.send({ hitType: "pageview", page: path});
+    //ReactGA.send({ hitType: "pageview", page: path});
     document.title = `${markerData.name} - mymizu`
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));

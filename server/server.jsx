@@ -147,6 +147,19 @@ app.get("/refill/:language/:slug", (req, res) => {
           <App gmApiKey={gmapApiKey} gaTag={gaTag}/>
         )}</div>
         `
+      ).replace(
+        '<div id="ga"></div>',
+        `
+        <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=${gaTag}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '${gaTag}');
+</script>
+        `
       )
     );
   });
@@ -173,7 +186,21 @@ app.get("/", (req, res) => {
           <App gmApiKey={gmapApiKey} gaTag={gaTag}/>
         )}</div>
         `
+      ).replace(
+        '<div id="ga"></div>',
+        `
+        <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=${gaTag}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){window.dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', '${gaTag}');
+</script>
+        `
       )
+
     );
   });
 });
