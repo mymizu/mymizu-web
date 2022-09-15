@@ -27,6 +27,7 @@ const translations = {
 export function App({gmApiKey, gaTag}) {
   useEffect(() => {
     ReactGA.initialize(gaTag);
+    ReactGA.pageview(window.location.pathname + window.location.search);
   }, [gaTag])
 
   const gmDefaultProps = {
@@ -118,6 +119,7 @@ export function App({gmApiKey, gaTag}) {
     axios.defaults.headers.common["Accept-Language"] = language;
     if (reload) {
       // todo: remove if can get map to reload with new language
+
       location.reload();
     }
   };
@@ -320,6 +322,7 @@ export function App({gmApiKey, gaTag}) {
       action: 'Clicked spot marker',
       label: markerData.id,
     });
+    window.history.pushState(`refillSpot${markerData.id}`, "", `/refill/${locale}/${markerData.slug}`);
     setCardData(transformCardData(markerData, locale));
   };
 
