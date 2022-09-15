@@ -26,8 +26,8 @@ export const Summary = ({ data, setShareModal }) => {
           })}
       </div>
       <div className="actionbuttons">
-        <RouteButton latitude={data.latitude} longitude={data.longitude} />
-        <ShareButton setShareModal={setShareModal} />
+        <RouteButton latitude={data.latitude} longitude={data.longitude} id={data.id} />
+        <ShareButton setShareModal={setShareModal} id={data.id} />
       </div>
     </div>
   );

@@ -70,6 +70,11 @@ export function App({gmApiKey, gaTag}) {
   };
 
   const handleResultClick = (result) => {
+    ReactGA.event({
+      category: 'Search',
+      action: 'Clicked search result',
+      label: result.formatted_address,
+    });
     const {location} = result.geometry;
 
     const resultLat = String(location.lat()).slice(0, 6);
@@ -223,6 +228,10 @@ export function App({gmApiKey, gaTag}) {
     } catch (e) {
       setLoading(false);
       console.log("error", e);
+      ReactGA.exception({
+        description: 'Error loading user token',
+        fatal: true
+      });
     }
     finishedRequest(reqRef);
   };
@@ -253,6 +262,9 @@ export function App({gmApiKey, gaTag}) {
       setLoading(false);
       setInitialLoad(true);
       console.log("error", e);
+      ReactGA.exception({
+        description: 'Error loading initial taps',
+      });
     }
     finishedRequest(reqRef);
   };
@@ -289,6 +301,10 @@ export function App({gmApiKey, gaTag}) {
       }
     } catch (e) {
       console.log(e);
+
+      ReactGA.exception({
+        description: 'Error loading secondary taps',
+      });
     }
     finishedRequest(reqRef);
   };
