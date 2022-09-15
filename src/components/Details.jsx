@@ -4,14 +4,12 @@ import {FormattedMessage, useIntl} from "react-intl";
 
 export const Details = ({ data }) => {
   const intl = useIntl()
-  const sendGaOutboundLink = (e) => {
-    const link = e.target.href;
-    ReactGA.outboundLink(
-      {
-        label: link,
-      },
-      () => {}
-    );
+  const onClickLink = () => {
+    ReactGA.event({
+      category: 'Refill Spot',
+      action: 'Clicked spot url',
+      label: markerData.id,
+    });
   }
   return (
     <div>
@@ -38,7 +36,7 @@ export const Details = ({ data }) => {
       {data.link && (
         <div className="detail-section">
           <img src="/public/images/globe.svg" alt="" />
-          <div><a href={data.link} onClick={sendGaOutboundLink} target="_new" rel="noopener nofollow" target="_blank">{data.link}</a></div>
+          <div><a href={data.link} onClick={onClickLink} target="_new" rel="noopener nofollow" target="_blank">{data.link}</a></div>
         </div>
       )}
       {data.address && (
