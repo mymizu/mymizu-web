@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useMemo} from "react";
 import GoogleMapReact from "google-map-react";
+import ReactGA from 'react-ga';
 import axios from "axios";
 
 import {FormattedMessage, IntlProvider} from "react-intl";
@@ -23,7 +24,11 @@ const translations = {
   ja: require("./translations/ja.json"),
 };
 
-export function App({gmApiKey}) {
+export function App({gmApiKey, gaTag}) {
+  useEffect(() => {
+    ReactGA.initialize(gaTag);
+  }, [gaTag])
+
   const gmDefaultProps = {
     center: {
       lat: 35.662,
@@ -208,7 +213,7 @@ export function App({gmApiKey}) {
       const token = res.data.new_token;
       setUserToken(token);
       localStorage.setItem(USER_TOKEN_KEY, token);
-      localStorage.setItem(USER_TOKEN_EXPIRES_AT, new Date(Date.now() + ( 3600 * 1000 * 24 * 365)).toString());
+      localStorage.setItem(USER_TOKEN_EXPIRES_AT, new Date(Date.now() + (3600 * 1000 * 24 * 365)).toString());
       localStorage.setItem(USER_TOKEN_SET_AT, new Date().toString());
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -455,7 +460,7 @@ export function App({gmApiKey}) {
                   >
                     日本語
                   </a>)}
-                  {locale !== "en" && ( <a
+                  {locale !== "en" && (<a
                     className="nav-link"
                     href="#"
                     hrefLang="en"

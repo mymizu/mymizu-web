@@ -2,6 +2,7 @@ require("dotenv").config();
 
 const configEnvVarMap = {
   gmApiKey: "GM_API_KEY",
+  gaTag: "GA_TAG",
   apiKey: "API_KEY",
   userToken: "USER_TOKEN",
 };

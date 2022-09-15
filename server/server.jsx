@@ -11,6 +11,7 @@ import i18nConfig from "../src/i18nConfig";
 
 const PORT = process.env.PORT || 3000;
 const gmapApiKey = config.gmApiKey;
+const gaTag = config.gaTag;
 const app = express();
 const crypto = require('crypto');
 
@@ -141,8 +142,9 @@ app.get("/refill/:language/:slug", (req, res) => {
         '<div id="root"></div>',
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
+        <script>window.__GA_TAG__=${JSON.stringify(gaTag)}</script>
         <div id="root">${ReactDOMServer.renderToString(
-          <App gmApiKey={gmapApiKey}/>
+          <App gmApiKey={gmapApiKey} gaTag={gaTag}/>
         )}</div>
         `
       )
@@ -166,8 +168,9 @@ app.get("/", (req, res) => {
         '<div id="root"></div>',
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
+                <script>window.__GA_TAG__=${JSON.stringify(gaTag)}</script>
         <div id="root">${ReactDOMServer.renderToString(
-          <App gmApiKey={gmapApiKey}/>
+          <App gmApiKey={gmapApiKey} gaTag={gaTag}/>
         )}</div>
         `
       )
