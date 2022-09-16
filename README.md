@@ -113,7 +113,7 @@ Thank you to all participants in our Summer 2022 Hackathon for their contributio
 
 - [Alexandre Plagnard](https://github.com/alexminden)
 - [Andy Park](https://github.com/atparkweb)
-- Dominic Lowes
+- [Dominic Lowes](https://github.com/SodaJyu)
 - [Quentin Siutkowski](https://www.linkedin.com/in/qsiutkowski/en)
 - [Juli Boucree](https://github.com/juliwithoutthee)
 
