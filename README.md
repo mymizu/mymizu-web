@@ -15,7 +15,7 @@ For more information see details below!
 
 # 2. How to get started
 
-# MyMizu Web
+# mymizu Web
 
 pre-requisites:
 - [NodeJS](https://nodejs.org/en/download/package-manager/)
@@ -23,8 +23,8 @@ pre-requisites:
 - mymizu api key
 - mymizu user token
 
-### How to get a MyMizu API key
-You will need to get someone from MyMizu to generate an API key for you.
+### How to get a mymizu API key
+You will need to get someone from the mymizu team to generate an API key for you.
 
 ### How to generate a user token
 Simply run:
