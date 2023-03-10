@@ -87,17 +87,7 @@ app.get("/a-new-page", (req, res) => {
 
 # 3. Pick a feature to work on
 
-- **You can select from our list of features:**
-
-Check out the issues list on github for features to work on including spec and design information:
-[Issues](https://github.com/mymizu/mymizu-web/issues).
-If you have any questions regarding features, feel free to comment directly on the issues or ask in our [Slack community](https://docs.google.com/forms/d/1Y87ByAJrkfp2Hk3idfg4bx1t3iDfrO5bEu9zmKv9ewg/prefill).
-
-- **If you have any suggestions or new features ideas:**
- [Please add in this form](https://docs.google.com/forms/d/1zG-V5DbkX3XTqUemAHjZXXduMXQrAGrC5-XzuVXjdY8/edit?usp=sharing)
- 
-- **If you found a bug on mymizu webapp:**
-Please create an [issue](https://github.com/mymizu/mymizu-web/issues) on GitHub page or let us know in the [Slack community](https://docs.google.com/forms/d/1Y87ByAJrkfp2Hk3idfg4bx1t3iDfrO5bEu9zmKv9ewg/prefill)
+Please see CONTRIBUTING file for information about how to contribute, and report bugs or suggest new features.
 
 # 4. Join our slack community
 
