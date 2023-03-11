@@ -43,17 +43,21 @@ export const Carousel = (props) => {
         ["carousel-slide-up"]: props.isSlideUp,
       })}
     >
-      <ArrowButton
-        onClick={previousSlide}
-        direction="back"
-        className={"left-carousel-button"}
-      />
+      {images?.length > 1 && 
+        <ArrowButton
+          onClick={previousSlide}
+          direction="back"
+          className={"left-carousel-button"}
+        />
+      }
       <ImageSlide url={images?.[currentIndex]?.url} />
-      <ArrowButton
-        onClick={nextSlide}
-        direction="forward"
-        className={"right-carousel-button"}
-      />
+      {images?.length > 1 && 
+        <ArrowButton
+          onClick={nextSlide}
+          direction="forward"
+          className={"right-carousel-button"}
+        />
+      }
     </div>
   );
 };
