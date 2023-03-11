@@ -17,6 +17,7 @@ import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
 import {ShareModal} from "./components/ShareModal";
+import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -30,7 +31,7 @@ export function App({gmApiKey, gaTag}) {
   }, [gaTag])*/
 
   
-  // JAPAN ORIGINAL LOCATION
+  // Japan Original Location
   const gmDefaultProps = {
     center: {
       lat: 35.662,
@@ -350,20 +351,34 @@ export function App({gmApiKey, gaTag}) {
       : null;
   };
 
-  useEffect(() => {
+  // Ask user for permission to give device location
+  const getGeoLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         setCenter({
           lat: position.coords.latitude,
           lng: position.coords.longitude,
         })
-        setZoom(15);
+        setZoom(16);
       })
     } else {
       setCenter(gmDefaultProps.center);
       setZoom(gmDefaultProps.zoom);
     }
-  }, []);
+  };
+
+  const buttonResetLocation = () => {
+    let lat = center.lat;
+    let lng = center.lng;
+    setZoom(zoom + .00001)
+    setCenter({lat: lat + .00001, lng: lng + .00001});
+    getGeoLocation();
+  }
+
+  // Get geolocation onload
+  useEffect(() => {
+    getGeoLocation();
+  }, [])
 
   useEffect(() => {
     const token = localStorage.getItem(USER_TOKEN_KEY);
@@ -527,6 +542,7 @@ export function App({gmApiKey, gaTag}) {
         </nav>
       </div>
       <div className="maps-container">
+        <CurrentLocationButton onClick={buttonResetLocation} />
         {detectedLocale && userToken && <GoogleMapReact
           bootstrapURLKeys={{
             key: gmApiKey,

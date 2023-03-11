@@ -703,3 +703,15 @@ and (max-device-width: 812px) {
     left: 100%;
   }
 }
+
+#current_location_button {
+  height: 70px;
+  width: 70px;
+  z-index: 5;
+  position: absolute;
+  cursor: pointer;
+  margin-left: auto;
+  top: 15px;
+  right: 15px;
+  border-radius: 50%;
+}
