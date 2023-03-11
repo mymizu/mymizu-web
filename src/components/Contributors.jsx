@@ -22,9 +22,12 @@ export default function Contributors() {
     }, []);
 
     return (
-        <div className="contributors-page">
+        <div className="contributors-page" style={{font: 'system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"'}}>
             <h1 className="title"> Past Contributors </h1>
-            <ul className="contributors">
+            <ul style={{
+                display: "flex",
+                flexWrap: "wrap",
+            }}>
             {contributors.map(contributor => (
                 <li key={contributor.id} className="card" style={{
                     display: "flex",
