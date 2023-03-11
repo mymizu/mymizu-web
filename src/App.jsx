@@ -1,29 +1,29 @@
-import React, {useState, useEffect, useMemo} from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 
-import {FormattedMessage, IntlProvider} from "react-intl";
+import { FormattedMessage, IntlProvider } from "react-intl";
 import i18nConfig from "./i18nConfig";
-import {FunFacts} from "./components";
+import { FunFacts } from "./components";
 import Metrics from "./components/Metrics";
-import {transformCardData} from "./utils/transformCardData";
-import {Modal} from "./components/Modal";
-import {useLang} from "./utils/useLang";
+import { transformCardData } from "./utils/transformCardData";
+import { Modal } from "./components/Modal";
+import { useLang } from "./utils/useLang";
 import getSlug from "./utils/getSlug";
-import {Marker} from "./components/Marker";
-import {Search} from "./components/Search";
-import {SearchResults} from "./components/SearchResults";
+import { Marker } from "./components/Marker";
+import { Search } from "./components/Search";
+import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
-import {ShareModal} from "./components/ShareModal";
+import { ShareModal } from "./components/ShareModal";
 
 const translations = {
   en: require("./translations/en.json"),
   ja: require("./translations/ja.json"),
 };
 
-export function App({gmApiKey, gaTag}) {
+export function App({ gmApiKey, gaTag }) {
   /*useEffect(() => {
     ReactGA.initialize(gaTag);
     ReactGA.send("pageview");
@@ -75,7 +75,7 @@ export function App({gmApiKey, gaTag}) {
       action: 'Clicked search result',
       label: result.formatted_address,
     });*/
-    const {location} = result.geometry;
+    const { location } = result.geometry;
 
     const resultLat = String(location.lat()).slice(0, 6);
     const resultLng = String(location.lng()).slice(0, 7);
@@ -162,9 +162,9 @@ export function App({gmApiKey, gaTag}) {
   ];
 
   const socialNav = [
-    {href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram"},
-    {href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook"},
-    {href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter"},
+    { href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram" },
+    { href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook" },
+    { href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter" },
   ];
 
   const footerNav = [
@@ -245,7 +245,7 @@ export function App({gmApiKey, gaTag}) {
 
       const res = await axios.get("/get-initial-markers");
 
-      const {taps} = res.data;
+      const { taps } = res.data;
 
       const newTaps = taps
         ? taps.map((tap) => {
@@ -274,14 +274,14 @@ export function App({gmApiKey, gaTag}) {
     const reqRef = getRequestRef();
     try {
       if (initialLoad) {
-        const {nw, se} = value;
+        const { nw, se } = value;
 
         startedRequest(reqRef);
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
         );
 
-        const {taps: resTaps} = res.data;
+        const { taps: resTaps } = res.data;
 
         const newTaps = [];
 
@@ -303,9 +303,9 @@ export function App({gmApiKey, gaTag}) {
     } catch (e) {
       console.log(e);
 
-    /*  ReactGA.exception({
-        description: 'Error loading secondary taps',
-      });*/
+      /*  ReactGA.exception({
+          description: 'Error loading secondary taps',
+        });*/
     }
     finishedRequest(reqRef);
   };
@@ -466,15 +466,29 @@ export function App({gmApiKey, gaTag}) {
               height="45"
               className="d-inline-block align-text-top"
             />
+            <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-expanded="false" aria-label="Toggle navigation">
+              <span
+                className="cross d-sm-inline d-md-inline d-lg-none"
+                onClick={handleNav}
+              >
+                {navOpen ? (
+                  <span className="cross d-sm-inline d-md-inline d-lg-none" onClick={handleNav}>
+                    &times;
+                  </span>
+                ) : (<span className="hamburger d-sm-inline d-md-inline d-lg-none" onClick={handleNav}>
+                  &#9776;
+                </span>)}
+              </span></button>
             <div
               className="collapse navbar-collapse justify-content-end"
               id="navbarNav"
             >
-              <ul className="nav navbar-nav " style={{marginTop: 10}}>
+              <ul className="nav navbar-nav " style={{ marginTop: 10 }}>
                 {topNav.map((el, i) => (
                   <li className="nav-item" key={i}>
                     <a className="nav-link" href={el.href[locale]} key={i}>
-                      <FormattedMessage id={el.id} defaultMessage=""/>
+                      <FormattedMessage id={el.id} defaultMessage="" />
                     </a>
                   </li>
                 ))}
@@ -498,14 +512,7 @@ export function App({gmApiKey, gaTag}) {
                 </li>
               </ul>
             </div>
-            <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-expanded="false" aria-label="Toggle navigation">
-              <span
-                className="hamburger d-sm-inline d-md-inline d-lg-none"
-                onClick={handleNav}
-              >
-              &#9776;
-            </span></button>
+
           </div>
         </nav>
       </div>
@@ -521,7 +528,7 @@ export function App({gmApiKey, gaTag}) {
           onChange={(value) => handleDebounce(value)}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
-          onGoogleApiLoaded={({map, maps}) => {
+          onGoogleApiLoaded={({ map, maps }) => {
             setGoogleMapFn(googleMapAPI(map, maps));
           }}
           yesIWantToUseGoogleMapApiInternals
@@ -557,7 +564,7 @@ export function App({gmApiKey, gaTag}) {
               setShareModal={setShowShareModal}
             />
             {showShareModal ? (
-              <ShareModal data={cardData} setShareModal={setShowShareModal}/>
+              <ShareModal data={cardData} setShareModal={setShowShareModal} />
             ) : (
               ""
             )}
@@ -582,9 +589,10 @@ export function App({gmApiKey, gaTag}) {
           <div className="loading-indicator">&nbsp;</div>
         )}
       </div>
+      <FunFacts />
       <div className="container-lg">
-        {userToken && <Metrics/>}
-        <FunFacts/>
+        {userToken && <Metrics />}
+
       </div>
       <div className="footer">
         <div className="container-lg">
@@ -593,7 +601,7 @@ export function App({gmApiKey, gaTag}) {
               {socialNav.map((el, i) => (
                 <li className="nav-item" key={i}>
                   <a href={el.href} className="nav-link px-2 text-muted">
-                    <i className={`bi ${el.iconName}`}/>
+                    <i className={`bi ${el.iconName}`} />
                   </a>
                 </li>
               ))}
@@ -602,7 +610,7 @@ export function App({gmApiKey, gaTag}) {
               {footerNav.map((el, i) => (
                 <li className="nav-item" key={i}>
                   <a href={el.href[locale]} className="nav-link px-2">
-                    <FormattedMessage id={el.id} defaultMessage=""/>
+                    <FormattedMessage id={el.id} defaultMessage="" />
                   </a>
                 </li>
               ))}
