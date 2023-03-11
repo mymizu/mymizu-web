@@ -11,7 +11,7 @@ export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp, setShareModa
 
   const showDetails = () => {
     if (group.title === "mobile") {
-      setIsSlideUp(!isSlideUp);
+      setIsSlideUp(true);
     }
   };
 
@@ -29,7 +29,7 @@ export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp, setShareModa
       className={classnames("info-card", { ["info-card-slide-up"]: isSlideUp })}
       onClick={() => showDetails()}
     >
-      <BackButton onClick={onClose} id="back" className={"back-button"} />
+      <BackButton onClick={(e) => onClose(e)} id="back" className={"back-button"} />
 
       <Carousel carouselImg={cardData?.carouselImg} isSlideUp={isSlideUp} />
       <div></div>

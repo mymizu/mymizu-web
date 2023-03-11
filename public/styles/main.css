@@ -359,9 +359,9 @@ footer .nav-link i {
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
 }
 
-.back-button #back {
+/* .back-button #back {
   height: 26px
-}
+} */
 
 .info-card .details {
   height: 100%;
@@ -412,8 +412,8 @@ footer .nav-link i {
 .left-carousel-button {
   left: 10px;
   position: absolute;
-  height: 20px;
-  width: 20px;
+  height: 28px;
+  width: 28px;
   top: 50%;
   transform: translate(0, -50%);
   margin-top: 10px;
@@ -428,16 +428,16 @@ footer .nav-link i {
   opacity: 0.8;
 }
 
-.left-carousel-button #back,
+/* .left-carousel-button #back,
 .right-carousel-button #back {
   height: 8px
-}
+} */
 
 .right-carousel-button {
   right: 10px;
   position: absolute;
-  height: 20px;
-  width: 20px;
+  height: 28px;
+  width: 28px;
   top: 50%;
   transform: translate(0, -50%);
   margin-top: 10px;
@@ -643,6 +643,7 @@ and (max-device-width: 812px) {
     overflow-y: hidden;
   }
 
+
   .info-card-slide-up {
     height: 100%;
     border-top-right-radius: 0px;
@@ -651,7 +652,7 @@ and (max-device-width: 812px) {
   }
 
   .carousel {
-    height: 100px;
+    height: 220px;
   }
 
   .carousel-slide-up {
