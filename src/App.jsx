@@ -13,7 +13,7 @@ import getSlug from "./utils/getSlug";
 import {Marker} from "./components/Marker";
 import {Search} from "./components/Search";
 import {SearchResults} from "./components/SearchResults";
-import googleMapAPI from "../utils/googlemaps";
+import googleMapAPI from "./utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
 import {ShareModal} from "./components/ShareModal";
