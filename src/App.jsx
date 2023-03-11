@@ -29,6 +29,8 @@ export function App({gmApiKey, gaTag}) {
     ReactGA.send("pageview");
   }, [gaTag])*/
 
+  
+  // JAPAN ORIGINAL LOCATION
   const gmDefaultProps = {
     center: {
       lat: 35.662,
@@ -349,6 +351,21 @@ export function App({gmApiKey, gaTag}) {
   };
 
   useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        setCenter({
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        })
+        setZoom(15);
+      })
+    } else {
+      setCenter(gmDefaultProps.center);
+      setZoom(gmDefaultProps.zoom);
+    }
+  }, []);
+
+  useEffect(() => {
     const token = localStorage.getItem(USER_TOKEN_KEY);
 
     if (token) {
@@ -518,6 +535,7 @@ export function App({gmApiKey, gaTag}) {
             libraries: ["places"],
           }}
           center={center}
+          zoom={zoom}
           onChange={(value) => handleDebounce(value)}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
