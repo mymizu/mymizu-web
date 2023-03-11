@@ -61,6 +61,8 @@
   cursor: pointer;
 }
 
+
+
 @media screen and (max-height: 450px) {
   .overlay a {
     font-size: 20px
@@ -71,6 +73,12 @@
     top: 15px;
     right: 35px;
   }
+
+
+}
+
+.facts-container {
+  position: relative;
 }
 
 .facts {
@@ -610,6 +618,11 @@ footer .nav-link i {
   padding: 10px 0;
 }
 
+.popup-container {
+  position: relative;
+  display: none;
+}
+
 /* Portrait and Landscape */
 @media only screen and (min-device-width: 375px) and (max-device-width: 812px) {
 
@@ -643,9 +656,66 @@ footer .nav-link i {
   }
 
   .facts {
+    display: none;
+  }
+
+  .popup-container {
+    position: absolute;
+    display: block;
+  }
+
+  .popup {
+    position: fixed;
+    bottom: 16%;
+    width: 100%;
+
+    z-index: 999;
+  }
+
+  .popup.fixed {
+    position: fixed;
+    bottom: 16%;
+    width: 100%;
+
+  }
+
+  .popup.show {
+    display: block;
+  }
+
+  .popup-content {
+    position: absolute;
+    right: 17%;
+    width: calc(90% - 45px);
+    height: auto;
     text-align: center;
-    margin-bottom: 240px;
-    color: #2D383F;
+    color: #2F97D1;
+    padding: 8px;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgb(0 0 0 / 20%);
+    border-radius: 12px;
+    top: auto;
+    bottom: 3%;
+    display: flex;
+  }
+
+
+  .funfact-toggler {
+    position: absolute;
+    bottom: 3%;
+    right: 2%;
+    height: 45px;
+    width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: white;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px rgb(0 0 0 / 20%);
+    z-index: 999;
   }
 
   .info-card {

@@ -56,6 +56,7 @@ export function App({ gmApiKey, gaTag }) {
   const [isSlideUp, setIsSlideUp] = useState(false);
   const [userToken, setUserToken] = useState(null);
 
+
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
   };
