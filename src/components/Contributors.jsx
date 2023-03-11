@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+
 const apiKey =
     "patZqW6kq6eJpR1rr.af975adfba875ba01c385ff086a6712767221ea337eac18af43624d004685335";
 const baseId = "appnTJyNgaBLsKObm";
@@ -21,10 +22,33 @@ export default function Contributors() {
     }, []);
 
     return (
-        <div>
+        <div className="contributors-page">
+            <h1 className="title"> Past Contributors </h1>
+            <ul className="contributors">
             {contributors.map(contributor => (
-                <div>{contributor.fields.Name}</div>
+                <li key={contributor.id} className="card" style={{
+                    display: "flex",
+                    letterSpacing: "1.6px",
+                    lineHeight: "200%",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "flex-start",
+                
+                    width: "300px",
+                    boxSizing: "content-box",
+                    margin: "10px",
+                    padding: "20px 10px",
+                    backgroundColor: "#DFEEF5",
+                /*    color: white;*/
+                    boxShadow: "2px 2px 4px gray",
+                }}>
+                    <h3 style={{fontSize: "40px"}}><span className="emoji">{contributor.fields.emoji}</span> {contributor.fields.Name} </h3>
+                    <p className="contribution">contribution : {contributor.fields["Contribution Type"]}</p>
+                    <p className="socials"><img style={{width: "20px", height: "20px"}} src="../../public/images/github-mark.png" alt="github"/> : {contributor.fields["GitHub/Social"]}</p>
+                    <p className="favouriteSeaAnimal">favourite sea animal : {contributor.fields["Favorite Sea Animal"]}</p>
+                </li>
             ))}
+            </ul>
         </div>
     );
 }
