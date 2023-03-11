@@ -328,7 +328,11 @@ export function App({gmApiKey, gaTag}) {
     setCardData(transformCardData(markerData, locale));
   };
 
-  const handleCloseModal = () => {
+  const handleCloseModal = (e) => {
+    if (!e) var e = window.event;
+    e.cancelBubble = true;
+    if (e.stopPropagation) e.stopPropagation();
+    setIsSlideUp(false);
     setCardData(null);
   };
 
