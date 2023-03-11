@@ -26,7 +26,7 @@ export default function FunFacts() {
     const maxFactKey = 11;
     const interval = setInterval(() => {
       setRandomKey(Math.floor(Math.random() * maxFactKey + 1));
-    }, 2000);
+    }, 60000);
   }, []);
 
   const handleFunFacts = () => {
@@ -47,7 +47,6 @@ export default function FunFacts() {
               </div> : () => { }}
               <span class="funfact-toggler" onClick={handleFunFacts}>💡</span>
             </div>
-
           </div>
         </div>
       )}
