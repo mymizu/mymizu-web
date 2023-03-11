@@ -11,8 +11,8 @@
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: rgb(255,255,255);
-  background-color: rgb(255,255,255, 0.9);
+  background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255, 0.9);
   overflow-x: hidden;
   transition: 0.5s;
 }
@@ -35,7 +35,8 @@
   transition: 0.3s;
 }
 
-.overlay a:hover, .overlay a:focus {
+.overlay a:hover,
+.overlay a:focus {
   color: #f1f1f1;
 }
 
@@ -48,18 +49,43 @@
   padding-top: 5px;
 }
 
+.cross {
+  font-size: 30px;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+}
+
 .hamburger {
   font-size: 30px;
   cursor: pointer;
 }
 
+
+
 @media screen and (max-height: 450px) {
-  .overlay a {font-size: 20px}
-  .overlay .closebtn {
-  font-size: 40px;
-  top: 15px;
-  right: 35px;
+  .overlay a {
+    font-size: 20px
   }
+
+  .overlay .closebtn {
+    font-size: 40px;
+    top: 15px;
+    right: 35px;
+  }
+
+
+}
+
+.facts-container {
+  position: relative;
+}
+
+.facts {
+  text-align: center;
+  margin-bottom: 60px;
+  margin-top: 60px;
+  color: #2F97D1;
 }
 
 .row.home {
@@ -263,11 +289,7 @@ img#logo {
   background-image: url("../images/ocean.jpg");
 }
 
-.facts {
-  text-align: center;
-  margin-bottom: 60px;
-  color: #2F97D1;
-}
+
 
 .footer {
   background: #E6F4FD;
@@ -303,7 +325,7 @@ footer .nav-link i {
 
 .marker img {
   position: absolute;
-  transform: translate(-50%,-100%);
+  transform: translate(-50%, -100%);
 }
 
 .marker img.pin {
@@ -596,10 +618,13 @@ footer .nav-link i {
   padding: 10px 0;
 }
 
+.popup-container {
+  position: relative;
+  display: none;
+}
+
 /* Portrait and Landscape */
-@media only screen
-and (min-device-width: 375px)
-and (max-device-width: 812px) {
+@media only screen and (min-device-width: 375px) and (max-device-width: 812px) {
 
   .maps-container {
     height: 91vh;
@@ -628,6 +653,69 @@ and (max-device-width: 812px) {
 
   .modal-container-slide-up {
     z-index: 3
+  }
+
+  .facts {
+    display: none;
+  }
+
+  .popup-container {
+    position: absolute;
+    display: block;
+  }
+
+  .popup {
+    position: fixed;
+    bottom: 16%;
+    width: 100%;
+
+    z-index: 999;
+  }
+
+  .popup.fixed {
+    position: fixed;
+    bottom: 16%;
+    width: 100%;
+
+  }
+
+  .popup.show {
+    display: block;
+  }
+
+  .popup-content {
+    position: absolute;
+    right: 17%;
+    width: calc(90% - 45px);
+    height: auto;
+    text-align: center;
+    color: #2F97D1;
+    padding: 8px;
+    background-color: white;
+    box-shadow: 0px 0px 10px rgb(0 0 0 / 20%);
+    border-radius: 12px;
+    top: auto;
+    bottom: 3%;
+    display: flex;
+  }
+
+
+  .funfact-toggler {
+    position: absolute;
+    bottom: 3%;
+    right: 2%;
+    height: 45px;
+    width: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background-color: white;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0px 0px 10px rgb(0 0 0 / 20%);
+    z-index: 999;
   }
 
   .info-card {
@@ -671,7 +759,7 @@ and (max-device-width: 812px) {
   }
 
   .info-card .details {
-   display: none;
+    display: none;
   }
 
   .info-card .details-slide-up {
@@ -695,11 +783,12 @@ and (max-device-width: 812px) {
   position: absolute;
 }
 
-@keyframes load{
-  0%{
+@keyframes load {
+  0% {
     left: -100%;
   }
-  100%{
+
+  100% {
     left: 100%;
   }
 }
