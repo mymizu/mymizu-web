@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useMemo} from "react";
+import React, {useState, useEffect, useMemo, useRef} from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 
@@ -55,6 +55,8 @@ export function App({gmApiKey, gaTag}) {
   const [requestsInProgress, setRequestsInProgress] = useState([]);
   const [isSlideUp, setIsSlideUp] = useState(false);
   const [userToken, setUserToken] = useState(null);
+  const [showSearchRecommendation, setShowSearchRecommendation] = useState(true)
+  const searchWrapperRef = useRef(null);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -348,6 +350,28 @@ export function App({gmApiKey, gaTag}) {
       : null;
   };
 
+  // Hook that alerts click outside search/searchModal
+  function useOutsideAlerterSearchRecommendation(ref) {
+    useEffect(() => {
+      // Alert if clicked on outside of element
+      function handleClickOutside(event) {
+        if (ref.current && !ref.current.contains(event.target)) {
+          setShowSearchRecommendation(false);
+        }
+      }
+
+        // Bind the event listener
+        document.addEventListener("mousedown", handleClickOutside);
+
+        return () => {
+            // Unbind the event listener on clean up
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+
+    }, [ref]);
+  }
+  useOutsideAlerterSearchRecommendation(searchWrapperRef);
+
   useEffect(() => {
     const token = localStorage.getItem(USER_TOKEN_KEY);
 
@@ -564,17 +588,23 @@ export function App({gmApiKey, gaTag}) {
           </div>
         )}
         {taps.length > 0 && (
-          <>
+          <div ref={searchWrapperRef}>
             <Search
               results={results}
               onSearch={handleSearchQuery}
               onReset={handleReset}
+              setShowSearchRecommendation={setShowSearchRecommendation}
+              showSearchRecommendation={showSearchRecommendation}
+              
             />
-            <SearchResults
-              results={results}
-              onSearchResultClick={handleResultClick}
-            />
-          </>
+            {showSearchRecommendation && 
+              <SearchResults
+                results={results}
+                onSearchResultClick={handleResultClick}
+              />
+            }
+
+          </div>
         )}
       </div>
       <div className="loading-container">
