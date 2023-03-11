@@ -11,8 +11,8 @@
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: rgb(255, 255, 255);
-  background-color: rgb(255, 255, 255, 0.9);
+  background-color: rgb(255,255,255);
+  background-color: rgb(255,255,255, 0.9);
   overflow-x: hidden;
   transition: 0.5s;
 }
@@ -35,8 +35,7 @@
   transition: 0.3s;
 }
 
-.overlay a:hover,
-.overlay a:focus {
+.overlay a:hover, .overlay a:focus {
   color: #f1f1f1;
 }
 
@@ -49,35 +48,18 @@
   padding-top: 5px;
 }
 
-.cross {
-  font-size: 30px;
-  cursor: pointer;
-  text-align: center;
-  vertical-align: middle;
-}
-
 .hamburger {
   font-size: 30px;
   cursor: pointer;
 }
 
 @media screen and (max-height: 450px) {
-  .overlay a {
-    font-size: 20px
-  }
-
+  .overlay a {font-size: 20px}
   .overlay .closebtn {
-    font-size: 40px;
-    top: 15px;
-    right: 35px;
+  font-size: 40px;
+  top: 15px;
+  right: 35px;
   }
-}
-
-.facts {
-  text-align: center;
-  margin-bottom: 60px;
-  margin-top: 60px;
-  color: #2F97D1;
 }
 
 .row.home {
@@ -281,7 +263,11 @@ img#logo {
   background-image: url("../images/ocean.jpg");
 }
 
-
+.facts {
+  text-align: center;
+  margin-bottom: 60px;
+  color: #2F97D1;
+}
 
 .footer {
   background: #E6F4FD;
@@ -317,7 +303,7 @@ footer .nav-link i {
 
 .marker img {
   position: absolute;
-  transform: translate(-50%, -100%);
+  transform: translate(-50%,-100%);
 }
 
 .marker img.pin {
@@ -611,7 +597,9 @@ footer .nav-link i {
 }
 
 /* Portrait and Landscape */
-@media only screen and (min-device-width: 375px) and (max-device-width: 812px) {
+@media only screen
+and (min-device-width: 375px)
+and (max-device-width: 812px) {
 
   .maps-container {
     height: 91vh;
@@ -640,12 +628,6 @@ footer .nav-link i {
 
   .modal-container-slide-up {
     z-index: 3
-  }
-
-  .facts {
-    text-align: center;
-    margin-bottom: 240px;
-    color: #2D383F;
   }
 
   .info-card {
@@ -689,7 +671,7 @@ footer .nav-link i {
   }
 
   .info-card .details {
-    display: none;
+   display: none;
   }
 
   .info-card .details-slide-up {
@@ -713,12 +695,11 @@ footer .nav-link i {
   position: absolute;
 }
 
-@keyframes load {
-  0% {
+@keyframes load{
+  0%{
     left: -100%;
   }
-
-  100% {
+  100%{
     left: 100%;
   }
 }
