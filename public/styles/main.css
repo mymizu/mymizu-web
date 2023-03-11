@@ -703,3 +703,15 @@ and (max-device-width: 812px) {
     left: 100%;
   }
 }
+
+@media screen and (max-width: 768px) {
+  .contributors-page .contributors li{
+      width: 40%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .contributors-page .contributors li{
+      width: 80%;
+  }
+}

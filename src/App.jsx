@@ -17,6 +17,7 @@ import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
 import {ShareModal} from "./components/ShareModal";
+import Contributors from "./components/Contributors";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -585,6 +586,7 @@ export function App({gmApiKey, gaTag}) {
       <div className="container-lg">
         {userToken && <Metrics/>}
         <FunFacts/>
+        <Contributors />
       </div>
       <div className="footer">
         <div className="container-lg">
