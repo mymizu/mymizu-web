@@ -1,0 +1,793 @@
+{
+    "current_page": 1,
+    "data": [
+        {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },  {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },
+        {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },
+        {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },
+        {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },
+        {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },
+        {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },
+        {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },
+        {
+            "id": 203227,
+            "name": "Ippondo Kumamoto Nagamine",
+            "longitude": 130.7641214,
+            "latitude": 32.811127,
+            "address": "日本、〒861-8037 熊本県熊本市東区長嶺西１丁目６−１０６",
+            "comment": "Website:https://www.facebook.com/ippondo.kumamoto.nagamine/Location:The bread shop located alongside the Suroy Mall. Parking is available in front of the shop for 2 cars and opposite in car parks No.7, 8, 9 and 10.How to Refill:Please ask a member of staffOpening Hours:Monday: 09:00 - 18:00Tuesday: 09:00 - 18:00Wednesday: 09:00 - 18:00Thursday: 09:00 - 18:00Friday: 09:00 - 18:00Saturday: 09:00 - 18:00Closed: Sundays and 3rd Monday of the monthWater: FilteredBusiness Type: Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-ippondo-kumamoto-nagamine",
+            "photo_url": "https://api.mymizu.co/api/photos/9135",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "09:00 - 18:00"
+                ],
+                "Tuesday": [
+                    "09:00 - 18:00"
+                ],
+                "Wednesday": [
+                    "09:00 - 18:00"
+                ],
+                "Thursday": [
+                    "09:00 - 18:00"
+                ],
+                "Friday": [
+                    "09:00 - 18:00"
+                ],
+                "Saturday": [
+                    "09:00 - 18:00"
+                ],
+                "Sunday": []
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered"
+                ],
+                "Business Type": [
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "https://www.facebook.com/ippondo.kumamoto.nagamine/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 9135,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40d8dda008.67657648.jpg"
+                },
+                {
+                    "id": 9133,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40b6a3c4f7.82084523.jpg"
+                },
+                {
+                    "id": 9134,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_611b40c497dc52.51276214.jpg"
+                }
+            ]
+        },
+        {
+            "id": 202961,
+            "name": "calmestcoffeeshop",
+            "longitude": 130.6996456,
+            "latitude": 32.9081291,
+            "address": "〒861-0136 熊本市北区植木町岩野802-3",
+            "comment": "Website:http://www.calmestcoffeeshop.com/Location:Go east 500 meters from the Roadside Station Suika no Sato on Route 3, and you will see a blue sign on your right.How to Refill:Please ask a member of staffOpening Hours:Monday: 11:00 - 19:00Tuesday: 11:00 - 19:00Thursday: 11:00 - 19:00Friday: 11:00 - 19:00Saturday: 11:00 - 19:00Sunday: 11:00 - 19:00Closed: WedWater: Filtered • TapBusiness Type: Cafe/Restaurant etc • Store/Shop",
+            "category_id": 4,
+            "slug": "kumamoto-calmestcoffeeshop",
+            "photo_url": "https://api.mymizu.co/api/photos/8706",
+            "copyright": null,
+            "opening_hours": {
+                "Monday": [
+                    "11:00 - 19:00"
+                ],
+                "Tuesday": [
+                    "11:00 - 19:00"
+                ],
+                "Wednesday": [],
+                "Thursday": [
+                    "11:00 - 19:00"
+                ],
+                "Friday": [
+                    "11:00 - 19:00"
+                ],
+                "Saturday": [
+                    "11:00 - 19:00"
+                ],
+                "Sunday": [
+                    "11:00 - 19:00"
+                ]
+            },
+            "grouped_tags": {
+                "Water": [
+                    "Filtered",
+                    "Tap"
+                ],
+                "Business Type": [
+                    "Cafe/Restaurant etc",
+                    "Store/Shop"
+                ]
+            },
+            "geographic_tags": [
+                {
+                    "id": 2067,
+                    "name": "Japan",
+                    "level": 0
+                },
+                {
+                    "id": 3462,
+                    "name": "Kumamoto",
+                    "level": 1
+                },
+                {
+                    "id": 6141,
+                    "name": "Kumamoto",
+                    "level": 2
+                }
+            ],
+            "website": "http://www.calmestcoffeeshop.com/",
+            "refill_instruction": "Please ask a member of staff",
+            "photos": [
+                {
+                    "id": 8706,
+                    "approved": true,
+                    "url": "https://mymizu-static.s3-ap-northeast-1.amazonaws.com/taps/photos/tap_0_6103b33acd9ce4.11757082.jpg"
+                }
+            ]
+        }
+    ],
+    "first_page_url": "http://api.mymizu.co/api/taps/search?page=1",
+    "from": 1,
+    "last_page": 1,
+    "last_page_url": "http://api.mymizu.co/api/taps/search?page=1",
+    "links": [
+        {
+            "url": null,
+            "label": "&amp;laquo; Previous",
+            "active": false
+        },
+        {
+            "url": "http://api.mymizu.co/api/taps/search?page=1",
+            "label": 1,
+            "active": true
+        },
+        {
+            "url": null,
+            "label": "Next &amp;raquo;",
+            "active": false
+        }
+    ],
+    "next_page_url": null,
+    "path": "http://api.mymizu.co/api/taps/search",
+    "per_page": 20,
+    "prev_page_url": null,
+    "to": 2,
+    "total": 2
+}

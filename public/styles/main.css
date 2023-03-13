@@ -480,6 +480,14 @@ footer .nav-link i {
   text-align: left;
 }
 
+.grid{
+  height: 75vh;
+  position: absolute;
+  z-index: 1;
+  top: 32px;
+  left: 25px;
+}
+
 .share-modal .link {
   flex-grow: 100;
   display: inline-block;
