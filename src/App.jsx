@@ -17,6 +17,7 @@ import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
 import {ShareModal} from "./components/ShareModal";
+import {Grid} from "./components/Grid"
 
 const translations = {
   en: require("./translations/en.json"),
@@ -55,6 +56,10 @@ export function App({gmApiKey, gaTag}) {
   const [requestsInProgress, setRequestsInProgress] = useState([]);
   const [isSlideUp, setIsSlideUp] = useState(false);
   const [userToken, setUserToken] = useState(null);
+
+  console.log(results, "🌸");
+  console.log(cardData, "💕");
+
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -586,6 +591,7 @@ export function App({gmApiKey, gaTag}) {
         {userToken && <Metrics/>}
         <FunFacts/>
       </div>
+<Grid className="grid"/>
       <div className="footer">
         <div className="container-lg">
           <footer>

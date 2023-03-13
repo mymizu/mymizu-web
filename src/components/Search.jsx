@@ -8,7 +8,6 @@ export function Search({ results, onSearch, onReset }) {
   const debounced = useDebouncedCallback(onSearch, 500, { leading: true });
   const showResultInputs =
     results.length > 0 ? "maps-location-search-input-with-results" : "";
-
   const handleReset = () => {
     inputRef.current.value = "";
     onReset();

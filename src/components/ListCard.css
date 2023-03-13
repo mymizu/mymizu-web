@@ -1,0 +1,76 @@
+@font-face {
+    font-family: "Futura";
+    src: url("../assets/futura/Futura\ Light\ font.ttf");
+  }
+  
+  .modal-card-container {
+    padding: 10px;
+    border-radius: 2%;
+    
+  }
+  .modal-card-container:hover {
+    border: solid thin;
+    border-color: #2f97d1;
+    opacity: 70%;
+  }
+  
+  .modal-card-picture {
+    height: 100px;
+    width: 100px;
+    background-color: antiquewhite;
+    border-radius: 5%;
+  }
+  
+  .modal-card-contents {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  .modal-card-details{
+    display:flex;
+    flex-direction: column;
+  }
+  .shop-list-name {
+    font-family: "Futura";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 23px;
+    display: flex;
+    align-items: flex-end;
+    color: #2f97d1;
+  }
+  .location-icon {
+    width: 20px;
+    fill: #f8b838;
+    margin-left: 5px;
+    margin-right: 5px;
+  }
+  .shop-list-body {
+    font-family: "Futura";
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 18px;
+    color: #666666;
+    margin-left: 10px;
+  }
+  
+  a:link {
+    text-decoration: none;
+  }
+  
+  a:visited {
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: none;
+  }
+  
+  a:active {
+    text-decoration: none;
+  }
+  
