@@ -46,7 +46,16 @@ cp .env.sample .env
 
 # Install dependencies
 yarn 
+#FOR DEVELOPMENT
+# Run server with watch. This command will restart the server when a change has been detected
+yarn start:reload
+#development proxy is hard coded to http://localhost:3000/ please edit this in pakage.json if your server is runnign on a different port
 
+#Run in a new terminal run the front end this will update the Vitual DOM so changes to front end are seen in real time
+yarn react-scripts start
+#this will automatically proxy to the server. please run the server frist.
+
+#FOR DEPLOYMENT TESTING
 # Compile both backend & client code
 # Make sure to re-run this if you want to see your changes built
 yarn build
