@@ -11,8 +11,8 @@
   z-index: 1;
   top: 0;
   left: 0;
-  background-color: rgb(255,255,255);
-  background-color: rgb(255,255,255, 0.9);
+  background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255, 0.9);
   overflow-x: hidden;
   transition: 0.5s;
 }
@@ -35,7 +35,8 @@
   transition: 0.3s;
 }
 
-.overlay a:hover, .overlay a:focus {
+.overlay a:hover,
+.overlay a:focus {
   color: #f1f1f1;
 }
 
@@ -54,11 +55,14 @@
 }
 
 @media screen and (max-height: 450px) {
-  .overlay a {font-size: 20px}
+  .overlay a {
+    font-size: 20px
+  }
+
   .overlay .closebtn {
-  font-size: 40px;
-  top: 15px;
-  right: 35px;
+    font-size: 40px;
+    top: 15px;
+    right: 35px;
   }
 }
 
@@ -303,7 +307,7 @@ footer .nav-link i {
 
 .marker img {
   position: absolute;
-  transform: translate(-50%,-100%);
+  transform: translate(-50%, -100%);
 }
 
 .marker img.pin {
@@ -568,6 +572,8 @@ footer .nav-link i {
   height: 100%;
   width: 100%;
   background-position: center center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }
 
 .summary {
@@ -597,9 +603,7 @@ footer .nav-link i {
 }
 
 /* Portrait and Landscape */
-@media only screen
-and (min-device-width: 375px)
-and (max-device-width: 812px) {
+@media only screen and (min-device-width: 375px) and (max-device-width: 812px) {
 
   .maps-container {
     height: 91vh;
@@ -671,7 +675,7 @@ and (max-device-width: 812px) {
   }
 
   .info-card .details {
-   display: none;
+    display: none;
   }
 
   .info-card .details-slide-up {
@@ -695,11 +699,12 @@ and (max-device-width: 812px) {
   position: absolute;
 }
 
-@keyframes load{
-  0%{
+@keyframes load {
+  0% {
     left: -100%;
   }
-  100%{
+
+  100% {
     left: 100%;
   }
 }

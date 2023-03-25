@@ -30,7 +30,7 @@ export const Carousel = (props) => {
   const ImageSlide = ({ url }) => {
     const styles = {
       backgroundImage: `url(${url})`,
-      backgroundSize: "cover",
+      // backgroundSize: "cover",
       WbackgroundPosition: "center",
     };
 
