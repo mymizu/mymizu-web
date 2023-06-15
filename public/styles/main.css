@@ -318,7 +318,7 @@ footer .nav-link i {
 .modal-container {
   height: 75vh;
   position: absolute;
-  z-index: 1;
+  z-index: 6;
   top: 32px;
   left: 25px;
 }
@@ -626,7 +626,7 @@ and (max-device-width: 812px) {
   }
 
   .modal-container-slide-up {
-    z-index: 3
+    z-index: 6
   }
 
   .info-card {
@@ -715,4 +715,16 @@ and (max-device-width: 812px) {
   100%{
     left: 100%;
   }
+}
+
+#current_location_button {
+  height: 70px;
+  width: 70px;
+  z-index: 5;
+  position: absolute;
+  cursor: pointer;
+  margin-left: auto;
+  bottom: 16px;
+  right: 60px;
+  border-radius: 50%;
 }
