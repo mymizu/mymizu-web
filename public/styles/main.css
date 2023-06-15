@@ -711,7 +711,7 @@ and (max-device-width: 812px) {
   position: absolute;
   cursor: pointer;
   margin-left: auto;
-  top: 15px;
-  right: 15px;
+  bottom: 16px;
+  right: 60px;
   border-radius: 50%;
 }
