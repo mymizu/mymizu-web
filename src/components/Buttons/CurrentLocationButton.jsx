@@ -6,7 +6,7 @@ const CurrentLocationButton = ({ onClick, className }) => {
       <img
         id="current_location_button"
         onClick={onClick}
-        src="./public/images/Im_here.png" 
+        src="/public/images/Im_here.png" 
         alt=""
       />
     // </button>
