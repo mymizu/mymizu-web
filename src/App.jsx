@@ -1,22 +1,22 @@
-import React, {useState, useEffect, useMemo} from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 
-import {FormattedMessage, IntlProvider} from "react-intl";
+import { FormattedMessage, IntlProvider } from "react-intl";
 import i18nConfig from "./i18nConfig";
-import {FunFacts} from "./components";
+import { FunFacts } from "./components";
 import Metrics from "./components/Metrics";
-import {transformCardData} from "./utils/transformCardData";
-import {Modal} from "./components/Modal";
-import {useLang} from "./utils/useLang";
+import { transformCardData } from "./utils/transformCardData";
+import { Modal } from "./components/Modal";
+import { useLang } from "./utils/useLang";
 import getSlug from "./utils/getSlug";
-import {Marker} from "./components/Marker";
-import {Search} from "./components/Search";
-import {SearchResults} from "./components/SearchResults";
+import { Marker } from "./components/Marker";
+import { Search } from "./components/Search";
+import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
-import {ShareModal} from "./components/ShareModal";
+import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
 
 const translations = {
@@ -24,7 +24,7 @@ const translations = {
   ja: require("./translations/ja.json"),
 };
 
-export function App({gmApiKey, gaTag}) {
+export function App({ gmApiKey, gaTag }) {
   /*useEffect(() => {
     ReactGA.initialize(gaTag);
     ReactGA.send("pageview");
@@ -78,7 +78,7 @@ export function App({gmApiKey, gaTag}) {
       action: 'Clicked search result',
       label: result.formatted_address,
     });*/
-    const {location} = result.geometry;
+    const { location } = result.geometry;
 
     const resultLat = String(location.lat()).slice(0, 6);
     const resultLng = String(location.lng()).slice(0, 7);
@@ -145,29 +145,29 @@ export function App({gmApiKey, gaTag}) {
       id: "topnav.community",
       href: {
         en: "https://www.mymizu.co/en/business",
-        ja: "https://www.mymizu.co/business"
-      }
+        ja: "https://www.mymizu.co/business",
+      },
     },
     {
       id: "topnav.partners",
       href: {
         en: "https://github.com/mymizu/mymizu-web",
-        ja: "https://github.com/mymizu/mymizu-web/"
-      }
+        ja: "https://github.com/mymizu/mymizu-web/",
+      },
     },
     {
       id: "topnav.feedback",
       href: {
         en: "https://go.mymizu.co/web-app-feedback-en",
-        ja: "https://go.mymizu.co/web-app-feedback-ja"
-      }
+        ja: "https://go.mymizu.co/web-app-feedback-ja",
+      },
     },
   ];
 
   const socialNav = [
-    {href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram"},
-    {href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook"},
-    {href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter"},
+    { href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram" },
+    { href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook" },
+    { href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter" },
   ];
 
   const footerNav = [
@@ -175,36 +175,36 @@ export function App({gmApiKey, gaTag}) {
       id: "footernav.joinus",
       href: {
         en: "https://www.mymizu.co/action-app-en",
-        ja: "https://www.mymizu.co/action-app-ja"
-      }
+        ja: "https://www.mymizu.co/action-app-ja",
+      },
     },
     {
       id: "footernav.supporters",
       href: {
         en: "https://www.mymizu.co/partners-en",
-        ja: "https://www.mymizu.co/partners-ja"
-      }
+        ja: "https://www.mymizu.co/partners-ja",
+      },
     },
     {
       id: "footernav.contact",
       href: {
         en: "https://www.mymizu.co/contact-us-en",
-        ja: "https://www.mymizu.co/contact-us-ja"
-      }
+        ja: "https://www.mymizu.co/contact-us-ja",
+      },
     },
     {
       id: "footernav.policy",
       href: {
         en: "https://legal.mymizu.co/privacy",
         ja: "https://legal.mymizu.co/privacy",
-      }
+      },
     },
     {
       id: "footernav.terms",
       href: {
         en: "https://legal.mymizu.co/terms",
         ja: "https://legal.mymizu.co/terms",
-      }
+      },
     },
   ];
 
@@ -222,7 +222,10 @@ export function App({gmApiKey, gaTag}) {
       const token = res.data.new_token;
       setUserToken(token);
       localStorage.setItem(USER_TOKEN_KEY, token);
-      localStorage.setItem(USER_TOKEN_EXPIRES_AT, new Date(Date.now() + (3600 * 1000 * 24 * 365)).toString());
+      localStorage.setItem(
+        USER_TOKEN_EXPIRES_AT,
+        new Date(Date.now() + 3600 * 1000 * 24 * 365).toString()
+      );
       localStorage.setItem(USER_TOKEN_SET_AT, new Date().toString());
 
       axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
@@ -248,15 +251,15 @@ export function App({gmApiKey, gaTag}) {
 
       const res = await axios.get("/get-initial-markers");
 
-      const {taps} = res.data;
+      const { taps } = res.data;
 
       const newTaps = taps
         ? taps.map((tap) => {
-          return {
-            ...tap,
-            isSearch: false,
-          };
-        })
+            return {
+              ...tap,
+              isSearch: false,
+            };
+          })
         : [];
 
       setInitialLoad(true);
@@ -277,14 +280,14 @@ export function App({gmApiKey, gaTag}) {
     const reqRef = getRequestRef();
     try {
       if (initialLoad) {
-        const {nw, se} = value;
+        const { nw, se } = value;
 
         startedRequest(reqRef);
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
         );
 
-        const {taps: resTaps} = res.data;
+        const { taps: resTaps } = res.data;
 
         const newTaps = [];
 
@@ -306,7 +309,7 @@ export function App({gmApiKey, gaTag}) {
     } catch (e) {
       console.log(e);
 
-    /*  ReactGA.exception({
+      /*  ReactGA.exception({
         description: 'Error loading secondary taps',
       });*/
     }
@@ -324,9 +327,9 @@ export function App({gmApiKey, gaTag}) {
       action: 'Clicked spot marker',
       label: markerData.id,
     });*/
-    const path = `/refill/${locale}/${markerData.slug}`
+    const path = `/refill/${locale}/${markerData.slug}`;
     //ReactGA.send({ hitType: "pageview", page: path});
-    document.title = `${markerData.name} - mymizu`
+    document.title = `${markerData.name} - mymizu`;
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
   };
@@ -346,8 +349,8 @@ export function App({gmApiKey, gaTag}) {
   const finishedRequest = (randomRef) => {
     Array.isArray(requestsInProgress)
       ? setRequestsInProgress(
-        requestsInProgress.filter((item) => item !== randomRef)
-      )
+          requestsInProgress.filter((item) => item !== randomRef)
+        )
       : null;
   };
 
@@ -389,8 +392,7 @@ export function App({gmApiKey, gaTag}) {
       return;
     }
     getUserToken();
-
-  }, [])
+  }, []);
 
   useEffect(() => {
     const language = window.navigator.userLanguage || window.navigator.language;
@@ -451,7 +453,7 @@ export function App({gmApiKey, gaTag}) {
 
           const res = await axios.get(`/get-refill-spot/${slug}`);
           setCardData(transformCardData(res.data, locale));
-          document.title = `${res.data.name} - mymizu`
+          document.title = `${res.data.name} - mymizu`;
           const newTaps = [];
           let flag = false;
           for (let j = 0; j < taps.length; j++) {
@@ -476,7 +478,7 @@ export function App({gmApiKey, gaTag}) {
 
           finishedRequest(reqRef);
         }
-      }
+      };
       load();
     }
   }, [userToken]);
@@ -502,42 +504,52 @@ export function App({gmApiKey, gaTag}) {
               className="collapse navbar-collapse justify-content-end"
               id="navbarNav"
             >
-              <ul className="nav navbar-nav " style={{marginTop: 10}}>
+              <ul className="nav navbar-nav " style={{ marginTop: 10 }}>
                 {topNav.map((el, i) => (
                   <li className="nav-item" key={i}>
                     <a className="nav-link" href={el.href[locale]} key={i}>
-                      <FormattedMessage id={el.id} defaultMessage=""/>
+                      <FormattedMessage id={el.id} defaultMessage="" />
                     </a>
                   </li>
                 ))}
                 <li className="nav-item lang-selector">
-                  {locale !== "ja" && (<a
-                    className="nav-link"
-                    href="#"
-                    onClick={() => updateLanguage("ja", true)}
-                    hrefLang="ja"
-                  >
-                    日本語
-                  </a>)}
-                  {locale !== "en" && (<a
-                    className="nav-link"
-                    href="#"
-                    hrefLang="en"
-                    onClick={() => updateLanguage("en", true)}
-                  >
-                    English
-                  </a>)}
+                  {locale !== "ja" && (
+                    <a
+                      className="nav-link"
+                      href="#"
+                      onClick={() => updateLanguage("ja", true)}
+                      hrefLang="ja"
+                    >
+                      日本語
+                    </a>
+                  )}
+                  {locale !== "en" && (
+                    <a
+                      className="nav-link"
+                      href="#"
+                      hrefLang="en"
+                      onClick={() => updateLanguage("en", true)}
+                    >
+                      English
+                    </a>
+                  )}
                 </li>
               </ul>
             </div>
-            <button className="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                    aria-expanded="false" aria-label="Toggle navigation">
+            <button
+              className="navbar-toggler"
+              data-bs-toggle="collapse"
+              data-bs-target="#navbarNav"
+              aria-expanded="false"
+              aria-label="Toggle navigation"
+            >
               <span
                 className="hamburger d-sm-inline d-md-inline d-lg-none"
                 onClick={handleNav}
               >
-              &#9776;
-            </span></button>
+                &#9776;
+              </span>
+            </button>
           </div>
         </nav>
       </div>
@@ -591,7 +603,9 @@ export function App({gmApiKey, gaTag}) {
               setShareModal={setShowShareModal}
             />
             {showShareModal ? (
-              <ShareModal data={cardData} setShareModal={setShowShareModal}/>
+              <div className="share-modal-container">
+                <ShareModal data={cardData} setShareModal={setShowShareModal} />
+              </div>
             ) : (
               ""
             )}
@@ -617,8 +631,8 @@ export function App({gmApiKey, gaTag}) {
         )}
       </div>
       <div className="container-lg">
-        {userToken && <Metrics/>}
-        <FunFacts/>
+        {userToken && <Metrics />}
+        <FunFacts />
       </div>
       <div className="footer">
         <div className="container-lg">
@@ -627,7 +641,7 @@ export function App({gmApiKey, gaTag}) {
               {socialNav.map((el, i) => (
                 <li className="nav-item" key={i}>
                   <a href={el.href} className="nav-link px-2 text-muted">
-                    <i className={`bi ${el.iconName}`}/>
+                    <i className={`bi ${el.iconName}`} />
                   </a>
                 </li>
               ))}
@@ -636,7 +650,7 @@ export function App({gmApiKey, gaTag}) {
               {footerNav.map((el, i) => (
                 <li className="nav-item" key={i}>
                   <a href={el.href[locale]} className="nav-link px-2">
-                    <FormattedMessage id={el.id} defaultMessage=""/>
+                    <FormattedMessage id={el.id} defaultMessage="" />
                   </a>
                 </li>
               ))}
