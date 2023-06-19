@@ -50,7 +50,12 @@ export const Carousel = (props) => {
           className={"left-carousel-button"}
         />
       }
-      <ImageSlide url={images?.[currentIndex]?.url} />
+      {images?.length > 0 && 
+        <ImageSlide url={images?.[currentIndex]?.url} />
+      }
+      {images?.length < 1 && 
+        <ImageSlide url="/public/images/mymizu_Refill_Spot.png"/>
+      }
       {images?.length > 1 && 
         <ArrowButton
           onClick={nextSlide}
@@ -58,6 +63,8 @@ export const Carousel = (props) => {
           className={"right-carousel-button"}
         />
       }
+
+
     </div>
   );
 };
