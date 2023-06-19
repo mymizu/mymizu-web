@@ -58,6 +58,7 @@ export function App({ gmApiKey, gaTag }) {
   const [requestsInProgress, setRequestsInProgress] = useState([]);
   const [isSlideUp, setIsSlideUp] = useState(false);
   const [userToken, setUserToken] = useState(null);
+  const [showCopyCheck, setShowCopyCheck] = useState(true);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -332,6 +333,7 @@ export function App({ gmApiKey, gaTag }) {
     document.title = `${markerData.name} - mymizu`;
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
+    setShowCopyCheck(true);
   };
 
   const handleCloseModal = () => {
@@ -604,7 +606,7 @@ export function App({ gmApiKey, gaTag }) {
             />
             {showShareModal ? (
               <div className="share-modal-container">
-                <ShareModal data={cardData} setShareModal={setShowShareModal} />
+                <ShareModal data={cardData} setShareModal={setShowShareModal} setShowCopyCheck={setShowCopyCheck} showCopyCheck={showCopyCheck}/>
               </div>
             ) : (
               ""

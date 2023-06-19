@@ -694,19 +694,22 @@ and (max-device-width: 812px) {
   position: absolute;
 }
 
-.share-modal-container {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
+@media only screen and (min-width: 300px) and (max-width: 870px) {
+  .share-modal-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .share-modal {
+    top:auto;
+    left: auto;
+  }
 }
 
-.share-modal {
-  top:auto;
-  left: auto;
-}
 
 @keyframes load{
   0%{
@@ -727,4 +730,8 @@ and (max-device-width: 812px) {
   bottom: 16px;
   right: 60px;
   border-radius: 50%;
+}
+
+#check_icon {
+  margin-right: 8px;
 }
