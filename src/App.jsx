@@ -56,7 +56,7 @@ export function App({ gmApiKey, gaTag }) {
   const [results, setResults] = useState([]);
   const [googleMapFn, setGoogleMapFn] = useState();
   const [requestsInProgress, setRequestsInProgress] = useState([]);
-  const [isSlideUp, setIsSlideUp] = useState(false);
+  const [isSlideUp, setIsSlideUp] = useState(true);
   const [userToken, setUserToken] = useState(null);
   const [showCopyCheck, setShowCopyCheck] = useState(true);
 

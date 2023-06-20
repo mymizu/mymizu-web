@@ -11,7 +11,7 @@ export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp, setShareModa
 
   const showDetails = () => {
     if (group.title === "mobile") {
-      setIsSlideUp(!isSlideUp);
+      setIsSlideUp(true);
     }
   };
 
