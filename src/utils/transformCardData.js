@@ -19,6 +19,7 @@ export const transformCardData = (data, locale) => {
     slug: data.slug,
     categoryId: data.category_id,
     latitude: data.latitude,
-    longitude: data.longitude
+    longitude: data.longitude,
+    createdAt: data.created_at
   };
 };

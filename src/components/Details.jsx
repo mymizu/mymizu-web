@@ -3,6 +3,11 @@ import {FormattedMessage, useIntl} from "react-intl";
 
 export const Details = ({ data }) => {
   const intl = useIntl()
+
+  /*code that determines the year that the refill partner joined mymizu and stores it in the variable "year"*/
+  date = new Date(data.createdAt);
+  const year = date.getFullYear();
+
   const onClickLink = () => {
     /*ReactGA.event({
       category: 'Refill Spot',
@@ -35,13 +40,19 @@ export const Details = ({ data }) => {
       {data.link && (
         <div className="detail-section">
           <img src="/public/images/globe.svg" alt="" />
-          <div><a href={data.link} onClick={onClickLink} target="_new" rel="noopener nofollow" target="_blank">{data.link}</a></div>
+          <div><a href={data.link} onClick={onClickLink} rel="noopener nofollow" target="_blank">{data.link}</a></div>
         </div>
       )}
       {data.address && (
         <div className="detail-section">
           <img src="/public/images/pin_drop.svg" alt="" />
           <div>{data.address}</div>
+        </div>
+      )}
+      {data.createdAt && data.categoryId === 4 && (
+        <div className="detail-section">
+          <img src="/public/images/handshake.svg" alt="" />
+          <FormattedMessage id="spot.addedSince" values={{year: year}}/>
         </div>
       )}
       <div className="detail-section">
