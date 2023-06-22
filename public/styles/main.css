@@ -343,6 +343,7 @@ footer .nav-link i {
 
 .back-button {
   position: absolute;
+  padding: 0;
   top: 0;
   left: 0;
   height: 32px;
