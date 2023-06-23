@@ -11,6 +11,7 @@ import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
 import getSlug from "./utils/getSlug";
 import { Marker } from "./components/Marker";
+import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
@@ -23,6 +24,9 @@ const translations = {
   en: require("./translations/en.json"),
   ja: require("./translations/ja.json"),
 };
+
+var userLatitude = 0;
+var userLongitude = 0;
 
 export function App({ gmApiKey, gaTag }) {
   /*useEffect(() => {
@@ -328,6 +332,9 @@ export function App({ gmApiKey, gaTag }) {
       action: 'Clicked spot marker',
       label: markerData.id,
     });*/
+    if (childProps.id == "current_location_icon") {
+      return;
+    };
     const path = `/refill/${locale}/${markerData.slug}`;
     //ReactGA.send({ hitType: "pageview", page: path});
     document.title = `${markerData.name} - mymizu`;
@@ -365,6 +372,10 @@ export function App({ gmApiKey, gaTag }) {
           lng: position.coords.longitude,
         })
         setZoom(16);
+        userLatitude = position.coords.latitude;
+        //console.log(userLatitude);
+        userLongitude = position.coords.longitude;
+        //console.log(userLongitude);
       })
     } else {
       setCenter(gmDefaultProps.center);
@@ -589,6 +600,11 @@ export function App({ gmApiKey, gaTag }) {
               />
             ))
             : null}
+            <CurrentLocationIcon  
+              lat={userLatitude}
+              lng={userLongitude}
+              id="current_location_icon"
+            />
         </GoogleMapReact>}
         {cardData && (
           <div
