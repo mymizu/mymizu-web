@@ -25,9 +25,6 @@ const translations = {
   ja: require("./translations/ja.json"),
 };
 
-var userLatitude = 0;
-var userLongitude = 0;
-
 export function App({ gmApiKey, gaTag }) {
   /*useEffect(() => {
     ReactGA.initialize(gaTag);
@@ -63,6 +60,8 @@ export function App({ gmApiKey, gaTag }) {
   const [isSlideUp, setIsSlideUp] = useState(true);
   const [userToken, setUserToken] = useState(null);
   const [showCopyCheck, setShowCopyCheck] = useState(true);
+  const [userLatitude, setUserLatitude] = useState(0);
+  const [userLongitude, setUserLongitude] = useState(0);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -372,10 +371,8 @@ export function App({ gmApiKey, gaTag }) {
           lng: position.coords.longitude,
         })
         setZoom(16);
-        userLatitude = position.coords.latitude;
-        //console.log(userLatitude);
-        userLongitude = position.coords.longitude;
-        //console.log(userLongitude);
+        setUserLatitude(position.coords.latitude);
+        setUserLongitude(position.coords.longitude);
       })
     } else {
       setCenter(gmDefaultProps.center);
