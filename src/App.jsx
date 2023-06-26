@@ -62,6 +62,7 @@ export function App({ gmApiKey, gaTag }) {
   const [showCopyCheck, setShowCopyCheck] = useState(true);
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
+  const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -373,10 +374,12 @@ export function App({ gmApiKey, gaTag }) {
         setZoom(16);
         setUserLatitude(position.coords.latitude);
         setUserLongitude(position.coords.longitude);
+        setCurrentLocationLoaded(true);
       })
     } else {
       setCenter(gmDefaultProps.center);
       setZoom(gmDefaultProps.zoom);
+      setCurrentLocationLoaded(false);
     }
   };
 
@@ -597,11 +600,13 @@ export function App({ gmApiKey, gaTag }) {
               />
             ))
             : null}
-            <CurrentLocationIcon  
+            {currentLocationLoaded && 
+            <CurrentLocationIcon
               lat={userLatitude}
               lng={userLongitude}
               id="current_location_icon"
             />
+            }
         </GoogleMapReact>}
         {cardData && (
           <div
