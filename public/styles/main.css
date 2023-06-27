@@ -315,6 +315,10 @@ footer .nav-link i {
   height: 50px;
 }
 
+.current-location-icon img.pin-large {
+  height: 50px;
+}
+
 .modal-container {
   height: 75vh;
   position: absolute;
@@ -735,4 +739,9 @@ and (max-device-width: 812px) {
 
 #check_icon {
   margin-right: 8px;
+}
+
+.maps-container .current-location-icon {
+  position: absolute;
+  transform: translate(-50%, -50%);
 }
