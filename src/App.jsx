@@ -11,6 +11,7 @@ import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
 import getSlug from "./utils/getSlug";
 import { Marker } from "./components/Marker";
+import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
 import googleMapAPI from "../utils/googlemaps";
@@ -59,6 +60,9 @@ export function App({ gmApiKey, gaTag }) {
   const [isSlideUp, setIsSlideUp] = useState(true);
   const [userToken, setUserToken] = useState(null);
   const [showCopyCheck, setShowCopyCheck] = useState(true);
+  const [userLatitude, setUserLatitude] = useState(0);
+  const [userLongitude, setUserLongitude] = useState(0);
+  const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -328,6 +332,9 @@ export function App({ gmApiKey, gaTag }) {
       action: 'Clicked spot marker',
       label: markerData.id,
     });*/
+    if (childProps.id == "current_location_icon") {
+      return;
+    };
     const path = `/refill/${locale}/${markerData.slug}`;
     //ReactGA.send({ hitType: "pageview", page: path});
     document.title = `${markerData.name} - mymizu`;
@@ -365,10 +372,14 @@ export function App({ gmApiKey, gaTag }) {
           lng: position.coords.longitude,
         })
         setZoom(16);
+        setUserLatitude(position.coords.latitude);
+        setUserLongitude(position.coords.longitude);
+        setCurrentLocationLoaded(true);
       })
     } else {
       setCenter(gmDefaultProps.center);
       setZoom(gmDefaultProps.zoom);
+      setCurrentLocationLoaded(false);
     }
   };
 
@@ -589,6 +600,13 @@ export function App({ gmApiKey, gaTag }) {
               />
             ))
             : null}
+            {currentLocationLoaded && 
+            <CurrentLocationIcon
+              lat={userLatitude}
+              lng={userLongitude}
+              id="current_location_icon"
+            />
+            }
         </GoogleMapReact>}
         {cardData && (
           <div
