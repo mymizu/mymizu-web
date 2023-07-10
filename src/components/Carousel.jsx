@@ -54,7 +54,7 @@ export const Carousel = (props) => {
         <ImageSlide url={images?.[currentIndex]?.url} />
       }
       {images?.length < 1 && 
-        <ImageSlide url="/public/images/mymizu_Refill_Spot.png"/>
+        <ImageSlide url="/public/images/mymizu_placeholder.png"/>
       }
       {images?.length > 1 && 
         <ArrowButton
