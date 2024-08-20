@@ -352,15 +352,13 @@ export function App({ gmApiKey, gaTag }) {
   };
 
   const startedRequest = (randomRef) => {
-    setRequestsInProgress([requestsInProgress, randomRef]);
+    setRequestsInProgress(prev => [...prev, randomRef]);
   };
 
   const finishedRequest = (randomRef) => {
-    Array.isArray(requestsInProgress)
-      ? setRequestsInProgress(
-          requestsInProgress.filter((item) => item !== randomRef)
-        )
-      : null;
+    setRequestsInProgress(prev => 
+      prev.filter((item) => item !== randomRef)
+    )
   };
 
   // Ask user for permission to give device location
@@ -434,20 +432,8 @@ export function App({ gmApiKey, gaTag }) {
   }, [taps, setInitialLoad, initialLoad, setTaps, locale, userToken]);
 
   useEffect(() => {
-    if (Object.keys(coordinate).length > 0) {
-      getTapsWhenMapsMoved(coordinate);
-    }
-  }, [coordinate]);
-
-  useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
   }, [locale]);
-
-  useEffect(() => {
-    if (Object.keys(coordinate).length > 0) {
-      getTapsWhenMapsMoved(coordinate);
-    }
-  }, [coordinate]);
 
   useEffect(() => {
     if (Object.keys(coordinate).length > 0) {
