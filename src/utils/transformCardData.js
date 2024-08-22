@@ -20,6 +20,7 @@ export const transformCardData = (data, locale) => {
     categoryId: data.category_id,
     latitude: data.latitude,
     longitude: data.longitude,
-    createdAt: data.created_at
+    createdAt: data.created_at,
+    location: data.location
   };
 };

@@ -24,6 +24,12 @@ export const Details = ({ data }) => {
         <div>{data.refillMethod}</div>
       </div>
       )}
+      {data.location && (
+      <div className="detail-section">
+        <img src="/public/images/mymizu_find_large.png" alt="" />
+        <div>{data.location}</div>
+      </div>
+      )}
       {data.openingHours && (
         <div className="detail-section">
           <img src="/public/images/clock.svg" alt="" />
