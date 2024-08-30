@@ -9,7 +9,6 @@ import Metrics from "./components/Metrics";
 import { transformCardData } from "./utils/transformCardData";
 import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
-import getSlug from "./utils/getSlug";
 import { Marker } from "./components/Marker";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
 import { Search } from "./components/Search";
@@ -19,6 +18,7 @@ import debounce from "lodash.debounce";
 import classnames from "classnames";
 import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
+import { useRefillSpotSlug } from "./hooks/useRefillSpotSlug";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -63,6 +63,8 @@ export function App({ gmApiKey, gaTag }) {
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
   const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
+
+  const slug = useRefillSpotSlug();
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -391,8 +393,10 @@ export function App({ gmApiKey, gaTag }) {
 
   // Get geolocation onload
   useEffect(() => {
-    getGeoLocation();
-  }, [])
+    if (slug === "") {
+      getGeoLocation();
+    }
+  }, [slug]);
 
   useEffect(() => {
     const token = localStorage.getItem(USER_TOKEN_KEY);
@@ -444,8 +448,6 @@ export function App({ gmApiKey, gaTag }) {
   useEffect(() => {
     if (userToken) {
       const load = async () => {
-        const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
-        const slug = getSlug(REFILL_SPOT_ROUTE);
         if (slug) {
           const reqRef = getRequestRef();
           startedRequest(reqRef);
@@ -480,7 +482,7 @@ export function App({ gmApiKey, gaTag }) {
       };
       load();
     }
-  }, [userToken]);
+  }, [slug, userToken]);
 
   return (
     <IntlProvider
