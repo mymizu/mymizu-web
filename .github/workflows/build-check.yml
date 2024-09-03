@@ -1,3 +1,5 @@
+name: Build Check
+
 on:
   push:
   pull_request:
@@ -18,7 +20,7 @@ jobs:
         with:
           node-version: ${{ matrix.node_version }}
 
-      - name: install and build
+      - name: Install and build
         run: |
           yarn install
           yarn build:prod
