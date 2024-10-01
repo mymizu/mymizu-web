@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 
@@ -63,6 +63,9 @@ export function App({ gmApiKey, gaTag }) {
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
   const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
+
+  const queuedTapsRequestRef = useRef(null);
+  const ongoingTapsRequestRef = useRef(null);
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -218,8 +221,6 @@ export function App({ gmApiKey, gaTag }) {
   };
 
   const getUserToken = async () => {
-    const reqRef = getRequestRef();
-    startedRequest(reqRef);
     try {
       setLoading(true);
 
@@ -245,12 +246,9 @@ export function App({ gmApiKey, gaTag }) {
         fatal: true
       });*/
     }
-    finishedRequest(reqRef);
   };
 
   const getInitialTaps = async () => {
-    const reqRef = getRequestRef();
-    startedRequest(reqRef);
     try {
       setLoading(true);
 
@@ -278,16 +276,15 @@ export function App({ gmApiKey, gaTag }) {
         description: 'Error loading initial taps',
       });*/
     }
-    finishedRequest(reqRef);
   };
 
   const getTapsWhenMapsMoved = async (value) => {
-    const reqRef = getRequestRef();
     try {
       if (initialLoad) {
+        setLoading(true);
+
         const { nw, se } = value;
 
-        startedRequest(reqRef);
         const res = await axios.get(
           `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
         );
@@ -309,7 +306,8 @@ export function App({ gmApiKey, gaTag }) {
           }
         }
 
-        setTaps([...taps, ...newTaps]);
+        setTaps((currentTaps) => [...currentTaps, ...newTaps]);
+        setLoading(false);
       }
     } catch (e) {
       console.log(e);
@@ -318,7 +316,22 @@ export function App({ gmApiKey, gaTag }) {
         description: 'Error loading secondary taps',
       });*/
     }
-    finishedRequest(reqRef);
+  };
+
+  const fetchQueuedTapsRequestIfAllowed = () => {
+    if (queuedTapsRequestRef.current && !ongoingTapsRequestRef.current) {
+      ongoingTapsRequestRef.current = queuedTapsRequestRef.current;
+      queuedTapsRequestRef.current = null;
+      getTapsWhenMapsMoved(ongoingTapsRequestRef.current).then(() => {
+        ongoingTapsRequestRef.current = null;
+        fetchQueuedTapsRequestIfAllowed();
+      });
+    }
+  };
+
+  const enqueueTapsRequest = (region) => {
+    queuedTapsRequestRef.current = region.bounds;
+    fetchQueuedTapsRequestIfAllowed();
   };
 
   const handleDebounce = useMemo(() => {
@@ -345,20 +358,6 @@ export function App({ gmApiKey, gaTag }) {
 
   const handleCloseModal = () => {
     setCardData(null);
-  };
-
-  const getRequestRef = () => {
-    return (Math.random() + 1).toString(36).substring(7);
-  };
-
-  const startedRequest = (randomRef) => {
-    setRequestsInProgress(prev => [...prev, randomRef]);
-  };
-
-  const finishedRequest = (randomRef) => {
-    setRequestsInProgress(prev => 
-      prev.filter((item) => item !== randomRef)
-    )
   };
 
   // Ask user for permission to give device location
@@ -436,20 +435,11 @@ export function App({ gmApiKey, gaTag }) {
   }, [locale]);
 
   useEffect(() => {
-    if (Object.keys(coordinate).length > 0) {
-      getTapsWhenMapsMoved(coordinate);
-    }
-  }, [coordinate]);
-
-  useEffect(() => {
     if (userToken) {
       const load = async () => {
         const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
         const slug = getSlug(REFILL_SPOT_ROUTE);
         if (slug) {
-          const reqRef = getRequestRef();
-          startedRequest(reqRef);
-
           const res = await axios.get(`/get-refill-spot/${slug}`);
           setCardData(transformCardData(res.data, locale));
           document.title = `${res.data.name} - mymizu`;
@@ -464,18 +454,15 @@ export function App({ gmApiKey, gaTag }) {
           if (!flag) {
             newTaps.push(res.data);
           }
-          setTaps([...taps, ...newTaps]);
+          setTaps((currentTaps) => [...currentTaps, ...newTaps]);
 
           setInitialLoad(true);
-          setTaps(newTaps);
 
           setCenter({
             lat: res?.data?.latitude ?? gmDefaultProps.center.lng,
             lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
           });
           setZoom(16);
-
-          finishedRequest(reqRef);
         }
       };
       load();
@@ -563,7 +550,7 @@ export function App({ gmApiKey, gaTag }) {
           }}
           center={center}
           zoom={zoom}
-          onChange={(value) => handleDebounce(value)}
+          onChange={enqueueTapsRequest}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
           onGoogleApiLoaded={({map, maps}) => {
@@ -575,7 +562,7 @@ export function App({ gmApiKey, gaTag }) {
             fullscreenControl: false,
           }}
         >
-          {!loading && taps.length
+          {taps.length
             ? taps.map((tap) => (
               <Marker
                 key={tap.id}
@@ -632,7 +619,7 @@ export function App({ gmApiKey, gaTag }) {
         )}
       </div>
       <div className="loading-container">
-        {requestsInProgress.length > 0 && (
+        {loading && (
           <div className="loading-indicator">&nbsp;</div>
         )}
       </div>
