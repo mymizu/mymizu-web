@@ -31,7 +31,7 @@ export function App({ gmApiKey, gaTag }) {
     ReactGA.send("pageview");
   }, [gaTag])*/
 
-  
+
   // Japan Original Location
   const gmDefaultProps = {
     center: {
@@ -66,6 +66,8 @@ export function App({ gmApiKey, gaTag }) {
 
   const queuedTapsRequestRef = useRef(null);
   const ongoingTapsRequestRef = useRef(null);
+
+  const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -369,8 +371,13 @@ export function App({ gmApiKey, gaTag }) {
           lng: position.coords.longitude,
         })
         setZoom(16);
-        setUserLatitude(position.coords.latitude);
-        setUserLongitude(position.coords.longitude);
+
+        const slug = getSlug(REFILL_SPOT_ROUTE);
+        if (slug !== "") {
+          setUserLatitude(position.coords.latitude);
+          setUserLongitude(position.coords.longitude);
+        }
+
         setCurrentLocationLoaded(true);
       })
     } else {
@@ -437,7 +444,6 @@ export function App({ gmApiKey, gaTag }) {
   useEffect(() => {
     if (userToken) {
       const load = async () => {
-        const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
         const slug = getSlug(REFILL_SPOT_ROUTE);
         if (slug) {
           const res = await axios.get(`/get-refill-spot/${slug}`);
@@ -573,7 +579,7 @@ export function App({ gmApiKey, gaTag }) {
               />
             ))
             : null}
-            {currentLocationLoaded && 
+            {currentLocationLoaded &&
             <CurrentLocationIcon
               lat={userLatitude}
               lng={userLongitude}
