@@ -366,18 +366,16 @@ export function App({ gmApiKey, gaTag }) {
   const getGeoLocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
-        setCenter({
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-        })
-        setZoom(16);
-
         const slug = getSlug(REFILL_SPOT_ROUTE);
         if (slug !== "") {
-          setUserLatitude(position.coords.latitude);
-          setUserLongitude(position.coords.longitude);
+          setCenter({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          })
+          setZoom(16);
         }
-
+        setUserLatitude(position.coords.latitude);
+        setUserLongitude(position.coords.longitude);
         setCurrentLocationLoaded(true);
       })
     } else {
