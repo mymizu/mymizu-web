@@ -407,6 +407,19 @@ footer .nav-link i {
   width: calc(100% - 50px);
 }
 
+.dropdown-button {
+  width: 25px;
+  height: 25px;
+  position: absolute;
+  right: 0;
+  border: none;
+  padding: 0;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .carousel {
   display: flex;
   height: 169px;

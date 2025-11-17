@@ -32,5 +32,6 @@
   "spot.share.title": "Share this refill spot",
   "spot.addedSince": "Registered Refill Partner since {year}",
   "search": "Search",
-  "copied": "Copied"
+  "copied": "Copied",
+  "today": "Today({day}):"
 }
