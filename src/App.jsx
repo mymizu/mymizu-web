@@ -19,6 +19,7 @@ import debounce from "lodash.debounce";
 import classnames from "classnames";
 import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
+import { LANG_PREF_KEY } from "./constants";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -120,7 +121,6 @@ export function App({ gmApiKey, gaTag }) {
     }
   };
 
-  const LANG_PREF_KEY = "userLanguage";
   const USER_TOKEN_KEY = "userToken";
   const USER_TOKEN_SET_AT = "userTokenSetAt";
   const USER_TOKEN_EXPIRES_AT = "userTokenExpiresAt";

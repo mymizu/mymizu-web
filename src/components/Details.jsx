@@ -1,6 +1,7 @@
 import React from "react";
 import { FormattedMessage, useIntl } from "react-intl";
 import DropdownButton from "./Buttons/DropdownButton";
+import getDayOfWeek from "../utils/getDayOfWeek";
 
 export const Details = ({ data }) => {
   const intl = useIntl();
@@ -8,25 +9,9 @@ export const Details = ({ data }) => {
   /*code that determines the year that the refill partner joined mymizu and stores it in the variable "year"*/
   date = new Date(data.createdAt);
   const year = date.getFullYear();
+  
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
-
-  const LANG_PREF_KEY = "userLanguage";
-  const locale = localStorage.getItem(LANG_PREF_KEY);
-  const DAYS = {
-    en: [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ],
-    ja: ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"],
-  };
-  const dayIndex = new Date().getDay();
-  const todayName = DAYS[locale][dayIndex];
-  const opening = data.openingHours[todayName];
+  const today = getDayOfWeek();
 
   const onClickLink = () => {
     /*ReactGA.event({
@@ -57,16 +42,16 @@ export const Details = ({ data }) => {
             {dropdownOpen ? (
               <p>
                 <strong>
-                  <FormattedMessage id="today" values={{ day: todayName }} />
+                  <FormattedMessage id="today" values={{ day: today }} />
                 </strong>{" "}
-                {opening}
+                {data.openingHours[today]}
               </p>
             ) : (
               <div>
                 <strong>
-                  <FormattedMessage id="today" values={{ day: todayName }} />
+                  <FormattedMessage id="today" values={{ day: today }} />
                 </strong>{" "}
-                {opening}
+                {data.openingHours[today]}
               </div>
             )}
             {dropdownOpen && (
