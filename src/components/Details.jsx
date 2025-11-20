@@ -9,7 +9,7 @@ export const Details = ({ data }) => {
   /*code that determines the year that the refill partner joined mymizu and stores it in the variable "year"*/
   date = new Date(data.createdAt);
   const year = date.getFullYear();
-  
+
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const today = getDayOfWeek();
 
@@ -39,21 +39,12 @@ export const Details = ({ data }) => {
         <div className="detail-section">
           <img src="/public/images/clock.svg" alt="" />
           <div>
-            {dropdownOpen ? (
-              <p>
-                <strong>
-                  <FormattedMessage id="today" values={{ day: today }} />
-                </strong>{" "}
-                {data.openingHours[today]}
-              </p>
-            ) : (
-              <div>
-                <strong>
-                  <FormattedMessage id="today" values={{ day: today }} />
-                </strong>{" "}
-                {data.openingHours[today]}
-              </div>
-            )}
+            <p className={!dropdownOpen && "place-open-dropdown-closed"}>
+              <b>
+                <FormattedMessage id="today" values={{ day: today }} />
+              </b>{" "}
+              {data.openingHours[today]}
+            </p>
             {dropdownOpen && (
               <>
                 {Object.keys(data.openingHours).map((key, keyIdx) => (
