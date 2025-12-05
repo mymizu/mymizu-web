@@ -32,5 +32,6 @@
   "spot.report": "給水スポット情報の修正依頼",
   "spot.addedSince": "{year}年から給水パートナーとして参加",
   "search": "品川駅",
-  "copied": "クリップボードにコピーされた"
+  "copied": "クリップボードにコピーされた",
+  "today": "本日({day}):"
 }
