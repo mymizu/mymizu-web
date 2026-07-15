@@ -33,5 +33,12 @@
   "spot.addedSince": "Registered Refill Partner since {year}",
   "search": "Search",
   "copied": "Copied",
-  "today": "Today({day}):"
+  "today": "Today({day}):",
+  "coolingShelter.capacity": "Capacity: {capacity} people",
+  "coolingShelter.localGovernment": "Operated by {name}",
+  "categoryFilter.water": "Water Stations",
+  "categoryFilter.coolingShelter": "Cooling Shelters",
+  "results.nearbyCoolingShelters": "Nearby cooling shelters",
+  "results.nearbyWaterStations": "Nearby water stations",
+  "results.aroundPlace": "Results around {place}"
 }
