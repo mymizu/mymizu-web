@@ -97,9 +97,11 @@ export function App({ gmApiKey, gaTag }) {
       label: result.formatted_address,
     });*/
     const { location } = result.geometry;
+    const lat = location.lat();
+    const lng = location.lng();
 
-    const resultLat = String(location.lat()).slice(0, 6);
-    const resultLng = String(location.lng()).slice(0, 7);
+    const resultLat = String(lat).slice(0, 6);
+    const resultLng = String(lng).slice(0, 7);
 
     const newPlaces = taps.map((tap) => {
       const tapLat = String(tap.latitude).slice(0, 6);
@@ -120,7 +122,8 @@ export function App({ gmApiKey, gaTag }) {
       };
     });
 
-    googleMapFn.map.setCenter(result.geometry.location);
+    setCenter({ lat, lng });
+    setZoom(17);
     setTaps(newPlaces);
     setResults([]);
     if (Object.keys(coordinate).length > 0) {
@@ -380,7 +383,7 @@ export function App({ gmApiKey, gaTag }) {
       return;
     }
     //*
-    
+
     const path = `/refill/${locale}/${markerData.slug}`;
     //ReactGA.send({ hitType: "pageview", page: path});
     document.title = `${markerData.name} - mymizu`;
@@ -388,6 +391,7 @@ export function App({ gmApiKey, gaTag }) {
     setCardData(transformCardData(markerData, locale));
     setShowCopyCheck(true);
     setActiveTapId(markerData.id);
+    setCenter({ lat: markerData.latitude, lng: markerData.longitude });
   };
 
   const handleCloseModal = () => {
