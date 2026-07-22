@@ -26,6 +26,19 @@ export function shouldShowClusters(zoom) {
   return zoom < MIN_ZOOM_FOR_INDIVIDUAL_TAPS;
 }
 
+export function getZoomToRevealNextLevel(level, currentZoom) {
+  const entry = LEVEL_ZOOM_BREAKPOINTS.find((e) => e.level === level);
+  const currentLevelCeiling = entry ? entry.maxZoom : currentZoom;
+  const next = Math.min(currentLevelCeiling + 1, MIN_ZOOM_FOR_INDIVIDUAL_TAPS);
+  return Math.max(next, currentZoom + 1);
+}
+
+const CATEGORY_KEY_ALIASES = {
+  cooling: ["cooling", "cooling_shelter", "coolingShelter", "shelter", "shelters"],
+  water: ["water", "water_station", "waterStation"],
+  all: ["all"],
+};
+
 // bounds: { nw: {lat,lng}, se: {lat,lng} } (google-map-react's onChange shape)
 // bbox: { min_lat, max_lat, min_lng, max_lng } (a cluster node's bbox)
 export function bboxIntersectsBounds(bbox, bounds) {
@@ -49,7 +62,14 @@ export function getLevelsForCategory(clusterTree, categoryKey) {
     return {};
   }
   if (clusterTree.categories) {
-    return (clusterTree.categories[categoryKey] || {}).levels || {};
+    const aliases = CATEGORY_KEY_ALIASES[categoryKey] || [categoryKey];
+    for (const alias of aliases) {
+      const levels = (clusterTree.categories[alias] || {}).levels;
+      if (levels && Object.keys(levels).length) {
+        return levels;
+      }
+    }
+    return {};
   }
   return clusterTree.levels || {};
 }
@@ -59,5 +79,7 @@ export function getClusterNodes(clusterTree, categoryKey, zoom, bounds) {
   const levels = getLevelsForCategory(clusterTree, categoryKey);
   const level = getClusterLevelForZoom(zoom);
   const nodes = levels[String(level)] || [];
-  return nodes.filter((node) => bboxIntersectsBounds(node.bbox, bounds));
+  return nodes
+    .filter((node) => bboxIntersectsBounds(node.bbox, bounds))
+    .map((node) => ({ ...node, level }));
 }

@@ -818,7 +818,7 @@ and (max-device-width: 812px) {
     justify-content: center;
     align-items: center;
   }
-  
+
   .share-modal {
     top:auto;
     left: auto;
@@ -836,14 +836,13 @@ and (max-device-width: 812px) {
 }
 
 #current_location_button {
-  height: 70px;
-  width: 70px;
+  height: 44px;
+  width: 44px;
   z-index: 5;
   position: absolute;
   cursor: pointer;
-  margin-left: auto;
-  bottom: 16px;
-  right: 60px;
+  bottom: 70px;
+  right: 8px;
   border-radius: 50%;
 }
 

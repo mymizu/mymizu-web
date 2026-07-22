@@ -22,7 +22,7 @@ import classnames from "classnames";
 import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
 import { LANG_PREF_KEY } from "./constants";
-import { getClusterNodes, shouldShowClusters} from "./utils/clusters";
+import { getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel } from "./utils/clusters";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -76,6 +76,31 @@ export function App({ gmApiKey, gaTag }) {
   const ongoingTapsRequestRef = useRef(null);
 
   const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
+  const ZOOM_STEP_DELAY_MS = 120;
+
+  const flyTo = (target, targetZoom, onComplete) => {
+    if (!googleMapFn?.map || !googleMapFn?.maps || !target) {
+      return false;
+    }
+    const { map, maps } = googleMapFn;
+
+    const stepZoom = (current) => {
+      if (current === targetZoom) {
+        onComplete && onComplete();
+        return;
+      }
+      const next = current < targetZoom ? current + 1 : current - 1;
+      maps.event.addListenerOnce(map, "zoom_changed", () => {
+        setTimeout(() => stepZoom(next), ZOOM_STEP_DELAY_MS);
+      });
+      map.setZoom(next);
+    };
+
+    map.panTo(target);
+    maps.event.addListenerOnce(map, "idle", () => stepZoom(map.getZoom()));
+
+    return true;
+  };
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -366,23 +391,22 @@ export function App({ gmApiKey, gaTag }) {
       return;
     };
 
-    // Feature: not working yet, but we can use this to zoom in on clusters when clicked
-
     if (childProps.isCluster) {
-      const { bbox, lat, lng } = childProps;
-      if (googleMapFn?.maps && bbox) {
-        const bounds = new googleMapFn.maps.LatLngBounds(
-          { lat: bbox.min_lat, lng: bbox.min_lng },
-          { lat: bbox.max_lat, lng: bbox.max_lng }
-        );
-        googleMapFn.map.fitBounds(bounds);
-      } else {
-        setCenter({ lat, lng });
-        setZoom(Math.min(zoom + 3, 18));
+      const { lat, lng, level } = childProps;
+      const targetZoom = getZoomToRevealNextLevel(level, zoom);
+      const target = { lat, lng };
+
+      const started = flyTo(target, targetZoom, () => {
+        setCenter(target);
+        setZoom(targetZoom);
+      });
+
+      if (!started) {
+        setCenter(target);
+        setZoom(targetZoom);
       }
       return;
     }
-    //*
 
     const path = `/refill/${locale}/${markerData.slug}`;
     //ReactGA.send({ hitType: "pageview", page: path});
@@ -400,21 +424,37 @@ export function App({ gmApiKey, gaTag }) {
   };
 
   // Ask user for permission to give device location
-  const getGeoLocation = () => {
+  const getGeoLocation = (forceRecenter = false) => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const slug = getSlug(REFILL_SPOT_ROUTE);
-        if (slug !== "") {
-          setCenter({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          })
-          setZoom(16);
-        }
-        setUserLatitude(position.coords.latitude);
-        setUserLongitude(position.coords.longitude);
-        setCurrentLocationLoaded(true);
-      })
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const slug = getSlug(REFILL_SPOT_ROUTE);
+
+          setUserLatitude(latitude);
+          setUserLongitude(longitude);
+          setCurrentLocationLoaded(true);
+
+          if (slug !== "" || forceRecenter) {
+            const target = { lat: latitude, lng: longitude };
+            const targetZoom = 16;
+
+            const started = flyTo(target, targetZoom, () => {
+              setCenter(target);
+              setZoom(targetZoom);
+            });
+
+            if (!started) {
+              setCenter(target);
+              setZoom(targetZoom);
+            }
+          }
+        },
+        (error) => {
+          console.log("geolocation error", error);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
     } else {
       setCenter(gmDefaultProps.center);
       setZoom(gmDefaultProps.zoom);
@@ -423,11 +463,7 @@ export function App({ gmApiKey, gaTag }) {
   };
 
   const buttonResetLocation = () => {
-    let lat = center.lat;
-    let lng = center.lng;
-    setZoom(zoom + .00001)
-    setCenter({lat: lat + .00001, lng: lng + .00001});
-    getGeoLocation();
+    getGeoLocation(true);
   }
 
   // Get geolocation onload
@@ -529,7 +565,14 @@ export function App({ gmApiKey, gaTag }) {
 
   const clusterCategoryKey = categoryFilter || "all";
 
-  const showClusters = shouldShowClusters(zoom) && !!clusterTree;
+  const hasClusterDataForCategory = useMemo(
+    () =>
+      Object.keys(getLevelsForCategory(clusterTree, clusterCategoryKey))
+        .length > 0,
+    [clusterTree, clusterCategoryKey]
+  );
+
+  const showClusters = shouldShowClusters(zoom) && !!clusterTree && hasClusterDataForCategory;
 
   const clusterNodes = useMemo(() => {
     if (!showClusters) {
@@ -638,8 +681,9 @@ export function App({ gmApiKey, gaTag }) {
                 lat={node.lat}
                 lng={node.lng}
                 count={node.count}
-                category={clusterCategoryKey}
+                category="all"
                 bbox={node.bbox}
+                level={node.level}
                 isCluster
               />
             ))
