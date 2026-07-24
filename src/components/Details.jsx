@@ -23,6 +23,18 @@ export const Details = ({ data }) => {
   return (
     <div>
       <div className="border-blue"></div>
+      {data.categoryId === 6 && (
+        <div className="cooling-shelter-info-box">
+          <img src="/public/images/snowflake.png" alt="" />
+          <div>
+            <p className="cooling-shelter-info-box-title">
+              <FormattedMessage id="coolingShelter.infoBox.title" />
+            </p>
+            <p className="cooling-shelter-info-box-text"><FormattedMessage id="coolingShelter.infoBox.line1" /></p>
+            <p className="cooling-shelter-info-box-text"><FormattedMessage id="coolingShelter.infoBox.line2" /></p>
+          </div>
+        </div>
+      )}
       {data.refillMethod && (
         <div className="detail-section">
           <img src="/public/images/cup.svg" alt="" />

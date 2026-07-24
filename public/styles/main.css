@@ -274,7 +274,7 @@ img#logo {
   border-top-right-radius: 30px;
   border-bottom-left-radius: 30px;
   border-bottom-right-radius: 30px;
-  padding: 18px 20px 18px 16px;
+  padding: 14px 20px 14px 16px;
   line-height: 20px;
   font-size: 1.05rem;
   color: #2F97D1;
@@ -291,8 +291,7 @@ img#logo {
 }
 
 .category-filter-chip-icon {
-  width: 24px;
-  height: 24px;
+    height: 38px;
 }
 
 .category-filter-chip-label {
@@ -457,6 +456,41 @@ footer .nav-link i {
 .info-card .details {
   height: 100%;
   padding: 0px 16px 77px 16px;
+}
+
+.cooling-shelter-info-box {
+  display: flex;
+  align-items: flex-start;
+  background-color: #F1EFFC;
+  border: 1px solid #B7AEEC;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.cooling-shelter-info-box img {
+  width: 28px;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.cooling-shelter-info-box p {
+  margin: 0 0 0.25rem 0;
+}
+
+.cooling-shelter-info-box p:last-child {
+  margin-bottom: 0;
+}
+
+.cooling-shelter-info-box-title {
+  color: #5B4FD6;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+
+.cooling-shelter-info-box-text {
+  color: black;
+  margin: 0 0 0.25rem 0;
 }
 
 .border-blue {
@@ -690,7 +724,7 @@ footer .nav-link i {
 }
 
 .summary .title .pin {
-  height: 30px;
+  height: 35px;
 }
 
 .summary .title h6 {
