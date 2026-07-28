@@ -23,6 +23,18 @@ export const Details = ({ data }) => {
   return (
     <div>
       <div className="border-blue"></div>
+      {data.categoryId === 6 && (
+        <div className="cooling-shelter-info-box">
+          <img src="/public/images/snowflake.png" alt="" />
+          <div>
+            <p className="cooling-shelter-info-box-title">
+              <FormattedMessage id="coolingShelter.infoBox.title" />
+            </p>
+            <p className="cooling-shelter-info-box-text"><FormattedMessage id="coolingShelter.infoBox.line1" /></p>
+            <p className="cooling-shelter-info-box-text"><FormattedMessage id="coolingShelter.infoBox.line2" /></p>
+          </div>
+        </div>
+      )}
       {data.refillMethod && (
         <div className="detail-section">
           <img src="/public/images/cup.svg" alt="" />
@@ -35,7 +47,7 @@ export const Details = ({ data }) => {
           <div>{data.location}</div>
         </div>
       )}
-      {data.openingHours && (
+      {data.categoryId !== 6 && data.openingHours && (
         <div className="detail-section">
           <img src="/public/images/clock.svg" alt="" />
           <div>
@@ -60,6 +72,51 @@ export const Details = ({ data }) => {
             dropdownOpen={dropdownOpen}
             onClick={() => setDropdownOpen(!dropdownOpen)}
           />
+        </div>
+      )}
+      {/* Cooling shelters: formatted_opening_hours is already localized/formatted
+          server-side (day names go through Laravel's translator) — just split on
+          "\n" and render, never re-parse the raw string. */}
+      {data.categoryId === 6 && data.coolingShelter?.formattedOpeningHours && (
+        <div className="detail-section">
+          <img src="/public/images/clock.svg" alt="" />
+          <div>
+            {data.coolingShelter.formattedOpeningHours.split("\n").map((line, idx) => (
+              <p key={idx}>{line}</p>
+            ))}
+          </div>
+        </div>
+      )}
+      {data.categoryId === 6 && data.coolingShelter?.phone && (
+        <div className="detail-section">
+          <img src="/public/images/phone.svg" alt="" />
+          <div>
+            <a href={`tel:${data.coolingShelter.phone}`}>
+              {data.coolingShelter.phone}
+            </a>
+          </div>
+        </div>
+      )}
+      {data.categoryId === 6 && data.coolingShelter?.capacity != null && (
+        <div className="detail-section">
+          <img src="/public/images/info.svg" alt="" />
+          <div>
+            <FormattedMessage
+              id="coolingShelter.capacity"
+              values={{ capacity: data.coolingShelter.capacity }}
+            />
+          </div>
+        </div>
+      )}
+      {data.categoryId === 6 && data.coolingShelter?.localGovernmentName && (
+        <div className="detail-section">
+          <img src="/public/images/handshake.svg" alt="" />
+          <div>
+            <FormattedMessage
+              id="coolingShelter.localGovernment"
+              values={{ name: data.coolingShelter.localGovernmentName }}
+            />
+          </div>
         </div>
       )}
       {data.link && (

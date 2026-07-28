@@ -11,15 +11,18 @@ import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
 import getSlug from "./utils/getSlug";
 import { Marker } from "./components/Marker";
+import { ClusterMarker } from "./components/ClusterMarker";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
+import { CategoryFilter } from "./components/CategoryFilter";
 import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
 import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
 import { LANG_PREF_KEY } from "./constants";
+import { getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel } from "./utils/clusters";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -64,11 +67,40 @@ export function App({ gmApiKey, gaTag }) {
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
   const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState(null);
+  const [clusterTree, setClusterTree] = useState(null);
+  const [mapBounds, setMapBounds] = useState(null);
+  const [activeTapId, setActiveTapId] = useState(null);
 
   const queuedTapsRequestRef = useRef(null);
   const ongoingTapsRequestRef = useRef(null);
 
   const REFILL_SPOT_ROUTE = "/refill/"; // TODO: constants
+  const ZOOM_STEP_DELAY_MS = 120;
+
+  const flyTo = (target, targetZoom, onComplete) => {
+    if (!googleMapFn?.map || !googleMapFn?.maps || !target) {
+      return false;
+    }
+    const { map, maps } = googleMapFn;
+
+    const stepZoom = (current) => {
+      if (current === targetZoom) {
+        onComplete && onComplete();
+        return;
+      }
+      const next = current < targetZoom ? current + 1 : current - 1;
+      maps.event.addListenerOnce(map, "zoom_changed", () => {
+        setTimeout(() => stepZoom(next), ZOOM_STEP_DELAY_MS);
+      });
+      map.setZoom(next);
+    };
+
+    map.panTo(target);
+    maps.event.addListenerOnce(map, "idle", () => stepZoom(map.getZoom()));
+
+    return true;
+  };
 
   const handleSearchQuery = (query) => {
     googleMapFn.search(query, searchResultCallback);
@@ -90,9 +122,11 @@ export function App({ gmApiKey, gaTag }) {
       label: result.formatted_address,
     });*/
     const { location } = result.geometry;
+    const lat = location.lat();
+    const lng = location.lng();
 
-    const resultLat = String(location.lat()).slice(0, 6);
-    const resultLng = String(location.lng()).slice(0, 7);
+    const resultLat = String(lat).slice(0, 6);
+    const resultLng = String(lng).slice(0, 7);
 
     const newPlaces = taps.map((tap) => {
       const tapLat = String(tap.latitude).slice(0, 6);
@@ -113,7 +147,8 @@ export function App({ gmApiKey, gaTag }) {
       };
     });
 
-    googleMapFn.map.setCenter(result.geometry.location);
+    setCenter({ lat, lng });
+    setZoom(17);
     setTaps(newPlaces);
     setResults([]);
     if (Object.keys(coordinate).length > 0) {
@@ -293,22 +328,13 @@ export function App({ gmApiKey, gaTag }) {
 
         const { taps: resTaps } = res.data;
 
-        const newTaps = [];
-
-        for (let i = 0; i < resTaps.length; i++) {
-          let flag = false;
-          for (let j = 0; j < taps.length; j++) {
-            if (resTaps[i].id === taps[j].id) {
-              flag = true;
-              break;
-            }
-          }
-          if (!flag) {
-            newTaps.push(resTaps[i]);
-          }
-        }
-
-        setTaps((currentTaps) => [...currentTaps, ...newTaps]);
+        setTaps((currentTaps) => {
+          const existingIds = new Set(currentTaps.map((tap) => tap.id));
+          const newTaps = (resTaps || []).filter(
+            (tap) => !existingIds.has(tap.id)
+          );
+          return newTaps.length ? [...currentTaps, ...newTaps] : currentTaps;
+        });
         setLoading(false);
       }
     } catch (e) {
@@ -320,6 +346,18 @@ export function App({ gmApiKey, gaTag }) {
     }
   };
 
+// Feature: Not working yet, error on server side, but we can use this to fetch all clusters and cache them on the client side
+  const fetchClusters = async () => {
+    try {
+      const res = await axios.get("/get-clusters", {
+        headers: userToken ? { Authorization: `Bearer ${userToken}` } : {},
+      });
+      setClusterTree(res.data);
+    } catch (e) {
+      console.log("error fetching clusters", e);
+    }
+  };
+//*
   const fetchQueuedTapsRequestIfAllowed = () => {
     if (queuedTapsRequestRef.current && !ongoingTapsRequestRef.current) {
       ongoingTapsRequestRef.current = queuedTapsRequestRef.current;
@@ -332,6 +370,8 @@ export function App({ gmApiKey, gaTag }) {
   };
 
   const enqueueTapsRequest = (region) => {
+    setZoom(region.zoom);
+    setMapBounds(region.bounds);
     queuedTapsRequestRef.current = region.bounds;
     fetchQueuedTapsRequestIfAllowed();
   };
@@ -350,34 +390,71 @@ export function App({ gmApiKey, gaTag }) {
     if (childProps.id == "current_location_icon") {
       return;
     };
+
+    if (childProps.isCluster) {
+      const { lat, lng, level } = childProps;
+      const targetZoom = getZoomToRevealNextLevel(level, zoom);
+      const target = { lat, lng };
+
+      const started = flyTo(target, targetZoom, () => {
+        setCenter(target);
+        setZoom(targetZoom);
+      });
+
+      if (!started) {
+        setCenter(target);
+        setZoom(targetZoom);
+      }
+      return;
+    }
+
     const path = `/refill/${locale}/${markerData.slug}`;
     //ReactGA.send({ hitType: "pageview", page: path});
     document.title = `${markerData.name} - mymizu`;
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
     setShowCopyCheck(true);
+    setActiveTapId(markerData.id);
+    setCenter({ lat: markerData.latitude, lng: markerData.longitude });
   };
 
   const handleCloseModal = () => {
     setCardData(null);
+    setActiveTapId(null);
   };
 
   // Ask user for permission to give device location
-  const getGeoLocation = () => {
+  const getGeoLocation = (forceRecenter = false) => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition((position) => {
-        const slug = getSlug(REFILL_SPOT_ROUTE);
-        if (slug !== "") {
-          setCenter({
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          })
-          setZoom(16);
-        }
-        setUserLatitude(position.coords.latitude);
-        setUserLongitude(position.coords.longitude);
-        setCurrentLocationLoaded(true);
-      })
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          const slug = getSlug(REFILL_SPOT_ROUTE);
+
+          setUserLatitude(latitude);
+          setUserLongitude(longitude);
+          setCurrentLocationLoaded(true);
+
+          if (slug !== "" || forceRecenter) {
+            const target = { lat: latitude, lng: longitude };
+            const targetZoom = 16;
+
+            const started = flyTo(target, targetZoom, () => {
+              setCenter(target);
+              setZoom(targetZoom);
+            });
+
+            if (!started) {
+              setCenter(target);
+              setZoom(targetZoom);
+            }
+          }
+        },
+        (error) => {
+          console.log("geolocation error", error);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
     } else {
       setCenter(gmDefaultProps.center);
       setZoom(gmDefaultProps.zoom);
@@ -386,11 +463,7 @@ export function App({ gmApiKey, gaTag }) {
   };
 
   const buttonResetLocation = () => {
-    let lat = center.lat;
-    let lng = center.lng;
-    setZoom(zoom + .00001)
-    setCenter({lat: lat + .00001, lng: lng + .00001});
-    getGeoLocation();
+    getGeoLocation(true);
   }
 
   // Get geolocation onload
@@ -436,6 +509,12 @@ export function App({ gmApiKey, gaTag }) {
   }, [taps, setInitialLoad, initialLoad, setTaps, locale, userToken]);
 
   useEffect(() => {
+    if (userToken) {
+      fetchClusters();
+    }
+  }, [userToken]);
+
+  useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
   }, [locale]);
 
@@ -446,6 +525,7 @@ export function App({ gmApiKey, gaTag }) {
         if (slug) {
           const res = await axios.get(`/get-refill-spot/${slug}`);
           setCardData(transformCardData(res.data, locale));
+          setActiveTapId(res.data.id);
           document.title = `${res.data.name} - mymizu`;
           const newTaps = [];
           let flag = false;
@@ -463,7 +543,7 @@ export function App({ gmApiKey, gaTag }) {
           setInitialLoad(true);
 
           setCenter({
-            lat: res?.data?.latitude ?? gmDefaultProps.center.lng,
+            lat: res?.data?.latitude ?? gmDefaultProps.center.lat,
             lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
           });
           setZoom(16);
@@ -472,6 +552,34 @@ export function App({ gmApiKey, gaTag }) {
       load();
     }
   }, [userToken]);
+
+  const visibleTaps = useMemo(() => {
+    if (categoryFilter === "cooling") {
+      return taps.filter((tap) => tap.category_id === 6);
+    }
+    if (categoryFilter === "water") {
+      return taps.filter((tap) => tap.category_id !== 6);
+    }
+    return taps;
+  }, [taps, categoryFilter]);
+
+  const clusterCategoryKey = categoryFilter || "all";
+
+  const hasClusterDataForCategory = useMemo(
+    () =>
+      Object.keys(getLevelsForCategory(clusterTree, clusterCategoryKey))
+        .length > 0,
+    [clusterTree, clusterCategoryKey]
+  );
+
+  const showClusters = shouldShowClusters(zoom) && !!clusterTree && hasClusterDataForCategory;
+
+  const clusterNodes = useMemo(() => {
+    if (!showClusters) {
+      return [];
+    }
+    return getClusterNodes(clusterTree, clusterCategoryKey, zoom, mapBounds);
+  }, [showClusters, clusterTree, clusterCategoryKey, zoom, mapBounds]);
 
   return (
     <IntlProvider
@@ -566,14 +674,28 @@ export function App({ gmApiKey, gaTag }) {
             fullscreenControl: false,
           }}
         >
-          {taps.length
-            ? taps.map((tap) => (
+          {showClusters
+            ? clusterNodes.map((node) => (
+              <ClusterMarker
+                key={`cluster-${clusterCategoryKey}-${node.id}`}
+                lat={node.lat}
+                lng={node.lng}
+                count={node.count}
+                category="all"
+                bbox={node.bbox}
+                level={node.level}
+                isCluster
+              />
+            ))
+            : visibleTaps.length
+            ? visibleTaps.map((tap) => (
               <Marker
                 key={tap.id}
                 lat={tap.latitude}
                 lng={tap.longitude}
                 category={tap.category_id}
                 tap={tap}
+                isActive={tap.id === activeTapId}
               />
             ))
             : null}
@@ -618,6 +740,10 @@ export function App({ gmApiKey, gaTag }) {
             <SearchResults
               results={results}
               onSearchResultClick={handleResultClick}
+            />
+            <CategoryFilter
+              activeCategory={categoryFilter}
+              onSelect={setCategoryFilter}
             />
           </>
         )}

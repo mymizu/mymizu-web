@@ -40,9 +40,22 @@ function createMyMizuClient({apiBaseUrl, apiKey, userToken, language}) {
     return response.data;
   };
 
+  // Feature: Not working yet, error on server side, but we can use this to fetch all clusters and cache them on the client side
+
+  const getRaw = async (
+    url,
+    data,
+    config,
+  ) => {
+    const urlToUse = `${url}?${baseQuery}&${queryString.stringify(data)}`;
+    return httpClient.get(urlToUse, config);
+  };
+  //*
+
   return {
     get,
     post,
+    getRaw,
   }
 }
 

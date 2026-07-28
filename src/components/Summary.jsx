@@ -8,9 +8,13 @@ export const Summary = ({ data, setShareModal }) => {
   return (
     <div className="summary">
       <div className="title">
-        {data.categoryId === 4 ? (
+        {data.categoryId === 4 && (
           <img className="pin" src="/public/images/map-pin-gold.svg" />
-        ) : (
+        )}
+        {data.categoryId === 6 && (
+          <img className="pin" src="/public/images/map-shelter.svg" />
+        )}
+        {data.categoryId !== 4 && data.categoryId !== 6 && (
           <img className="pin" src="/public/images/map-pin.svg" />
         )}
         <h6>{data?.title}</h6>

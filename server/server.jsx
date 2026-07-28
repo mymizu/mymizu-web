@@ -61,16 +61,23 @@ app.get("/api/authorize", async (req, res) => {
   }
 });
 
-app.get("/get-initial-markers", async (req, res) => {
-  const initialPos = {
-    c1: 35.662,
-    c2: 39.73655447363853,
-    c3: 32.64245244856602,
-    c4: 150.75432142615318,
-  };
+const INITIAL_POSITION = {
+  c1: 35.662,
+  c2: 39.73655447363853,
+  c3: 32.64245244856602,
+  c4: 150.75432142615318,
+};
 
+const TAP_FETCH_OPTIONS = {
+  include_cooling_shelters: true,
+};
+
+app.get("/get-initial-markers", async (req, res) => {
   try {
-    const markers = await myMizuClient(getToken(req), getLanguage(req)).get("/api/taps/nearby", initialPos);
+    const markers = await myMizuClient(getToken(req), getLanguage(req)).get("/api/taps/nearby", {
+      ...INITIAL_POSITION,
+      ...TAP_FETCH_OPTIONS,
+    });
 
     res.status(200).send(markers);
   } catch (e) {
@@ -104,7 +111,10 @@ app.get("/get-marker-moving-map?", async (req, res) => {
       c4,
     };
 
-    const markers = await myMizuClient(getToken(req), getLanguage(req)).get("/api/taps/nearby", pos);
+    const markers = await myMizuClient(getToken(req), getLanguage(req)).get("/api/taps/nearby", {
+      ...pos,
+      ...TAP_FETCH_OPTIONS,
+    });
 
     res.status(200).send(markers);
   } catch (e) {
@@ -114,6 +124,48 @@ app.get("/get-marker-moving-map?", async (req, res) => {
     });
   }
 });
+
+// Feature: Not working yet, error on server side, but we can use this to fetch all clusters and cache them on the client side
+app.get("/get-clusters", async (req, res) => {
+  try {
+    const ifNoneMatch = req.headers["if-none-match"];
+
+    const upstream = await myMizuClient(getToken(req), getLanguage(req)).getRaw(
+      "/api/taps/clusters/all",
+      {},
+      {
+        headers: ifNoneMatch ? { "If-None-Match": ifNoneMatch } : {},
+        validateStatus: (status) => status === 200 || status === 304,
+      }
+    );
+
+    if (upstream.headers["etag"]) {
+      res.set("ETag", upstream.headers["etag"]);
+    }
+    res.set(
+      "Cache-Control",
+      upstream.headers["cache-control"] || "public, max-age=3600"
+    );
+
+    if (upstream.status === 304) {
+      res.status(304).end();
+      return;
+    }
+
+    res.set("Content-Type", "application/json");
+    res.status(200).send(upstream.data);
+  } catch (e) {
+    const status = e.response?.status || 502;
+    const upstreamBody = e.response?.data;
+
+    res.status(status).json({
+      message: "Unable to fetch clusters",
+      error: upstreamBody ?? e.message,
+    });
+  }
+});
+
+//*
 
 app.get("/get-refill-spot/:slug", async (req, res) => {
   try {
@@ -203,28 +255,6 @@ app.get("/", (req, res) => {
 
     );
   });
-});
-
-app.get("/get-marker-moving-map?", async (req, res) => {
-  try {
-    const {c1, c2, c3, c4} = req.query;
-
-    const pos = {
-      c1,
-      c2,
-      c3,
-      c4,
-    };
-
-    const markers = await myMizuClient(getToken(req), getLanguage(req)).get("/api/taps/nearby", pos);
-
-    res.status(200).send(markers);
-  } catch (e) {
-    res.status(400).json({
-      message: "Unable to fetch initial markers",
-      error: e,
-    });
-  }
 });
 
 app.listen(PORT, () => {

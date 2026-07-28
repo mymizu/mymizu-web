@@ -251,6 +251,91 @@ img#logo {
   font-size: 12px;
 }
 
+.category-filter {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: calc(100% - 32px);
+  max-width: 280px;
+}
+
+.category-filter-chip {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: white;
+  border: none;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  border-top-left-radius: 30px;
+  border-top-right-radius: 30px;
+  border-bottom-left-radius: 30px;
+  border-bottom-right-radius: 30px;
+  padding: 14px 20px 14px 16px;
+  line-height: 20px;
+  font-size: 1.05rem;
+  color: #2F97D1;
+  cursor: pointer;
+  text-align: left;
+}
+
+.category-filter-chip-icon-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-right: 15px;
+}
+
+.category-filter-chip-icon {
+    height: 38px;
+}
+
+.category-filter-chip-label {
+  font-size: 1.05rem;
+}
+
+.category-filter-chip-active {
+  background-color: #EAF4FC;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25), inset 0 0 0 2px #2F97D1;
+  font-weight: 600;
+}
+
+.cluster-marker-wrapper {
+  position: relative;
+}
+
+.cluster-marker {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.35);
+}
+
+.cluster-marker-all,
+.cluster-marker-water {
+  background-color: #2F97D1;
+}
+
+.cluster-marker-cooling {
+  background-color: #F0883E;
+}
+
+.cluster-marker-count {
+  font-size: 13px;
+  line-height: 1;
+}
+
 #forest {
   background-image: url("../images/forest.jpg");
 }
@@ -371,6 +456,41 @@ footer .nav-link i {
 .info-card .details {
   height: 100%;
   padding: 0px 16px 77px 16px;
+}
+
+.cooling-shelter-info-box {
+  display: flex;
+  align-items: flex-start;
+  background-color: #F1EFFC;
+  border: 1px solid #B7AEEC;
+  border-radius: 12px;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.cooling-shelter-info-box img {
+  width: 28px;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.cooling-shelter-info-box p {
+  margin: 0 0 0.25rem 0;
+}
+
+.cooling-shelter-info-box p:last-child {
+  margin-bottom: 0;
+}
+
+.cooling-shelter-info-box-title {
+  color: #5B4FD6;
+  font-weight: 700;
+  margin: 0 0 0.25rem 0;
+}
+
+.cooling-shelter-info-box-text {
+  color: black;
+  margin: 0 0 0.25rem 0;
 }
 
 .border-blue {
@@ -604,7 +724,7 @@ footer .nav-link i {
 }
 
 .summary .title .pin {
-  height: 30px;
+  height: 35px;
 }
 
 .summary .title h6 {
@@ -628,6 +748,13 @@ and (max-device-width: 812px) {
 
   .maps-location-search-container {
     padding-inline: 0.5rem;
+  }
+
+  .category-filter {
+    left: 8px;
+    bottom: 8px;
+    width: calc(100% - 16px);
+    max-width: 240px;
   }
 
   .maps-location-search-input {
@@ -725,7 +852,7 @@ and (max-device-width: 812px) {
     justify-content: center;
     align-items: center;
   }
-  
+
   .share-modal {
     top:auto;
     left: auto;
@@ -743,14 +870,13 @@ and (max-device-width: 812px) {
 }
 
 #current_location_button {
-  height: 70px;
-  width: 70px;
+  height: 44px;
+  width: 44px;
   z-index: 5;
   position: absolute;
   cursor: pointer;
-  margin-left: auto;
-  bottom: 16px;
-  right: 60px;
+  bottom: 70px;
+  right: 8px;
   border-radius: 50%;
 }
 

@@ -33,5 +33,15 @@
   "spot.addedSince": "{year}年から給水パートナーとして参加",
   "search": "品川駅",
   "copied": "クリップボードにコピーされた",
-  "today": "本日({day}):"
+  "today": "本日({day}):",
+  "coolingShelter.capacity": "収容人数：{capacity}人",
+  "coolingShelter.localGovernment": "運営：{name}",
+  "coolingShelter.infoBox.title": "クーリングシェルター情報",
+  "coolingShelter.infoBox.line1": "危険な暑さを避け、涼みながら休憩できる施設です。",
+  "coolingShelter.infoBox.line2": "マイボトルへの給水については、各施設に直接お問い合わせください。",
+  "categoryFilter.water": "給水スポット",
+  "categoryFilter.coolingShelter": "クーリングシェルター",
+  "results.nearbyCoolingShelters": "近くのクーリングシェルター",
+  "results.nearbyWaterStations": "近くの給水スポット",
+  "results.aroundPlace": "{place}周辺の結果"
 }
