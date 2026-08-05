@@ -43,7 +43,7 @@ export function CategoryFilter({ activeCategory, onSelect }) {
         <span className="category-filter-chip-icon-container">
           <img
             className="category-filter-chip-icon"
-            src="/public/images/map-shelter.svg"
+            src="/public/images/map-shelter-filter.svg"
             alt=""
           />
         </span>
