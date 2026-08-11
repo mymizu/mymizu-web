@@ -5,7 +5,7 @@
       "namespace": "android_app",
       "package_name": "co.mymizu.mymizu",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_PLAY_APP_SIGNING_SHA256_FINGERPRINT",
+        "C0:13:75:C0:FF:08:7C:9B:42:17:C5:26:5C:9A:9D:98:30:00:8D:61:52:64:4A:23:95:F2:A9:82:0B:E5:60:2D",
         "FA:C6:17:45:DC:09:03:78:6F:B9:ED:E6:2A:96:2B:39:9F:73:48:F0:BB:6F:89:9B:83:32:66:75:91:03:3B:9C"
       ]
     }
