@@ -7,7 +7,7 @@ export const Details = ({ data }) => {
   const intl = useIntl();
 
   /*code that determines the year that the refill partner joined mymizu and stores it in the variable "year"*/
-  date = new Date(data.createdAt);
+  const date = new Date(data.createdAt);
   const year = date.getFullYear();
 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
