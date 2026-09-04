@@ -359,6 +359,13 @@ export function App({ gmApiKey, gaTag }) {
   };
 //*
   const fetchQueuedTapsRequestIfAllowed = () => {
+    // getTapsWhenMapsMoved() no-ops until initialLoad is set, and this used to
+    // clear the queue before calling it — so any map movement before the first
+    // load completed was silently thrown away. That race existed before, but
+    // mounting the map without waiting for the token widens the window, so hold
+    // the bounds until we are actually able to use them.
+    if (!initialLoad) return;
+
     if (queuedTapsRequestRef.current && !ongoingTapsRequestRef.current) {
       ongoingTapsRequestRef.current = queuedTapsRequestRef.current;
       queuedTapsRequestRef.current = null;
@@ -508,6 +515,14 @@ export function App({ gmApiKey, gaTag }) {
     }
   }, [taps, setInitialLoad, initialLoad, setTaps, locale, userToken]);
 
+  // Once the first load lands, replay whatever bounds the user moved to while
+  // it was still in flight.
+  useEffect(() => {
+    if (initialLoad) {
+      fetchQueuedTapsRequestIfAllowed();
+    }
+  }, [initialLoad]);
+
   useEffect(() => {
     if (userToken) {
       fetchClusters();
@@ -653,7 +668,13 @@ export function App({ gmApiKey, gaTag }) {
       </div>
       <div className="maps-container">
         <CurrentLocationButton onClick={buttonResetLocation} />
-        {detectedLocale && userToken && <GoogleMapReact
+        {/* Deliberately not gated on userToken. The map itself needs no auth —
+            only the markers do — and waiting for /api/authorize put a ~780ms
+            round trip (for a 356-byte token) directly in front of the 385KB
+            Google Maps script, which is the LCP element on mobile. The marker
+            pipeline stays gated: getTapsWhenMapsMoved() only runs once
+            initialLoad is set, which still requires the token. */}
+        {detectedLocale && <GoogleMapReact
           bootstrapURLKeys={{
             key: gmApiKey,
             language: locale,

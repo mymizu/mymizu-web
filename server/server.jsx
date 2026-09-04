@@ -35,11 +35,71 @@ const getToken = (req) => {
 };
 
 
-app.get("/bundle.js", (req, res) => {
-  res.sendFile(path.join(__dirname, "../dist/bundle.js"));
+// Every asset was previously served with Express's default
+// `Cache-Control: public, max-age=0`, so each repeat visit spent a revalidation
+// round trip per asset. On mobile latency that is a large share of a repeat
+// view. The bundle is now addressed by content hash so it can be cached hard
+// and still change instantly on deploy.
+const DIST_BUNDLE = path.join(__dirname, "../dist/bundle.js");
+const HASHED_BUNDLE_RE = /^\/bundle\.[0-9a-f]{12}\.js$/;
+
+let bundleHash = null;
+const getBundleHash = () => {
+  if (bundleHash) return bundleHash;
+  try {
+    bundleHash = crypto
+      .createHash("sha256")
+      .update(fs.readFileSync(DIST_BUNDLE))
+      .digest("hex")
+      .slice(0, 12);
+  } catch (e) {
+    // Server started before the client build finished. Fall back to the
+    // unhashed URL rather than failing the page.
+    console.warn("Could not hash bundle.js; serving it unhashed:", e.message);
+    bundleHash = null;
+  }
+  return bundleHash;
+};
+
+const bundleUrl = () => {
+  const hash = getBundleHash();
+  return hash ? `/bundle.${hash}.js` : "/bundle.js";
+};
+
+// Content-addressed: the URL changes whenever the bundle does, so this can be
+// cached indefinitely.
+app.get(HASHED_BUNDLE_RE, (req, res) => {
+  res.set("Cache-Control", "public, max-age=31536000, immutable");
+  res.sendFile(DIST_BUNDLE);
 });
 
-app.use("/public", express.static(path.join(__dirname, "../public")));
+// Kept for any client holding the old URL, and as the fallback when hashing
+// failed. Must revalidate, since this path's contents change on every deploy.
+app.get("/bundle.js", (req, res) => {
+  res.set("Cache-Control", "public, max-age=0, must-revalidate");
+  res.sendFile(DIST_BUNDLE);
+});
+
+app.use(
+  "/public",
+  express.static(path.join(__dirname, "../public"), {
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, filePath) => {
+      // Images and fonts are replaced in place occasionally (the cooling
+      // shelter pins were), so a week rather than a year: long enough to skip
+      // the revalidation round trips, short enough that a swapped-in asset
+      // still lands without a rename.
+      const longLived = /\.(png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot)$/i;
+      res.setHeader(
+        "Cache-Control",
+        longLived.test(filePath)
+          ? "public, max-age=604800"
+          : "public, max-age=3600"
+      );
+    },
+  })
+);
 
 app.get("/.well-known/apple-app-site-association", (req, res) => {
   res.type("application/json");
@@ -239,27 +299,29 @@ app.get("/get-refill-spot/:slug", async (req, res) => {
   }
 });
 
-app.get("/refill/:language/:slug", (req, res) => {
+// Both HTML routes render the same shell; this is the shared implementation the
+// duplicated copies used to ask for in a TODO. It also rewrites the bundle tag
+// to the content-hashed URL so the immutable caching above actually applies.
+const renderPage = (res) => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
     if (err) {
       console.error(err);
       return res.status(500).send("An error occurred");
     }
-    // @NOTE:
-    // You can inject SEO headers to the <head> tag as well
-    return res.send(
-      // @TODO:
-      // You can turn this into a function on a different file
-      data.replace(
+
+    const html = data
+      .replace('src="/bundle.js"', `src="${bundleUrl()}"`)
+      .replace(
         '<div id="root"></div>',
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
         <script>window.__GA_TAG__=${JSON.stringify(gaTag)}</script>
         <div id="root">${ReactDOMServer.renderToString(
-          <App gmApiKey={gmapApiKey} gaTag={gaTag}/>
+          <App gmApiKey={gmapApiKey} gaTag={gaTag} />
         )}</div>
         `
-      ).replace(
+      )
+      .replace(
         '<div id="ga"></div>',
         `
         <!-- Google tag (gtag.js) -->
@@ -272,50 +334,18 @@ app.get("/refill/:language/:slug", (req, res) => {
   gtag('config', '${gaTag}');
 </script>
         `
-      )
-    );
+      );
+
+    // The document embeds the hashed bundle URL, so it must not be cached past
+    // a deploy or clients would keep asking for a bundle that no longer exists.
+    res.set("Cache-Control", "private, no-cache");
+    return res.send(html);
   });
-});
+};
 
-app.get("/", (req, res) => {
-  fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
-    if (err) {
-      console.error(err);
-      return res.status(500).send("An error occurred");
-    }
+app.get("/refill/:language/:slug", (req, res) => renderPage(res));
 
-    // @NOTE:
-    // You can inject SEO headers to the <head> tag as well
-    return res.send(
-      // @TODO:
-      // You can turn this into a function on a different file
-      data.replace(
-        '<div id="root"></div>',
-        `
-        <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
-                <script>window.__GA_TAG__=${JSON.stringify(gaTag)}</script>
-        <div id="root">${ReactDOMServer.renderToString(
-          <App gmApiKey={gmapApiKey} gaTag={gaTag}/>
-        )}</div>
-        `
-      ).replace(
-        '<div id="ga"></div>',
-        `
-        <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=${gaTag}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){window.dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', '${gaTag}');
-</script>
-        `
-      )
-
-    );
-  });
-});
+app.get("/", (req, res) => renderPage(res));
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
