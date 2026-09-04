@@ -4,7 +4,22 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width">
-  <title>mymizu</title>
+  <!-- head:meta — replaced per request by server/meta.js, which builds a
+       spot-specific title and description for /refill/:language/:slug and the
+       defaults below for the map itself. What is here is the fallback: it is
+       what ships in the static file and what is served if the spot lookup
+       fails, so it must stand on its own. -->
+  <title>mymizu — find free water refill spots near you</title>
+  <meta name="description" content="Find free drinking water near you. mymizu maps 200,000+ cafés, shops, restaurants and public fountains where you can refill your bottle for free.">
+  <link rel="canonical" href="https://map.mymizu.co/">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="mymizu">
+  <meta property="og:title" content="mymizu — find free water refill spots near you">
+  <meta property="og:description" content="Find free drinking water near you. mymizu maps 200,000+ cafés, shops, restaurants and public fountains where you can refill your bottle for free.">
+  <meta property="og:url" content="https://map.mymizu.co/">
+  <meta property="og:image" content="https://map.mymizu.co/public/mymizu-logo.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- /head:meta -->
 
   <!-- The map fills ~91% of a mobile viewport, so the Google Maps tiles are the
        LCP element. The Maps script is requested by google-map-react only after
