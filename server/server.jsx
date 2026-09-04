@@ -41,6 +41,18 @@ app.get("/bundle.js", (req, res) => {
 
 app.use("/public", express.static(path.join(__dirname, "../public")));
 
+app.get("/.well-known/apple-app-site-association", (req, res) => {
+  res.type("application/json");
+  res.sendFile(
+    path.join(__dirname, "../public/.well-known/apple-app-site-association")
+  );
+});
+
+app.get("/.well-known/assetlinks.json", (req, res) => {
+  res.type("application/json");
+  res.sendFile(path.join(__dirname, "../public/.well-known/assetlinks.json"));
+});
+
 // --- SEO: robots + sitemaps -------------------------------------------------
 // These must live at the site root. Static assets are mounted under /public, so
 // a file dropped in public/ would only be reachable at /public/robots.txt, which
@@ -86,6 +98,7 @@ app.get("/sitemap-spots-:page.xml", (req, res) =>
   sendSitemap(res, `sitemap-spots-${req.params.page}.xml`),
 );
 // --- end SEO ----------------------------------------------------------------
+
 
 app.get("/api/authorize", async (req, res) => {
   const params = {
