@@ -1,5 +1,7 @@
 import axios from "axios";
 
+import config from "./config";
+
 // Canonical origin for every URL in the sitemap. Must match the share URL built
 // in src/utils/transformCardData.js, and the base_url the API generates with
 // (config/mymizu.php -> sitemap.base_url), or Google sees competing URLs for the
@@ -15,7 +17,7 @@ export const SITE_ORIGIN = process.env.SITE_ORIGIN || "https://map.mymizu.co";
 // We proxy those files rather than redirecting to them, because a sitemap may
 // only list URLs on the host that serves it. Served from here, the sitemap and
 // the spot URLs share an origin, so no Search Console cross-submission is needed.
-const SITEMAP_SOURCE = (process.env.SITEMAP_SOURCE || "").replace(/\/$/, "");
+const SITEMAP_SOURCE = (config.sitemapSource || "").replace(/\/$/, "");
 
 // The upstream file changes once a day; hold it briefly so a burst of crawler
 // requests doesn't become a burst of S3 reads.
@@ -38,10 +40,12 @@ const fetchUpstream = async (name) => {
     // Sitemaps are plain XML; hand it back as a string, untouched.
     responseType: "text",
     transformResponse: [(data) => data],
-    validateStatus: (status) => status === 200 || status === 404,
+    // S3 returns 403 rather than 404 for a missing object when the caller has no
+    // ListBucket permission, so both mean "not there".
+    validateStatus: (status) => status === 200 || status === 404 || status === 403,
   });
 
-  if (response.status === 404) {
+  if (response.status === 404 || response.status === 403) {
     const error = new Error(`Sitemap ${name} not found upstream`);
     error.notFound = true;
     throw error;

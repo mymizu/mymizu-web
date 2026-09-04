@@ -5,6 +5,9 @@ const configEnvVarMap = {
   gaTag: "GA_TAG",
   apiKey: "API_KEY",
   userToken: "USER_TOKEN",
+  // Bucket path the API uploads the generated sitemap to. Without it the
+  // /sitemap*.xml routes return 503 rather than serving something wrong.
+  sitemapSource: "SITEMAP_SOURCE",
 };
 
 const getConfig = () => {
