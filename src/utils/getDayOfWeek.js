@@ -1,6 +1,6 @@
 import { LANG_PREF_KEY } from "../constants";
 
-export default getDayOfWeek = () => {
+const getDayOfWeek = () => {
   const DAYS = {
     en: [
       "Sunday",
@@ -18,3 +18,5 @@ export default getDayOfWeek = () => {
   const dayIndex = new Date().getDay();
   return DAYS[locale][dayIndex];
 };
+
+export default getDayOfWeek;
