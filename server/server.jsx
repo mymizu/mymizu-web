@@ -40,6 +40,18 @@ app.get("/bundle.js", (req, res) => {
 
 app.use("/public", express.static(path.join(__dirname, "../public")));
 
+app.get("/.well-known/apple-app-site-association", (req, res) => {
+  res.type("application/json");
+  res.sendFile(
+    path.join(__dirname, "../public/.well-known/apple-app-site-association")
+  );
+});
+
+app.get("/.well-known/assetlinks.json", (req, res) => {
+  res.type("application/json");
+  res.sendFile(path.join(__dirname, "../public/.well-known/assetlinks.json"));
+});
+
 app.get("/api/authorize", async (req, res) => {
   const params = {
     l: getLanguage(req),

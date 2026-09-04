@@ -1,0 +1,16 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appIDs": ["CNW77AW2GA.com.lawriecate.mizu"],
+        "components": [
+          {
+            "/": "/refill/*",
+            "comment": "Refill spot share links, e.g. /refill/en/meguro-ayaka"
+          }
+        ]
+      }
+    ]
+  }
+}
