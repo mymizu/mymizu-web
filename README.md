@@ -61,6 +61,18 @@ yarn start:reload
 yarn start
 ```
 
+**Feature flags**
+
+Flags live in `server/config.js` and are read from the environment, so changing
+one is a variable and a restart — no code change and no rebuild.
+
+| Variable | Default | What it controls |
+| --- | --- | --- |
+| `COOLING_SHELTERS` | off | The cooling-shelter layer: whether the API is asked for shelters at all, whether the category filter is shown, and whether shelters count towards cluster totals. Set to `1`, `true`, `yes` or `on` to enable. |
+
+The server stamps each flag into the page (`window.__COOLING_SHELTERS__`) and
+passes it to `<App>`, so the server-rendered markup and the hydrated tree agree.
+
 **Routing / Adding Pages**
 
 You can add routes to `server/server.jsx`, and be sure to import the component in which you'd like to inject into the html page, like so:
