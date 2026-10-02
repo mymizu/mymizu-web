@@ -4,7 +4,7 @@ import React from "react";
 import ReactDOMServer from "react-dom/server";
 import express from "express";
 
-import config from "./config";
+import config, { coolingSheltersEnabled } from "./config";
 import {App} from "../src/App";
 import {myMizuClient} from "./myMizuClient";
 import i18nConfig from "../src/i18nConfig";
@@ -188,8 +188,11 @@ const INITIAL_POSITION = {
   c4: 150.75432142615318,
 };
 
+// With the flag off the API leaves cooling shelters out of every tap response,
+// so the layer disappears at the source rather than being filtered out further
+// down — nothing to hide in the map, the search or the detail pages.
 const TAP_FETCH_OPTIONS = {
-  include_cooling_shelters: true,
+  include_cooling_shelters: coolingSheltersEnabled,
 };
 
 app.get("/get-initial-markers", async (req, res) => {
@@ -316,8 +319,15 @@ const renderPage = (res) => {
         `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
         <script>window.__GA_TAG__=${JSON.stringify(gaTag)}</script>
+        <script>window.__COOLING_SHELTERS__=${JSON.stringify(
+          coolingSheltersEnabled
+        )}</script>
         <div id="root">${ReactDOMServer.renderToString(
-          <App gmApiKey={gmapApiKey} gaTag={gaTag} />
+          <App
+            gmApiKey={gmapApiKey}
+            gaTag={gaTag}
+            coolingShelters={coolingSheltersEnabled}
+          />
         )}</div>
         `
       )

@@ -29,7 +29,10 @@ const translations = {
   ja: require("./translations/ja.json"),
 };
 
-export function App({ gmApiKey, gaTag }) {
+// coolingShelters: the seasonal shelter layer. Off by default so a bundle that
+// somehow renders without the server's value shows the safe thing; the server
+// stamps the real value into the page (see server/config.js).
+export function App({ gmApiKey, gaTag, coolingShelters = false }) {
   /*useEffect(() => {
     ReactGA.initialize(gaTag);
     ReactGA.send("pageview");
@@ -578,7 +581,11 @@ export function App({ gmApiKey, gaTag }) {
     return taps;
   }, [taps, categoryFilter]);
 
-  const clusterCategoryKey = categoryFilter || "all";
+  // `all` counts cooling shelters; `water` is the same tree without them. With
+  // the layer off the markers exclude shelters, so the cluster totals have to
+  // as well or they overstate what zooming in will reveal.
+  const clusterCategoryKey =
+    categoryFilter || (coolingShelters ? "all" : "water");
 
   const hasClusterDataForCategory = useMemo(
     () =>
@@ -762,10 +769,12 @@ export function App({ gmApiKey, gaTag }) {
               results={results}
               onSearchResultClick={handleResultClick}
             />
-            <CategoryFilter
-              activeCategory={categoryFilter}
-              onSelect={setCategoryFilter}
-            />
+            {coolingShelters && (
+              <CategoryFilter
+                activeCategory={categoryFilter}
+                onSelect={setCategoryFilter}
+              />
+            )}
           </>
         )}
       </div>
