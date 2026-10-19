@@ -1,8 +1,9 @@
 import axios from "axios";
 import queryString from "query-string";
 import config from "./config";
+import { MYMIZU_API_BASE_URL } from "../src/constants";
 
-const baseURL = "https://api.mymizu.co";
+const baseURL = MYMIZU_API_BASE_URL;
 
 // @NOTES: I'm not sure how userToken is generated.
 // I assume that we request for a token initially with an API key. But let's leave it as is for now.

@@ -706,9 +706,12 @@ footer .nav-link i {
 }
 
 .image-slide {
+  display: block;
   height: 100%;
   width: 100%;
-  background-position: center center;
+  min-width: 0;
+  object-fit: cover;
+  object-position: center center;
 }
 
 .summary {
