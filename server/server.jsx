@@ -43,9 +43,14 @@ const getToken = (req) => {
 const DIST_BUNDLE = path.join(__dirname, "../dist/bundle.js");
 const HASHED_BUNDLE_RE = /^\/bundle\.[0-9a-f]{12}\.js$/;
 
+// Set only by `yarn dev` (scripts/dev.js), never in production. It turns on the
+// browser live-reload hook below and re-hashes the bundle on each page load,
+// since in dev the client bundle is rebuilt without restarting this server.
+const LIVE_RELOAD_PORT = process.env.LIVE_RELOAD_PORT;
+
 let bundleHash = null;
 const getBundleHash = () => {
-  if (bundleHash) return bundleHash;
+  if (bundleHash && !LIVE_RELOAD_PORT) return bundleHash;
   try {
     bundleHash = crypto
       .createHash("sha256")
@@ -302,6 +307,13 @@ app.get("/get-refill-spot/:slug", async (req, res) => {
   }
 });
 
+// Dev only: reload the page whenever scripts/dev.js reports a rebuild.
+const liveReloadScript = LIVE_RELOAD_PORT
+  ? `<script>(function(){var es=new EventSource(location.protocol+"//"+location.hostname+":${Number(
+      LIVE_RELOAD_PORT
+    )}/livereload");es.addEventListener("reload",function(){location.reload();});})();</script>`
+  : "";
+
 // Both HTML routes render the same shell; this is the shared implementation the
 // duplicated copies used to ask for in a TODO. It also rewrites the bundle tag
 // to the content-hashed URL so the immutable caching above actually applies.
@@ -344,7 +356,8 @@ const renderPage = (res) => {
   gtag('config', '${gaTag}');
 </script>
         `
-      );
+      )
+      .replace("</body>", `${liveReloadScript}</body>`);
 
     // The document embeds the hashed bundle URL, so it must not be cached past
     // a deploy or clients would keep asking for a bundle that no longer exists.

@@ -39,26 +39,41 @@ curl -l 'https://api.mymizu.co/api/start?api_key=$INSERT_API_KEY&platform=ios&cl
 
 **Running the project locally**
 
+This repo uses Yarn 1 (classic). If your global `yarn` is v2 or later, use
+`npx yarn@1` in place of `yarn` below.
+
 All commands should be run in the project root directory.
 ```bash
 # Create an .env file & insert the appropriate values. Be sure to include your api key and user token from the previous steps.
 cp .env.sample .env
 
 # Install dependencies
-yarn 
+yarn
 
-# Compile both backend & client code
-# Make sure to re-run this if you want to see your changes built
+# Start the dev loop
+yarn dev
+```
+
+Then open http://localhost:3000. `yarn dev` builds the client and server with
+esbuild in watch mode, restarts the server when server code changes, and reloads
+open browser tabs after each successful rebuild, so edits show up on save. Build
+errors are printed without stopping the watcher. `PORT` and `LIVE_RELOAD_PORT`
+(default `35729`) can be overridden in the environment. Ctrl+C stops everything.
+
+**Testing a production build**
+
+```bash
+# Compile both backend & client code (unminified)
 yarn build
 
 # Compile for prod. This minifies the compiled files for production
 yarn build:prod
 
-# Run server with watch. This command will restart the server when a change has been detected
-yarn start:reload
-
-# Run server without watch
+# Run the compiled server
 yarn start
+
+# Or run it with nodemon, restarting when build/server.js changes
+yarn start:reload
 ```
 
 **Feature flags**

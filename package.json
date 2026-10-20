@@ -11,7 +11,8 @@
     "build": "npm run build:client && npm run build:server",
     "build:prod": "npm run build:client:prod && npm run build:server:prod",
     "start": "node ./build/server.js",
-    "restart": "npm run build:client && npm run build:server && nodemon ./build/server.js"
+    "restart": "npm run build:client && npm run build:server && nodemon ./build/server.js",
+    "dev": "node scripts/dev.js"
   },
   "dependencies": {
     "-": "^0.0.1",
