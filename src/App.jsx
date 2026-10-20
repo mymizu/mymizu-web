@@ -22,6 +22,7 @@ import classnames from "classnames";
 import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
 import { LANG_PREF_KEY } from "./constants";
+import { languageFromPath, pathForLanguage } from "./utils/languagePath";
 import { getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel } from "./utils/clusters";
 
 const translations = {
@@ -168,9 +169,19 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
     setLocale(language);
     axios.defaults.headers.common["Accept-Language"] = language;
     if (reload) {
-      // todo: remove if can get map to reload with new language
+      // Saved here rather than left to the effect on `locale`, which may not
+      // run before the page unloads.
+      localStorage.setItem(LANG_PREF_KEY, language);
 
-      location.reload();
+      // todo: remove if can get map to reload with new language
+      // A refill spot page names its language in the URL, so open the same
+      // spot in the new language rather than reloading the old address.
+      const path = pathForLanguage(window.location.pathname, language);
+      if (path) {
+        window.location.assign(path + window.location.search + window.location.hash);
+      } else {
+        location.reload();
+      }
     }
   };
 
@@ -495,11 +506,17 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
   useEffect(() => {
     const language = window.navigator.userLanguage || window.navigator.language;
     const userLanguage = localStorage.getItem(LANG_PREF_KEY);
+    // A refill spot link says which language it is in (/refill/ja/...), and
+    // that wins: someone opening a shared or searched-for link sees the page
+    // in the language of the URL, and the URL never disagrees with the page.
+    const urlLanguage = languageFromPath(window.location.pathname);
 
     // Check if 'en' or 'ja' sub-strings are in the default's language: should handle
     // particular cases such as en-GB, en-US, etc.
 
-    if (userLanguage) {
+    if (urlLanguage) {
+      updateLanguage(urlLanguage);
+    } else if (userLanguage) {
       updateLanguage(userLanguage);
     } else {
       if (language.includes("en")) {
@@ -637,7 +654,11 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
                     <a
                       className="nav-link"
                       href="#"
-                      onClick={() => updateLanguage("ja", true)}
+                      onClick={(e) => {
+                        // Stop the "#" navigation, which could cancel the page change.
+                        e.preventDefault();
+                        updateLanguage("ja", true);
+                      }}
                       hrefLang="ja"
                     >
                       日本語
@@ -648,7 +669,11 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
                       className="nav-link"
                       href="#"
                       hrefLang="en"
-                      onClick={() => updateLanguage("en", true)}
+                      onClick={(e) => {
+                        // Stop the "#" navigation, which could cancel the page change.
+                        e.preventDefault();
+                        updateLanguage("en", true);
+                      }}
                     >
                       English
                     </a>
