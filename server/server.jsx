@@ -3,10 +3,12 @@ import fs from "fs";
 import React from "react";
 import ReactDOMServer from "react-dom/server";
 import express from "express";
+import axios from "axios";
 
 import config, { coolingSheltersEnabled } from "./config";
 import {App} from "../src/App";
 import {myMizuClient} from "./myMizuClient";
+import { MYMIZU_API_BASE_URL } from "../src/constants";
 import i18nConfig from "../src/i18nConfig";
 import {buildRobotsTxt, getSitemap, isSitemapConfigured} from "./sitemap";
 
@@ -258,10 +260,14 @@ app.get("/get-clusters", async (req, res) => {
   try {
     const ifNoneMatch = req.headers["if-none-match"];
 
-    const upstream = await myMizuClient(getToken(req), getLanguage(req)).getRaw(
-      "/api/taps/clusters/all",
-      {},
+    // The API's public, edge-cached copy (MyMizu#202): the same dataset and
+    // ETag for everyone, so no token, key or query string (it refuses one).
+    // The browser normally reads it there itself (src/utils/publicApi.js);
+    // this is the way round when it can't.
+    const upstream = await axios.get(
+      `${MYMIZU_API_BASE_URL}/api/public/v1/clusters/all`,
       {
+        timeout: 50000,
         headers: ifNoneMatch ? { "If-None-Match": ifNoneMatch } : {},
         validateStatus: (status) => status === 200 || status === 304,
       }

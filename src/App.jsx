@@ -9,6 +9,7 @@ import Metrics from "./components/Metrics";
 import { transformCardData } from "./utils/transformCardData";
 import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
+import { fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
 import getSlug from "./utils/getSlug";
 import { Marker } from "./components/Marker";
 import { ClusterMarker } from "./components/ClusterMarker";
@@ -336,11 +337,19 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
 
         const { nw, se } = value;
 
-        const res = await axios.get(
-          `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
+        // Straight from the API's edge where the view is small enough (see
+        // utils/publicApi), otherwise through this server as before.
+        const direct = await fetchPublicTaps(
+          { c1: nw.lat, c2: nw.lng, c3: se.lat, c4: se.lng },
+          { cooling: coolingShelters }
         );
-
-        const { taps: resTaps } = res.data;
+        const resTaps = direct
+          ? direct.taps
+          : (
+              await axios.get(
+                `/get-marker-moving-map?c1=${nw.lat}&c2=${nw.lng}&c3=${se.lat}&c4=${se.lng}`
+              )
+            ).data.taps;
 
         setTaps((currentTaps) => {
           const existingIds = new Set(currentTaps.map((tap) => tap.id));
@@ -363,6 +372,13 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
 // Feature: Not working yet, error on server side, but we can use this to fetch all clusters and cache them on the client side
   const fetchClusters = async () => {
     try {
+      // Straight from the API's edge (see utils/publicApi), otherwise through
+      // this server.
+      const direct = await fetchPublicClusters();
+      if (direct) {
+        setClusterTree(direct);
+        return;
+      }
       const res = await axios.get("/get-clusters", {
         headers: userToken ? { Authorization: `Bearer ${userToken}` } : {},
       });
