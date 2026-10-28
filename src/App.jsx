@@ -9,7 +9,7 @@ import Metrics from "./components/Metrics";
 import { transformCardData } from "./utils/transformCardData";
 import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
-import { fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
+import { fetchPublicClusterLevel, fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
 import getSlug from "./utils/getSlug";
 import { spotTitle } from "./utils/spotTitle";
 import { SocialIcon } from "./components/SocialIcon";
@@ -26,7 +26,7 @@ import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
 import { LANG_PREF_KEY } from "./constants";
 import { languageFromPath, pathForLanguage } from "./utils/languagePath";
-import { getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel } from "./utils/clusters";
+import { getClusterLevelForZoom, getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel } from "./utils/clusters";
 
 const translations = {
   en: require("./translations/en.json"),
@@ -82,7 +82,10 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   // Set once the first map tiles have drawn. The cluster tree waits for it:
   // see the effect that fetches it.
   const [mapPainted, setMapPainted] = useState(false);
-  const clustersRequestedRef = useRef(false);
+  // Levels of the tree asked for so far (loaded or on their way), and whether
+  // the whole tree has been loaded instead (an API without per-level URLs).
+  const clusterLevelsRequestedRef = useRef(new Set());
+  const wholeClusterTreeRef = useRef(false);
   const [mapBounds, setMapBounds] = useState(null);
   const [activeTapId, setActiveTapId] = useState(null);
 
@@ -378,8 +381,10 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     }
   };
 
-// Feature: Not working yet, error on server side, but we can use this to fetch all clusters and cache them on the client side
-  const fetchClusters = async () => {
+  // The whole tree, for an API that can't serve it a level at a time.
+  const fetchWholeClusterTree = async () => {
+    if (wholeClusterTreeRef.current) return;
+    wholeClusterTreeRef.current = true;
     try {
       // Straight from the API's edge (see utils/publicApi), otherwise through
       // this server.
@@ -394,8 +399,27 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
       setClusterTree(res.data);
     } catch (e) {
       // Let the next zoom or pan try again.
-      clustersRequestedRef.current = false;
+      wholeClusterTreeRef.current = false;
       console.log("error fetching clusters", e);
+    }
+  };
+
+  // One level of the tree, merged into what is already loaded.
+  const fetchClusterLevel = async (level) => {
+    clusterLevelsRequestedRef.current.add(level);
+    try {
+      const payload = await fetchPublicClusterLevel(level);
+      if (!payload) {
+        fetchWholeClusterTree();
+        return;
+      }
+      setClusterTree((current) => ({
+        generated_at: payload.generated_at,
+        levels: { ...(current?.levels || {}), ...(payload.levels || {}) },
+      }));
+    } catch (e) {
+      clusterLevelsRequestedRef.current.delete(level);
+      console.log("error fetching cluster level", level, e);
     }
   };
 //*
@@ -576,7 +600,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   }, [initialLoad]);
 
   // "Tiles loaded" means fetched, not yet drawn: the map still fades them in,
-  // and the main thread may be busy. Starting the 3.5MB download then still
+  // and the main thread may be busy. Starting the cluster download then still
   // put it in front of the paint on a slow phone, so wait until the browser
   // is idle as well (with a cap, so a page that never idles still gets it).
   const onFirstTilesLoaded = () => {
@@ -590,20 +614,21 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     }, { timeout: 3000 });
   };
 
-  // The cluster tree is every cluster at every level: ~3.5MB compressed and
-  // ~16MB of JSON to parse. Fetched at page load it shared the connection
-  // with the map tiles and then held the main thread while it was parsed, so
-  // on a phone the map (the largest paint) waited for it. It is now asked for
-  // only once the first tiles have drawn, and only when the map is zoomed out
-  // far enough to show clusters: a refill spot page opens at street level,
-  // where it shows individual taps and never needs the tree unless the
+  // The whole cluster tree is every cluster at every level: ~3.4MB compressed
+  // and ~16MB of JSON, 12MB of it level 1, which only zoom 14 draws. So only
+  // the level the current zoom draws is fetched (the home view at zoom 11
+  // needs level 3, ~160KB compressed), and others as the zoom reaches them;
+  // each is kept once loaded. As before, nothing is fetched until the first
+  // tiles have drawn, and nothing at street level: a refill spot page opens
+  // at zoom 16, showing individual taps, and needs no clusters unless the
   // visitor zooms out.
   useEffect(() => {
-    if (clusterTree || clustersRequestedRef.current) return;
     if (!mapPainted || !shouldShowClusters(zoom)) return;
-    clustersRequestedRef.current = true;
-    fetchClusters();
-  }, [mapPainted, zoom, clusterTree]);
+    if (wholeClusterTreeRef.current) return;
+    const level = getClusterLevelForZoom(zoom);
+    if (clusterLevelsRequestedRef.current.has(level)) return;
+    fetchClusterLevel(level);
+  }, [mapPainted, zoom]);
 
   useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);

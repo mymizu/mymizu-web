@@ -93,6 +93,10 @@ export const tileUrl = ({ y, x }, { locale, cooling }) =>
 
 export const clustersUrl = () => `${PUBLIC_BASE_URL}/clusters/all`;
 
+// One level of that tree (MyMizu: TapClusterController@publicLevel), in the
+// same shape with only that level: { generated_at, levels: { "3": [...] } }.
+export const clusterLevelUrl = (level) => `${PUBLIC_BASE_URL}/clusters/${level}`;
+
 // The API names places in English or Japanese only: the visitor's first
 // preference of the two, as this server's getLanguage() picks it.
 export const publicLocale = () => {
@@ -167,6 +171,32 @@ export const fetchPublicTaps = async (box, { cooling }) => {
     }
     return { taps };
   } catch (error) {
+    return settleFailure(error);
+  }
+};
+
+// Whether the API serves single levels. An API from before it did answers
+// 404, and then the whole tree (fetchPublicClusters) is used instead, so this
+// page works on either side of that deploy.
+let levelsAvailable = true;
+
+/**
+ * One level of the cluster tree from its public URL, or null when the caller
+ * should load the whole tree instead (the API predates per-level URLs, or the
+ * direct route isn't available). The browser's own HTTP cache revalidates
+ * each level with its ETag.
+ */
+export const fetchPublicClusterLevel = async (level) => {
+  if (!available || !levelsAvailable) {
+    return null;
+  }
+  try {
+    return await getJson(clusterLevelUrl(level));
+  } catch (error) {
+    if (error?.status === 404) {
+      levelsAvailable = false;
+      return null;
+    }
     return settleFailure(error);
   }
 };
