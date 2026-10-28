@@ -127,6 +127,25 @@ app.get("/.well-known/assetlinks.json", (req, res) => {
   res.sendFile(path.join(__dirname, "../public/.well-known/assetlinks.json"));
 });
 
+// --- Icons ------------------------------------------------------------------
+// iOS (the share sheet's link preview, Add to Home Screen) and many crawlers
+// ask for these at the site root without reading the page's <link> tags, so
+// serve them there as well as under /public.
+const ROOT_ICONS = {
+  "/favicon.ico": "favicon.ico",
+  "/apple-touch-icon.png": "apple-touch-icon.png",
+  "/apple-touch-icon-precomposed.png": "apple-touch-icon.png",
+  "/site.webmanifest": "site.webmanifest",
+};
+
+Object.entries(ROOT_ICONS).forEach(([route, file]) => {
+  app.get(route, (req, res) => {
+    res.set("Cache-Control", "public, max-age=604800");
+    if (file.endsWith(".webmanifest")) res.type("application/manifest+json");
+    res.sendFile(path.join(__dirname, "../public", file));
+  });
+});
+
 // --- SEO: robots + sitemaps -------------------------------------------------
 // These must live at the site root. Static assets are mounted under /public, so
 // a file dropped in public/ would only be reachable at /public/robots.txt, which
