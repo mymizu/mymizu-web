@@ -1,23 +1,43 @@
-import React, { useState } from "react";
+import React from "react";
+import { useIntl } from "react-intl";
 import { ShareButton } from "./Buttons/ShareButton";
 import { RouteButton } from "./Buttons/RouteButton";
 
-export const Summary = ({ data, setShareModal }) => {
+// The card's heading. Modal labels the card with it and moves focus to it
+// when a spot is opened from the map.
+export const SPOT_TITLE_ID = "spot-card-title";
 
+export const Summary = ({ data, setShareModal }) => {
+  const intl = useIntl();
 
   return (
     <div className="summary">
       <div className="title">
         {data.categoryId === 4 && (
-          <img className="pin" src="/public/images/map-pin-gold.svg" />
+          <img
+            className="pin"
+            src="/public/images/map-pin-gold.svg"
+            alt={intl.formatMessage({ id: "spot.category.partner" })}
+          />
         )}
         {data.categoryId === 6 && (
-          <img className="pin" src="/public/images/map-shelter.svg" />
+          <img
+            className="pin"
+            src="/public/images/map-shelter.svg"
+            alt={intl.formatMessage({ id: "spot.category.shelter" })}
+          />
         )}
         {data.categoryId !== 4 && data.categoryId !== 6 && (
-          <img className="pin" src="/public/images/map-pin.svg" />
+          <img
+            className="pin"
+            src="/public/images/map-pin.svg"
+            alt={intl.formatMessage({ id: "spot.category.spot" })}
+          />
         )}
-        <h6>{data?.title}</h6>
+        {/* tabIndex lets Modal move focus here when the card opens. */}
+        <h2 id={SPOT_TITLE_ID} className="spot-card-title" tabIndex={-1}>
+          {data?.title}
+        </h2>
       </div>
       <div className="description">
         {data.description !== null &&
