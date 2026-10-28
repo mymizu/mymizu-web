@@ -582,7 +582,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     whenIdle(() => {
       setMapPainted(true);
       // Tells the page's analytics snippet it can load now (server.jsx).
-      window.dispatchEvent(new Event("mymizu:map-painted"));
+      window.dispatchEvent(new window.Event("mymizu:map-painted"));
     }, { timeout: 3000 });
   };
 
