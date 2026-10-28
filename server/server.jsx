@@ -337,7 +337,9 @@ const renderPage = (res, meta) => {
     }
 
     const html = data
-      .replace(META_BLOCK_RE, meta ? renderMetaTags(meta) : "$&")
+      // A function, not a string: spot names and comments are user text, and
+      // a "$'" or "$&" in a replacement string would splice in the page.
+      .replace(META_BLOCK_RE, (block) => (meta ? renderMetaTags(meta) : block))
       .replace('src="/bundle.js"', `src="${bundleUrl()}"`)
       .replace(
         '<div id="root"></div>',
