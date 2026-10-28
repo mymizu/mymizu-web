@@ -570,6 +570,17 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     }
   }, [initialLoad]);
 
+  // "Tiles loaded" means fetched, not yet drawn: the map still fades them in,
+  // and the main thread may be busy. Starting the 3.5MB download then still
+  // put it in front of the paint on a slow phone, so wait until the browser
+  // is idle as well (with a cap, so a page that never idles still gets it).
+  const onFirstTilesLoaded = () => {
+    if (mapPainted) return;
+    const whenIdle =
+      window.requestIdleCallback || ((fn) => setTimeout(fn, 1000));
+    whenIdle(() => setMapPainted(true), { timeout: 3000 });
+  };
+
   // The cluster tree is every cluster at every level: ~3.5MB compressed and
   // ~16MB of JSON to parse. Fetched at page load it shared the connection
   // with the map tiles and then held the main thread while it was parsed, so
@@ -773,7 +784,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
           onChange={enqueueTapsRequest}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
-          onTilesLoaded={() => setMapPainted(true)}
+          onTilesLoaded={onFirstTilesLoaded}
           onGoogleApiLoaded={({map, maps}) => {
             setGoogleMapFn(googleMapAPI(map, maps));
           }}
