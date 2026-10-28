@@ -52,7 +52,6 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     zoom: 11,
   };
 
-  const [navOpen, setNavOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
@@ -276,10 +275,6 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
       },
     },
   ];
-
-  const handleNav = () => {
-    setNavOpen(!navOpen);
-  };
 
   const getUserToken = async () => {
     try {
@@ -701,17 +696,23 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
       locale={locale}
       defaultLocale={i18nConfig.defaultLocale}
     >
-      <div>
-        {/* Header */}
+      <header>
+        {/* The first thing Tab reaches: past the nav links and straight to
+            the map and search. Shown only while it has focus. */}
+        <a className="skip-link visually-hidden-focusable" href="#main-content">
+          <FormattedMessage id="skip.main" />
+        </a>
         <nav className="navbar navbar-expand-lg bg-light">
           <div className="container-fluid nav-container">
-            <img
-              id="logo"
-              src="/public/images/logo.svg"
-              alt=""
-              height="45"
-              className="d-inline-block align-text-top"
-            />
+            <a href="/" className="logo-link">
+              <img
+                id="logo"
+                src="/public/images/logo.svg"
+                alt="mymizu"
+                height="45"
+                className="d-inline-block align-text-top"
+              />
+            </a>
             <div
               className="collapse navbar-collapse justify-content-end"
               id="navbarNav"
@@ -735,6 +736,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
                         updateLanguage("ja", true);
                       }}
                       hrefLang="ja"
+                      lang="ja"
                     >
                       日本語
                     </a>
@@ -744,6 +746,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
                       className="nav-link"
                       href="#"
                       hrefLang="en"
+                      lang="en"
                       onClick={(e) => {
                         // Stop the "#" navigation, which could cancel the page change.
                         e.preventDefault();
@@ -761,18 +764,21 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
               data-bs-toggle="collapse"
               data-bs-target="#navbarNav"
               aria-expanded="false"
-              aria-label="Toggle navigation"
+              aria-controls="navbarNav"
+              aria-label={translations[locale]["nav.toggle"]}
             >
-              <span
-                className="hamburger d-sm-inline d-md-inline d-lg-none"
-                onClick={handleNav}
-              >
+              <span className="hamburger d-sm-inline d-md-inline d-lg-none">
                 &#9776;
               </span>
             </button>
           </div>
         </nav>
-      </div>
+      </header>
+      {/* tabIndex so the skip link moves focus here, not just the scroll. */}
+      <main id="main-content" tabIndex={-1}>
+      <h1 className="visually-hidden">
+        <FormattedMessage id="page.heading" />
+      </h1>
       <div className="maps-container">
         <CurrentLocationButton onClick={buttonResetLocation} />
         {/* Deliberately not gated on userToken. The map itself needs no auth —
@@ -883,11 +889,16 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
         {loading && (
           <div className="loading-indicator">&nbsp;</div>
         )}
+        {/* Always rendered, so screen readers notice when the text changes. */}
+        <div role="status" className="visually-hidden">
+          {loading && <FormattedMessage id="loading.spots" />}
+        </div>
       </div>
       <div className="container-lg">
         {userToken && <Metrics />}
         <FunFacts />
       </div>
+      </main>
       <div className="footer">
         <div className="container-lg">
           <footer>

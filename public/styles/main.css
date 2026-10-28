@@ -80,6 +80,39 @@ img#logo {
   padding: 5px;
 }
 
+/* Skip link (App.jsx): hidden until focused, then a pill over the header. */
+.skip-link:focus,
+.skip-link:focus-within {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 1000;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background-color: #fff;
+  color: #19638D;
+  font-weight: 600;
+  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  outline: 3px solid #1F78AB;
+  outline-offset: 2px;
+}
+
+/* Focused by the skip link; it isn't a control, so no ring. */
+#main-content:focus {
+  outline: none;
+}
+
+/* The link wraps the logo without changing the navbar's layout. */
+.logo-link {
+  display: flex;
+}
+
+.logo-link:focus-visible {
+  outline: 3px solid #1F78AB;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 .nav-container {
   margin: 0 15px;
 }
