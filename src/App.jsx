@@ -79,6 +79,10 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [clusterTree, setClusterTree] = useState(null);
+  // Set once the first map tiles have drawn. The cluster tree waits for it:
+  // see the effect that fetches it.
+  const [mapPainted, setMapPainted] = useState(false);
+  const clustersRequestedRef = useRef(false);
   const [mapBounds, setMapBounds] = useState(null);
   const [activeTapId, setActiveTapId] = useState(null);
 
@@ -389,6 +393,8 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
       });
       setClusterTree(res.data);
     } catch (e) {
+      // Let the next zoom or pan try again.
+      clustersRequestedRef.current = false;
       console.log("error fetching clusters", e);
     }
   };
@@ -564,11 +570,20 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     }
   }, [initialLoad]);
 
+  // The cluster tree is every cluster at every level: ~3.5MB compressed and
+  // ~16MB of JSON to parse. Fetched at page load it shared the connection
+  // with the map tiles and then held the main thread while it was parsed, so
+  // on a phone the map (the largest paint) waited for it. It is now asked for
+  // only once the first tiles have drawn, and only when the map is zoomed out
+  // far enough to show clusters: a refill spot page opens at street level,
+  // where it shows individual taps and never needs the tree unless the
+  // visitor zooms out.
   useEffect(() => {
-    if (userToken) {
-      fetchClusters();
-    }
-  }, [userToken]);
+    if (clusterTree || clustersRequestedRef.current) return;
+    if (!mapPainted || !shouldShowClusters(zoom)) return;
+    clustersRequestedRef.current = true;
+    fetchClusters();
+  }, [mapPainted, zoom, clusterTree]);
 
   useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
@@ -740,6 +755,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
           onChange={enqueueTapsRequest}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
+          onTilesLoaded={() => setMapPainted(true)}
           onGoogleApiLoaded={({map, maps}) => {
             setGoogleMapFn(googleMapAPI(map, maps));
           }}
