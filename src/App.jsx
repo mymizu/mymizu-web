@@ -17,7 +17,6 @@ import { Marker } from "./components/Marker";
 import { ClusterMarker } from "./components/ClusterMarker";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
 import { Search } from "./components/Search";
-import { SearchResults } from "./components/SearchResults";
 import { CategoryFilter } from "./components/CategoryFilter";
 import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
@@ -116,8 +115,14 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     return true;
   };
 
+  // Each search looks up its places one by one, so an earlier, shorter query
+  // can answer after a later one. Only the latest is shown (and announced).
+  const latestSearchRef = useRef(null);
   const handleSearchQuery = (query) => {
-    googleMapFn.search(query, searchResultCallback);
+    latestSearchRef.current = query;
+    googleMapFn.search(query, (places) => {
+      if (latestSearchRef.current === query) searchResultCallback(places);
+    });
   };
 
   const handleReset = () => {
@@ -774,6 +779,24 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
         </nav>
       </div>
       <div className="maps-container">
+        {/* First, so keyboard and screen reader users reach the search box
+            before the map and the spot card, as it is drawn above them. */}
+        {taps.length > 0 && (
+          <>
+            <Search
+              results={results}
+              onSearch={handleSearchQuery}
+              onReset={handleReset}
+              onSearchResultClick={handleResultClick}
+            />
+            {coolingShelters && (
+              <CategoryFilter
+                activeCategory={categoryFilter}
+                onSelect={setCategoryFilter}
+              />
+            )}
+          </>
+        )}
         <CurrentLocationButton onClick={buttonResetLocation} />
         {/* Deliberately not gated on userToken. The map itself needs no auth —
             only the markers do — and waiting for /api/authorize put a ~780ms
@@ -858,25 +881,6 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
               />
             )}
           </div>
-        )}
-        {taps.length > 0 && (
-          <>
-            <Search
-              results={results}
-              onSearch={handleSearchQuery}
-              onReset={handleReset}
-            />
-            <SearchResults
-              results={results}
-              onSearchResultClick={handleResultClick}
-            />
-            {coolingShelters && (
-              <CategoryFilter
-                activeCategory={categoryFilter}
-                onSelect={setCategoryFilter}
-              />
-            )}
-          </>
         )}
       </div>
       <div className="loading-container">
