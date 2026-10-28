@@ -132,10 +132,20 @@ const offersOf = (spot, language) => {
  * about that tap. Without a description at all, Google built the snippet from
  * the nav and footer text.
  */
+// Kana, kanji or full-width forms: enough to tell Japanese text from English.
+const JAPANESE_RE = /[\u3040-\u30ff\u3400-\u9fff\uff00-\uffef]/;
+
+// Free text is stored as contributors wrote it, so a Japanese page can be
+// handed an English comment or a romanised address. On a Japanese page those
+// are left out, so the description reads as Japanese throughout; the spot's
+// name is kept whatever script it is in, since it is what the page is about.
+const inLanguage = (text, language) =>
+  language !== "ja" || JAPANESE_RE.test(text || "");
+
 const describeSpot = (spot, language) => {
   const max = MAX_DESCRIPTION[language];
   const name = oneLine(spot.name);
-  const area = areaOf(spot);
+  const area = inLanguage(areaOf(spot), language) ? areaOf(spot) : "";
   const shelter = spot.category_id === COOLING_SHELTER_CATEGORY_ID;
 
   let lead;
@@ -153,10 +163,21 @@ const describeSpot = (spot, language) => {
 
   // Location is the purpose-written "how to find it"; older spots only have
   // the free-text comment, whose first line is usually the same thing.
-  const comment = String(spot.simple_comment || "").split(/\r?\n/)[0];
-  const directions = spot.location || comment;
+  // Bilingual comments put one language on each of their first two lines, so
+  // the second is tried when the first is in the wrong language. A comment
+  // that opens with a heading ("Hours:") is a form whose lines mean nothing
+  // apart from their headings, so none of it is used.
+  const lines = String(spot.simple_comment || "")
+    .split(/\r?\n/)
+    .filter((line) => oneLine(line));
+  const comment = sentence(lines[0], language)
+    ? lines.slice(0, 2).find((line) => inLanguage(line, language))
+    : undefined;
+  const directions =
+    spot.location && inLanguage(spot.location, language) ? spot.location : comment;
 
   const optional = [...offersOf(spot, language), spot.refill_instruction, directions]
+    .filter((piece) => inLanguage(piece, language))
     .map((piece) => sentence(piece, language))
     .filter(Boolean);
 
@@ -198,16 +219,22 @@ const spotAlternates = (slug) =>
 
 export const spotMeta = (spot, language, slug) => {
   const l = lang(language);
+  // The first photo, as the spot card shows them, so a shared link previews the
+  // place itself. Full size rather than a card thumbnail: link previews want
+  // at least 1200px wide. photo_url is the API's redirect to the same file,
+  // for a payload without the photos array.
   const photo = Array.isArray(spot?.photos)
-    ? spot.photos.find((p) => p && p.url)
+    ? spot.photos.find((p) => p && p.url && p.approved !== false)
     : null;
+  const image = photo ? photo.url : spot?.photo_url || DEFAULT_IMAGE;
 
   return {
     title: spotTitle(spot, l),
     description: describeSpot(spot, l),
     language: l,
     canonical: spotUrl(slug, l),
-    image: photo ? photo.url : DEFAULT_IMAGE,
+    image,
+    imageAlt: oneLine(spot.name),
     alternates: spotAlternates(slug),
   };
 };
@@ -254,7 +281,11 @@ ${alternates}
   <meta property="og:title" content="${t}">
   <meta property="og:description" content="${d}">
   <meta property="og:url" content="${url}">
-  <meta property="og:image" content="${img}">
+  <meta property="og:image" content="${img}">${
+    meta.imageAlt
+      ? `\n  <meta property="og:image:alt" content="${escapeAttr(meta.imageAlt)}">`
+      : ""
+  }
   <meta property="og:locale" content="${meta.language === "ja" ? "ja_JP" : "en_US"}">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="${t}">

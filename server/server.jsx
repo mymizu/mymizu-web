@@ -329,11 +329,16 @@ const liveReloadScript = LIVE_RELOAD_PORT
 // defaults) while letting each request substitute its own.
 const META_BLOCK_RE = /[ \t]*<!-- head:meta[\s\S]*?\/head:meta -->/;
 
+// The language a page with no language in its URL is rendered in, before the
+// browser switches it to the visitor's. Its title and description are in the
+// same language, so the head never describes a page the body does not match.
+const DEFAULT_LOCALE = "ja";
+
 // `locale` is the language the page body is rendered in. A refill spot URL
 // names one, and Google indexes that body under the URL's title and
 // description, so /refill/en/... must not come back with a Japanese nav and
 // footer. Pages with no language in the URL keep rendering Japanese.
-const renderPage = (res, meta, locale = "ja") => {
+const renderPage = (res, meta, locale = DEFAULT_LOCALE) => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
     if (err) {
       console.error(err);
@@ -396,14 +401,11 @@ app.get("/refill/:language/:slug", async (req, res) => {
 
   // Falls back to the generic map meta if the spot could not be fetched, so a
   // slow or missing spot never costs us the page.
-  return renderPage(
-    res,
-    meta || spotFallbackMeta(slug, language),
-    isLanguage(language) ? language : undefined
-  );
+  if (!isLanguage(language)) return renderPage(res, homeMeta(DEFAULT_LOCALE));
+  return renderPage(res, meta || spotFallbackMeta(slug, language), language);
 });
 
-app.get("/", (req, res) => renderPage(res, homeMeta(getLanguage(req))));
+app.get("/", (req, res) => renderPage(res, homeMeta(DEFAULT_LOCALE)));
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
