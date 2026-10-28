@@ -11,6 +11,7 @@ import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
 import { fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
 import getSlug from "./utils/getSlug";
+import { spotTitle } from "./utils/spotTitle";
 import { Marker } from "./components/Marker";
 import { ClusterMarker } from "./components/ClusterMarker";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
@@ -34,7 +35,7 @@ const translations = {
 // coolingShelters: the seasonal shelter layer. Off by default so a bundle that
 // somehow renders without the server's value shows the safe thing; the server
 // stamps the real value into the page (see server/config.js).
-export function App({ gmApiKey, gaTag, coolingShelters = false }) {
+export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale }) {
   /*useEffect(() => {
     ReactGA.initialize(gaTag);
     ReactGA.send("pageview");
@@ -55,7 +56,11 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
   const [coordinate, setCoordinate] = useState({});
-  const [locale, setLocale] = useState("ja");
+  // A refill spot URL names its language, and the server renders the page in
+  // it; starting from the same one keeps hydration in step with that HTML.
+  // Everywhere else the server renders Japanese, and the effect below picks
+  // the visitor's language once the page has loaded.
+  const [locale, setLocale] = useState(initialLocale || "ja");
   const [detectedLocale, setDetectedLocale] = useState(false);
   const [language] = useLang();
   const [center, setCenter] = useState(gmDefaultProps.center);
@@ -447,7 +452,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
 
     const path = `/refill/${locale}/${markerData.slug}`;
     //ReactGA.send({ hitType: "pageview", page: path});
-    document.title = `${markerData.name} - mymizu`;
+    document.title = spotTitle(markerData, locale);
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
     setShowCopyCheck(true);
@@ -567,6 +572,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
 
   useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
+    document.documentElement.lang = locale;
   }, [locale]);
 
   useEffect(() => {
@@ -577,7 +583,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
           const res = await axios.get(`/get-refill-spot/${slug}`);
           setCardData(transformCardData(res.data, locale));
           setActiveTapId(res.data.id);
-          document.title = `${res.data.name} - mymizu`;
+          document.title = spotTitle(res.data, locale);
           const newTaps = [];
           let flag = false;
           for (let j = 0; j < taps.length; j++) {

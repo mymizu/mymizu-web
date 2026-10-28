@@ -11,6 +11,7 @@ import {myMizuClient} from "./myMizuClient";
 import { MYMIZU_API_BASE_URL } from "../src/constants";
 import i18nConfig from "../src/i18nConfig";
 import {buildRobotsTxt, getSitemap, isSitemapConfigured} from "./sitemap";
+import {homeMeta, isLanguage, metaForSpot, renderMetaTags, spotFallbackMeta} from "./meta";
 
 const PORT = process.env.PORT || 3000;
 const gmapApiKey = config.gmApiKey;
@@ -323,7 +324,16 @@ const liveReloadScript = LIVE_RELOAD_PORT
 // Both HTML routes render the same shell; this is the shared implementation the
 // duplicated copies used to ask for in a TODO. It also rewrites the bundle tag
 // to the content-hashed URL so the immutable caching above actually applies.
-const renderPage = (res) => {
+// Everything between the markers in public/index.html is the head's meta block.
+// Swapping the whole block keeps the static file self-contained (it carries the
+// defaults) while letting each request substitute its own.
+const META_BLOCK_RE = /[ \t]*<!-- head:meta[\s\S]*?\/head:meta -->/;
+
+// `locale` is the language the page body is rendered in. A refill spot URL
+// names one, and Google indexes that body under the URL's title and
+// description, so /refill/en/... must not come back with a Japanese nav and
+// footer. Pages with no language in the URL keep rendering Japanese.
+const renderPage = (res, meta, locale = "ja") => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
     if (err) {
       console.error(err);
@@ -331,6 +341,10 @@ const renderPage = (res) => {
     }
 
     const html = data
+      .replace("<html>", `<html lang="${locale}">`)
+      // A function, not a string: spot names and comments are user text, and
+      // a "$'" or "$&" in a replacement string would splice in the page.
+      .replace(META_BLOCK_RE, (block) => (meta ? renderMetaTags(meta) : block))
       .replace('src="/bundle.js"', `src="${bundleUrl()}"`)
       .replace(
         '<div id="root"></div>',
@@ -345,6 +359,7 @@ const renderPage = (res) => {
             gmApiKey={gmapApiKey}
             gaTag={gaTag}
             coolingShelters={coolingSheltersEnabled}
+            initialLocale={locale}
           />
         )}</div>
         `
@@ -372,9 +387,23 @@ const renderPage = (res) => {
   });
 };
 
-app.get("/refill/:language/:slug", (req, res) => renderPage(res));
+// The spot's own title and description are built server-side. The client sets
+// document.title too, but only after auth and a fetch have resolved — invisible
+// to social crawlers, which run no JS at all, and slow for search crawlers.
+app.get("/refill/:language/:slug", async (req, res) => {
+  const {language, slug} = req.params;
+  const meta = isLanguage(language) ? await metaForSpot(slug, language) : null;
 
-app.get("/", (req, res) => renderPage(res));
+  // Falls back to the generic map meta if the spot could not be fetched, so a
+  // slow or missing spot never costs us the page.
+  return renderPage(
+    res,
+    meta || spotFallbackMeta(slug, language),
+    isLanguage(language) ? language : undefined
+  );
+});
+
+app.get("/", (req, res) => renderPage(res, homeMeta(getLanguage(req))));
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
