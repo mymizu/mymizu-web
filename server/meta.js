@@ -1,7 +1,7 @@
 import crypto from "crypto";
 
-import config from "./config";
 import { myMizuClient } from "./myMizuClient";
+import { spotTitle } from "../src/utils/spotTitle";
 
 // Canonical origin, matching the share URL in src/utils/transformCardData.js
 // and the sitemap the API generates.
@@ -12,10 +12,18 @@ const SITE_ORIGIN = (process.env.SITE_ORIGIN || "https://map.mymizu.co").replace
 
 const DEFAULT_IMAGE = `${SITE_ORIGIN}/public/mymizu-logo.png`;
 
-// Google truncates around 155-160 characters. Spot detail comes first because
-// it is what makes the page distinct; the line about mymizu is appended and is
-// the part that gets trimmed if a spot has a long name or address.
-const MAX_DESCRIPTION = 158;
+// Google cuts descriptions by display width, not characters: about 155-160
+// characters of English, and roughly 100-120 of Japanese, whose characters are
+// twice as wide. Spot detail comes first because it is what makes the page
+// distinct; the line about mymizu is appended only if it still fits.
+const MAX_DESCRIPTION = { en: 158, ja: 110 };
+
+// Length as Google lays it out. Japanese pages often carry romanised addresses
+// and English comments, so there a half-width character counts as half.
+const displayLength = (text, language) =>
+  language === "ja"
+    ? [...text].reduce((sum, ch) => sum + (ch.codePointAt(0) > 0xff ? 1 : 0.5), 0)
+    : text.length;
 
 // What mymizu is, for people meeting it in a search result or a shared link.
 const TAGLINE = {
@@ -47,10 +55,15 @@ const escapeAttr = (value) =>
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
 
+// Tap::COOLING_SHELTER_CATEGORY_ID (backend) = 6
+const COOLING_SHELTER_CATEGORY_ID = 6;
+
+const oneLine = (text) => String(text || "").replace(/\s+/g, " ").trim();
+
 // Trim to a word boundary rather than mid-word, and only add an ellipsis when
 // something was actually removed.
 const truncate = (text, max) => {
-  const clean = String(text).replace(/\s+/g, " ").trim();
+  const clean = oneLine(text);
   if (clean.length <= max) return clean;
   const cut = clean.slice(0, max - 1);
   const lastSpace = cut.lastIndexOf(" ");
@@ -58,43 +71,107 @@ const truncate = (text, max) => {
   return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).trim() + "…";
 };
 
-/**
- * Spot-specific sentence first, then the mymizu line if it still fits. A page
- * about a particular tap should read as being about that tap.
- */
-const describeSpot = (spot, language) => {
-  const name = spot.name || "";
-  const address = spot.address || "";
-  const water = spot?.grouped_tags?.Water || "";
-
-  let detail;
-  if (language === "ja") {
-    detail = address
-      ? `${name}（${address}）でマイボトルに無料で給水できます。`
-      : `${name}でマイボトルに無料で給水できます。`;
-    if (water) detail += `水の種類：${water}。`;
-  } else {
-    detail = address
-      ? `Free water refill at ${name}, ${address}.`
-      : `Free water refill at ${name}.`;
-    if (water) detail += ` ${water} water.`;
-  }
-
-  const tagline = TAGLINE[language];
-  const joined = `${detail} ${tagline}`;
-
-  // If the spot's own detail already fills the budget, keep that and drop the
-  // tagline rather than truncating the useful half.
-  if (joined.length <= MAX_DESCRIPTION) return joined;
-  if (detail.length >= MAX_DESCRIPTION - 20) return truncate(detail, MAX_DESCRIPTION);
-  return truncate(joined, MAX_DESCRIPTION);
+// End a fragment with the language's full stop, unless it already has one. A
+// fragment that ends in a colon is a heading ("Hours:") cut from what it
+// introduced, so it is dropped.
+const sentence = (text, language) => {
+  const clean = oneLine(text);
+  if (/[:：]$/.test(clean)) return "";
+  if (!clean || /[.!?。！？…]$/.test(clean)) return clean;
+  return clean + (language === "ja" ? "。" : ".");
 };
 
-const titleForSpot = (spot, language) => {
-  const name = spot.name || "";
-  return language === "ja"
-    ? `${name} — 無料給水スポット | mymizu`
-    : `${name} — free water refill spot | mymizu`;
+/**
+ * Where the spot is, short enough to sit next to its name. Addresses come in
+ * two shapes: geocoder output, "13-9, Fukasawa 2 Chome, Umegaoka, Setagaya,
+ * Tokyo Prefecture, Japan", whose last few parts are the area; and Japanese
+ * postal addresses with no commas, "〒144-0041 東京都大田区羽田空港", which are
+ * short and kept whole once the postcode is gone.
+ */
+const areaOf = (spot) => {
+  const address = oneLine(spot.address)
+    // Google Maps style, "日本、〒659-0094 兵庫県…": the country and postcode
+    // add length without saying anything about where the spot is.
+    .replace(/^日本[、,]?\s*/, "")
+    .replace(/〒?\s*\d{3}-\d{4}\s*/g, "")
+    .trim();
+  // Some spots carry their name as the address, which adds nothing.
+  if (!address || address === oneLine(spot.name)) return "";
+
+  const parts = address
+    .split(/\s*,\s*/)
+    // Postcodes and house numbers are noise in a search snippet.
+    .filter((part) => part && !/^[\d\s-]+$/.test(part));
+  return truncate(parts.slice(-3).join(", "), 60);
+};
+
+/**
+ * What the spot offers, from its tags. The API sends them grouped under
+ * localised labels ({"Type of Water": ["Filtered", "Tap"]}, or {"水の種類":
+ * [...]} in Japanese), and an empty array when there are none. The labels are
+ * already in the page's language, so they are used as they come rather than
+ * matched against a list that would go stale when a group is added.
+ */
+const offersOf = (spot, language) => {
+  const groups = spot.grouped_tags;
+  if (!groups || typeof groups !== "object" || Array.isArray(groups)) return [];
+
+  return Object.entries(groups)
+    .filter(([, tags]) => Array.isArray(tags) && tags.length)
+    .map(([label, tags]) =>
+      language === "ja" ? `${label}：${tags.join("、")}` : `${label}: ${tags.join(", ")}`
+    );
+};
+
+/**
+ * Built from the most distinctive detail down: what and where the spot is,
+ * what it offers, how to refill, then how to find it. Each piece is added only
+ * if it fits whole, so a long one is skipped rather than cut mid-sentence and
+ * the shorter ones after it still get their chance. The mymizu line goes last
+ * and only if there is room: a page about a particular tap should read as being
+ * about that tap. Without a description at all, Google built the snippet from
+ * the nav and footer text.
+ */
+const describeSpot = (spot, language) => {
+  const max = MAX_DESCRIPTION[language];
+  const name = oneLine(spot.name);
+  const area = areaOf(spot);
+  const shelter = spot.category_id === COOLING_SHELTER_CATEGORY_ID;
+
+  let lead;
+  if (language === "ja") {
+    const place = area ? `${name}（${area}）` : name;
+    lead = shelter
+      ? `${place}は暑さをしのげるクーリングシェルターです。`
+      : `${place}でマイボトルに無料で給水できます。`;
+  } else {
+    const place = area ? `${name}, ${area}` : name;
+    lead = shelter
+      ? `${place}: a cooling shelter, somewhere to rest out of the heat.`
+      : `Free water refill at ${place}.`;
+  }
+
+  // Location is the purpose-written "how to find it"; older spots only have
+  // the free-text comment, whose first line is usually the same thing.
+  const comment = String(spot.simple_comment || "").split(/\r?\n/)[0];
+  const directions = spot.location || comment;
+
+  const optional = [...offersOf(spot, language), spot.refill_instruction, directions]
+    .map((piece) => sentence(piece, language))
+    .filter(Boolean);
+
+  // Japanese runs sentences together, except after one written in English.
+  const join = (a, b) =>
+    language === "ja" && !/[\x21-\x7e]$/.test(a) ? `${a}${b}` : `${a} ${b}`;
+
+  let description = truncate(lead, max);
+  for (const piece of optional) {
+    const next = join(description, piece);
+    if (displayLength(next, language) <= max) description = next;
+  }
+
+  const withTagline = join(description, TAGLINE[language]);
+  return displayLength(withTagline, language) <= max ? withTagline : description;
 };
 
 export const homeMeta = (language) => {
@@ -108,6 +185,17 @@ export const homeMeta = (language) => {
   };
 };
 
+const spotUrl = (slug, language) =>
+  `${SITE_ORIGIN}/refill/${language}/${encodeURIComponent(slug)}`;
+
+// Matches the hreflang set the sitemap declares for every spot, x-default
+// included, so the two do not disagree about which page is which.
+const spotAlternates = (slug) =>
+  [...LANGUAGES, "x-default"].map((alt) => ({
+    language: alt,
+    href: spotUrl(slug, alt === "x-default" ? "en" : alt),
+  }));
+
 export const spotMeta = (spot, language, slug) => {
   const l = lang(language);
   const photo = Array.isArray(spot?.photos)
@@ -115,15 +203,27 @@ export const spotMeta = (spot, language, slug) => {
     : null;
 
   return {
-    title: titleForSpot(spot, l),
+    title: spotTitle(spot, l),
     description: describeSpot(spot, l),
     language: l,
-    canonical: `${SITE_ORIGIN}/refill/${l}/${encodeURIComponent(slug)}`,
+    canonical: spotUrl(slug, l),
     image: photo ? photo.url : DEFAULT_IMAGE,
-    alternates: LANGUAGES.map((alt) => ({
-      language: alt,
-      href: `${SITE_ORIGIN}/refill/${alt}/${encodeURIComponent(slug)}`,
-    })),
+    alternates: spotAlternates(slug),
+  };
+};
+
+/**
+ * For a spot page whose spot could not be fetched: the map's own title and
+ * description, but still canonical to the spot URL. Pointing it at the home
+ * page instead would tell Google, on any crawl that hit a slow API, that the
+ * spot page is a duplicate of the map and can be dropped from the index.
+ */
+export const spotFallbackMeta = (slug, language) => {
+  if (!isLanguage(language)) return homeMeta(language);
+  return {
+    ...homeMeta(language),
+    canonical: spotUrl(slug, language),
+    alternates: spotAlternates(slug),
   };
 };
 
@@ -233,6 +333,12 @@ export const metaForSpot = async (slug, language) => {
     rememberSpot(key, meta);
     return meta;
   } catch (error) {
+    // The token is held for the life of the process. If the API stops
+    // accepting it, mint a new one next time instead of serving the generic
+    // meta on every spot page until the next deploy.
+    const status = error?.response?.status;
+    if (status === 401 || status === 403) tokenPromise = null;
+
     // A missing or slow spot must not cost us the page.
     console.warn(`Could not build meta for refill spot "${slug}":`, error.message);
     return null;

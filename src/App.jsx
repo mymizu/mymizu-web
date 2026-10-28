@@ -11,6 +11,7 @@ import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
 import { fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
 import getSlug from "./utils/getSlug";
+import { spotTitle } from "./utils/spotTitle";
 import { Marker } from "./components/Marker";
 import { ClusterMarker } from "./components/ClusterMarker";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
@@ -447,7 +448,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
 
     const path = `/refill/${locale}/${markerData.slug}`;
     //ReactGA.send({ hitType: "pageview", page: path});
-    document.title = `${markerData.name} - mymizu`;
+    document.title = spotTitle(markerData, locale);
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
     setShowCopyCheck(true);
@@ -577,7 +578,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
           const res = await axios.get(`/get-refill-spot/${slug}`);
           setCardData(transformCardData(res.data, locale));
           setActiveTapId(res.data.id);
-          document.title = `${res.data.name} - mymizu`;
+          document.title = spotTitle(res.data, locale);
           const newTaps = [];
           let flag = false;
           for (let j = 0; j < taps.length; j++) {

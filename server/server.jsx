@@ -11,7 +11,7 @@ import {myMizuClient} from "./myMizuClient";
 import { MYMIZU_API_BASE_URL } from "../src/constants";
 import i18nConfig from "../src/i18nConfig";
 import {buildRobotsTxt, getSitemap, isSitemapConfigured} from "./sitemap";
-import {homeMeta, isLanguage, metaForSpot, renderMetaTags} from "./meta";
+import {homeMeta, isLanguage, metaForSpot, renderMetaTags, spotFallbackMeta} from "./meta";
 
 const PORT = process.env.PORT || 3000;
 const gmapApiKey = config.gmApiKey;
@@ -388,7 +388,7 @@ app.get("/refill/:language/:slug", async (req, res) => {
 
   // Falls back to the generic map meta if the spot could not be fetched, so a
   // slow or missing spot never costs us the page.
-  return renderPage(res, meta || homeMeta(language));
+  return renderPage(res, meta || spotFallbackMeta(slug, language));
 });
 
 app.get("/", (req, res) => renderPage(res, homeMeta(getLanguage(req))));
