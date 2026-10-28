@@ -88,7 +88,9 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   // What had focus when a spot was opened from the map (usually its marker),
   // so closing the card can return focus there. See handleCloseModal.
   const cardOpenerRef = useRef(null);
-  const [focusCard, setFocusCard] = useState(false);
+  // Counts spots opened from the map; the card takes focus each time it
+  // changes, including for the spot that is already open. 0 = leave focus.
+  const [focusCard, setFocusCard] = useState(0);
 
   const queuedTapsRequestRef = useRef(null);
   const ongoingTapsRequestRef = useRef(null);
@@ -467,7 +469,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
 
     const path = `/refill/${locale}/${markerData.slug}`;
     cardOpenerRef.current = document.activeElement;
-    setFocusCard(true);
+    setFocusCard((n) => n + 1);
     //ReactGA.send({ hitType: "pageview", page: path});
     document.title = spotTitle(markerData, locale);
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
@@ -483,7 +485,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   const handleCloseModal = (event) => {
     const opener = cardOpenerRef.current;
     cardOpenerRef.current = null;
-    setFocusCard(false);
+    setFocusCard(0);
     setCardData(null);
     setShowShareModal(false);
     setActiveTapId(null);

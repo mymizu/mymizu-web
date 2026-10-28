@@ -6,10 +6,10 @@ import BackButton from "./Buttons/BackButton";
 import { checkViewPort } from "../helpers";
 import classnames from "classnames";
 
-// focusOnOpen: move focus to the card's heading when it opens or shows a
-// different spot, so keyboard and screen reader users land in it. Set when a
-// spot is opened from the map; a card that opens with the page leaves focus
-// where the browser puts it.
+// focusOnOpen: move focus to the card's heading each time this changes to a
+// non-zero value, so keyboard and screen reader users land in the card. App
+// bumps it whenever a spot is opened from the map; a card that opens with
+// the page (0) leaves focus where the browser puts it.
 export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp, setShareModal, focusOnOpen }) => {
   const { group } = checkViewPort();
 
@@ -33,7 +33,7 @@ export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp, setShareModa
     if (focusOnOpen) {
       document.getElementById(SPOT_TITLE_ID)?.focus({ preventScroll: true });
     }
-  }, [cardData?.id]);
+  }, [focusOnOpen]);
 
   return (
     <section
