@@ -19,6 +19,7 @@ import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
 import { CategoryFilter } from "./components/CategoryFilter";
+import { SpotList } from "./components/SpotList";
 import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
 import classnames from "classnames";
@@ -884,6 +885,14 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
           <div className="loading-indicator">&nbsp;</div>
         )}
       </div>
+      {/* The spots on the map as a list, for anyone who can't use the map. */}
+      <SpotList
+        taps={visibleTaps}
+        bounds={mapBounds}
+        zoom={zoom}
+        locale={locale}
+        onOpen={(tap) => onMarkerClick(tap.id, { tap })}
+      />
       <div className="container-lg">
         {userToken && <Metrics />}
         <FunFacts />
