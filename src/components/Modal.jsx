@@ -22,6 +22,7 @@ export const Modal = ({ onClose, cardData, isSlideUp, setIsSlideUp, setShareModa
       }
     }
     document.addEventListener("keydown", handleEscape);
+    return () => document.removeEventListener("keydown", handleEscape);
   }, []);
 
   return (

@@ -74,7 +74,6 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   const [requestsInProgress, setRequestsInProgress] = useState([]);
   const [isSlideUp, setIsSlideUp] = useState(true);
   const [userToken, setUserToken] = useState(null);
-  const [showCopyCheck, setShowCopyCheck] = useState(true);
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
   const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
@@ -467,13 +466,13 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     document.title = spotTitle(markerData, locale);
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
-    setShowCopyCheck(true);
     setActiveTapId(markerData.id);
     setCenter({ lat: markerData.latitude, lng: markerData.longitude });
   };
 
   const handleCloseModal = () => {
     setCardData(null);
+    setShowShareModal(false);
     setActiveTapId(null);
   };
 
@@ -851,12 +850,12 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
               setIsSlideUp={setIsSlideUp}
               setShareModal={setShowShareModal}
             />
-            {showShareModal ? (
-              <div className="share-modal-container">
-                <ShareModal data={cardData} setShareModal={setShowShareModal} setShowCopyCheck={setShowCopyCheck} showCopyCheck={showCopyCheck}/>
-              </div>
-            ) : (
-              ""
+            {showShareModal && (
+              <ShareModal
+                key={cardData.id}
+                data={cardData}
+                onClose={() => setShowShareModal(false)}
+              />
             )}
           </div>
         )}
