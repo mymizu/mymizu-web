@@ -235,6 +235,10 @@ export const spotMeta = (spot, language, slug) => {
     canonical: spotUrl(slug, l),
     image,
     imageAlt: oneLine(spot.name),
+    // The payload itself, for the page to hand to the browser (see
+    // renderPage), so the spot card does not wait on a token and a second
+    // fetch of what the server already has.
+    spot,
     alternates: spotAlternates(slug),
   };
 };

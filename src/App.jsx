@@ -590,40 +590,58 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     document.documentElement.lang = locale;
   }, [locale]);
 
+  // Opens the card for the spot a /refill/... URL names, and centres the map
+  // on it.
+  const showInitialSpot = (data) => {
+    setCardData(transformCardData(data, locale));
+    setActiveTapId(data.id);
+    document.title = spotTitle(data, locale);
+    setTaps((currentTaps) =>
+      currentTaps.some((tap) => tap.id === data.id)
+        ? currentTaps
+        : [...currentTaps, data]
+    );
+    setCenter({
+      lat: data?.latitude ?? gmDefaultProps.center.lat,
+      lng: data?.longitude ?? gmDefaultProps.center.lng,
+    });
+    setZoom(16);
+  };
+
+  // The server puts the spot in the page (window.__SPOT__), so the card and
+  // the map's starting position no longer wait for a token and a second fetch.
+  // Run in the same pass as the locale effect, the map mounts already centred
+  // on the spot, rather than loading the default view's tiles and then
+  // moving. Without the inline copy (an old cached page, a failed lookup) it
+  // is fetched once the token is there, as before.
+  const initialSpotRef = useRef(false);
   useEffect(() => {
-    if (userToken) {
-      const load = async () => {
-        const slug = getSlug(REFILL_SPOT_ROUTE);
-        if (slug) {
-          const res = await axios.get(`/get-refill-spot/${slug}`);
-          setCardData(transformCardData(res.data, locale));
-          setActiveTapId(res.data.id);
-          document.title = spotTitle(res.data, locale);
-          const newTaps = [];
-          let flag = false;
-          for (let j = 0; j < taps.length; j++) {
-            if (res.data.id === taps[j].id) {
-              flag = true;
-              break;
-            }
-          }
-          if (!flag) {
-            newTaps.push(res.data);
-          }
-          setTaps((currentTaps) => [...currentTaps, ...newTaps]);
+    if (initialSpotRef.current) return;
+    const slug = getSlug(REFILL_SPOT_ROUTE);
+    if (!slug) return;
 
-          setInitialLoad(true);
-
-          setCenter({
-            lat: res?.data?.latitude ?? gmDefaultProps.center.lat,
-            lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
-          });
-          setZoom(16);
-        }
-      };
-      load();
+    const inline = window.__SPOT__;
+    if (inline && inline.slug === slug) {
+      initialSpotRef.current = true;
+      showInitialSpot(inline);
+      return;
     }
+    if (!userToken) return;
+
+    initialSpotRef.current = true;
+    axios
+      .get(`/get-refill-spot/${slug}`)
+      .then((res) => showInitialSpot(res.data))
+      .catch((e) => console.log("error fetching refill spot", e));
   }, [userToken]);
+
+  // Marker requests carry the token, so the first load still waits for it,
+  // and for the spot to be on the map.
+  useEffect(() => {
+    if (initialSpotRef.current && userToken && cardData) {
+      setInitialLoad(true);
+    }
+  }, [userToken, cardData]);
 
   const visibleTaps = useMemo(() => {
     if (categoryFilter === "cooling") {

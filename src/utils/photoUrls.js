@@ -7,6 +7,15 @@ import { MYMIZU_API_BASE_URL } from "../constants";
 // larger than the original, so these are the only widths worth offering.
 export const PHOTO_WIDTHS = [320, 480, 640, 960, 1280];
 
+// How wide the card draws a photo, mirroring main.css: the card fills the
+// screen in the phone layout (the min/max-device-width block) and is 360px
+// wide everywhere else. The browser uses this with the pixel ratio to choose
+// from the srcset, e.g. 480w on a 1x desktop, 960w on a 2x one, and 960w or
+// 1280w on a 2x or 3x phone. Shared with the server, which preloads the first
+// photo of a spot page with the same sizes so the browser picks the same file.
+export const PHOTO_SIZES =
+  "(min-device-width: 375px) and (max-device-width: 812px) 100vw, 360px";
+
 // The photo at about `width` pixels wide. A photo without an id keeps its own
 // url, as it isn't one the API can resize.
 export const photoUrlForWidth = (photo, width) => {
