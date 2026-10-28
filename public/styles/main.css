@@ -420,7 +420,9 @@ footer .nav-link i {
   background-color: white;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   overflow: hidden;
-  width: 360px;
+  /* Narrower than 360px only when the window is: a 320px-wide view (400%
+     zoom) would otherwise scroll sideways. */
+  width: min(360px, calc(100vw - 32px));
   color: #666666;
   overflow-y: scroll;
   position: relative;
@@ -670,8 +672,12 @@ footer .nav-link i {
   padding: 10px 0;
 }
 
-/* Portrait and Landscape */
-@media only screen
+/* The phone layout. Phones, portrait and landscape, by device width as
+   before; and any window up to 600px wide, which device width never sees: a
+   desktop browser zoomed to 400% is 320 CSS px wide, and a phone narrower than
+   375px. Keep PHOTO_SIZES in src/utils/photoUrls.js in step. */
+@media only screen and (max-width: 600px),
+only screen
 and (min-device-width: 375px)
 and (max-device-width: 812px) {
 
