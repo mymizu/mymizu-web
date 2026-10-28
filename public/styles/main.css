@@ -1114,4 +1114,11 @@ and (max-device-width: 812px) {
     animation: none;
     transition: none;
   }
+
+  /* A still bar across the top of the map, rather than one sliding past. */
+  .loading-indicator {
+    animation: none;
+    left: 0;
+    opacity: 0.6;
+  }
 }

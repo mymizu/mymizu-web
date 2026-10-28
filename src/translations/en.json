@@ -55,6 +55,8 @@
   "categoryFilter.water": "Water Stations",
   "categoryFilter.coolingShelter": "Cooling Shelters",
   "results.nearbyCoolingShelters": "Nearby cooling shelters",
+  "categoryFilter.label": "Show on the map",
+  "metrics.label": "What the mymizu community has saved",
   "results.nearbyWaterStations": "Nearby water stations",
   "results.aroundPlace": "Results around {place}"
 }

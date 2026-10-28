@@ -49,7 +49,14 @@ const Metrics = () => {
   }, [stats]);
 
   return stats && (
-    <div className="metrics">
+    // It scrolls sideways when narrow, so it is a Tab stop (to scroll it with
+    // the arrow keys) and needs a name to go with that.
+    <div
+      className="metrics"
+      role="region"
+      tabIndex={0}
+      aria-label={intl.formatMessage({ id: "metrics.label" })}
+    >
       <Metric
         background="ocean"
         label={"metrics.bottle"}

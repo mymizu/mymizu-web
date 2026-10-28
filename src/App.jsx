@@ -96,6 +96,11 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     if (!googleMapFn?.map || !googleMapFn?.maps || !target) {
       return false;
     }
+    // Someone who has asked for less motion gets the target view at once:
+    // returning false makes the caller set it directly.
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
+      return false;
+    }
     const { map, maps } = googleMapFn;
 
     const stepZoom = (current) => {
