@@ -100,11 +100,16 @@ app.use(
       // the revalidation round trips, short enough that a swapped-in asset
       // still lands without a rename.
       const longLived = /\.(png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot)$/i;
+      // public/vendor/<name>-<version>/ never changes in place: a new version
+      // is a new directory.
+      const versioned = /[\\/]vendor[\\/][^\\/]+-\d[^\\/]*[\\/]/;
       res.setHeader(
         "Cache-Control",
-        longLived.test(filePath)
-          ? "public, max-age=604800"
-          : "public, max-age=3600"
+        versioned.test(filePath)
+          ? "public, max-age=31536000, immutable"
+          : longLived.test(filePath)
+            ? "public, max-age=604800"
+            : "public, max-age=3600"
       );
     },
   })
