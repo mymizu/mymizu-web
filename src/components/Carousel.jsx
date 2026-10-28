@@ -1,15 +1,7 @@
 import React, { useState } from "react";
 import ArrowButton from "./Buttons/ArrowButton";
 import classnames from "classnames";
-import { photoSrcSet, photoUrlForWidth } from "../utils/photoUrls";
-
-// How wide the card draws a photo, mirroring main.css: the card fills the
-// screen in the phone layout (the min/max-device-width block) and is 360px
-// wide everywhere else. The browser uses this with the pixel ratio to choose
-// from the srcset, e.g. 480w on a 1x desktop, 960w on a 2x one, and 960w or
-// 1280w on a 2x or 3x phone.
-const PHOTO_SIZES =
-  "(min-device-width: 375px) and (max-device-width: 812px) 100vw, 360px";
+import { PHOTO_SIZES, photoSrcSet, photoUrlForWidth } from "../utils/photoUrls";
 
 // One spot photo, at the size the card draws it. If the sized url fails, it
 // falls back once to the original url. Keyed by photo id by the caller, so

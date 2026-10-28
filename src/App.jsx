@@ -12,6 +12,7 @@ import { useLang } from "./utils/useLang";
 import { fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
 import getSlug from "./utils/getSlug";
 import { spotTitle } from "./utils/spotTitle";
+import { SocialIcon } from "./components/SocialIcon";
 import { Marker } from "./components/Marker";
 import { ClusterMarker } from "./components/ClusterMarker";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
@@ -79,6 +80,10 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [clusterTree, setClusterTree] = useState(null);
+  // Set once the first map tiles have drawn. The cluster tree waits for it:
+  // see the effect that fetches it.
+  const [mapPainted, setMapPainted] = useState(false);
+  const clustersRequestedRef = useRef(false);
   const [mapBounds, setMapBounds] = useState(null);
   const [activeTapId, setActiveTapId] = useState(null);
 
@@ -230,9 +235,9 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   ];
 
   const socialNav = [
-    { href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram" },
-    { href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook" },
-    { href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter" },
+    { href: "https://www.instagram.com/mymizu.co/", icon: "instagram", label: "Instagram" },
+    { href: "https://www.facebook.com/mymizu.co/", icon: "facebook", label: "Facebook" },
+    { href: "https://www.twitter.com/mymizuco/", icon: "twitter", label: "Twitter" },
   ];
 
   const footerNav = [
@@ -389,6 +394,8 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
       });
       setClusterTree(res.data);
     } catch (e) {
+      // Let the next zoom or pan try again.
+      clustersRequestedRef.current = false;
       console.log("error fetching clusters", e);
     }
   };
@@ -412,9 +419,14 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   };
 
   const enqueueTapsRequest = (region) => {
+    // Queued before the state updates: called from a Maps event, outside
+    // React's batching, each setState re-renders synchronously and runs any
+    // pending effects. If one of those sets initialLoad, its replay must
+    // already find these bounds, or they are dropped (this closure's
+    // initialLoad is the old one) and the map shows no taps.
+    queuedTapsRequestRef.current = region.bounds;
     setZoom(region.zoom);
     setMapBounds(region.bounds);
-    queuedTapsRequestRef.current = region.bounds;
     fetchQueuedTapsRequestIfAllowed();
   };
 
@@ -564,51 +576,93 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     }
   }, [initialLoad]);
 
+  // "Tiles loaded" means fetched, not yet drawn: the map still fades them in,
+  // and the main thread may be busy. Starting the 3.5MB download then still
+  // put it in front of the paint on a slow phone, so wait until the browser
+  // is idle as well (with a cap, so a page that never idles still gets it).
+  const onFirstTilesLoaded = () => {
+    if (mapPainted) return;
+    const whenIdle =
+      window.requestIdleCallback || ((fn) => setTimeout(fn, 1000));
+    whenIdle(() => {
+      setMapPainted(true);
+      // Tells the page's analytics snippet it can load now (server.jsx).
+      window.dispatchEvent(new window.Event("mymizu:map-painted"));
+    }, { timeout: 3000 });
+  };
+
+  // The cluster tree is every cluster at every level: ~3.5MB compressed and
+  // ~16MB of JSON to parse. Fetched at page load it shared the connection
+  // with the map tiles and then held the main thread while it was parsed, so
+  // on a phone the map (the largest paint) waited for it. It is now asked for
+  // only once the first tiles have drawn, and only when the map is zoomed out
+  // far enough to show clusters: a refill spot page opens at street level,
+  // where it shows individual taps and never needs the tree unless the
+  // visitor zooms out.
   useEffect(() => {
-    if (userToken) {
-      fetchClusters();
-    }
-  }, [userToken]);
+    if (clusterTree || clustersRequestedRef.current) return;
+    if (!mapPainted || !shouldShowClusters(zoom)) return;
+    clustersRequestedRef.current = true;
+    fetchClusters();
+  }, [mapPainted, zoom, clusterTree]);
 
   useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
     document.documentElement.lang = locale;
   }, [locale]);
 
+  // Opens the card for the spot a /refill/... URL names, and centres the map
+  // on it.
+  const showInitialSpot = (data) => {
+    setCardData(transformCardData(data, locale));
+    setActiveTapId(data.id);
+    document.title = spotTitle(data, locale);
+    setTaps((currentTaps) =>
+      currentTaps.some((tap) => tap.id === data.id)
+        ? currentTaps
+        : [...currentTaps, data]
+    );
+    setCenter({
+      lat: data?.latitude ?? gmDefaultProps.center.lat,
+      lng: data?.longitude ?? gmDefaultProps.center.lng,
+    });
+    setZoom(16);
+  };
+
+  // The server puts the spot in the page (window.__SPOT__), so the card and
+  // the map's starting position no longer wait for a token and a second fetch.
+  // Run in the same pass as the locale effect, the map mounts already centred
+  // on the spot, rather than loading the default view's tiles and then
+  // moving. Without the inline copy (an old cached page, a failed lookup) it
+  // is fetched once the token is there, as before.
+  const initialSpotRef = useRef(false);
   useEffect(() => {
-    if (userToken) {
-      const load = async () => {
-        const slug = getSlug(REFILL_SPOT_ROUTE);
-        if (slug) {
-          const res = await axios.get(`/get-refill-spot/${slug}`);
-          setCardData(transformCardData(res.data, locale));
-          setActiveTapId(res.data.id);
-          document.title = spotTitle(res.data, locale);
-          const newTaps = [];
-          let flag = false;
-          for (let j = 0; j < taps.length; j++) {
-            if (res.data.id === taps[j].id) {
-              flag = true;
-              break;
-            }
-          }
-          if (!flag) {
-            newTaps.push(res.data);
-          }
-          setTaps((currentTaps) => [...currentTaps, ...newTaps]);
+    if (initialSpotRef.current) return;
+    const slug = getSlug(REFILL_SPOT_ROUTE);
+    if (!slug) return;
 
-          setInitialLoad(true);
-
-          setCenter({
-            lat: res?.data?.latitude ?? gmDefaultProps.center.lat,
-            lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
-          });
-          setZoom(16);
-        }
-      };
-      load();
+    const inline = window.__SPOT__;
+    if (inline && inline.slug === slug) {
+      initialSpotRef.current = true;
+      showInitialSpot(inline);
+      return;
     }
+    if (!userToken) return;
+
+    initialSpotRef.current = true;
+    axios
+      .get(`/get-refill-spot/${slug}`)
+      .then((res) => showInitialSpot(res.data))
+      .catch((e) => console.log("error fetching refill spot", e));
   }, [userToken]);
+
+  // Marker requests carry the token, so the first load still waits for it,
+  // and for the spot to be on the map.
+  useEffect(() => {
+    if (initialSpotRef.current && userToken && cardData) {
+      setInitialLoad(true);
+    }
+  }, [userToken, cardData]);
 
   const visibleTaps = useMemo(() => {
     if (categoryFilter === "cooling") {
@@ -740,6 +794,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
           onChange={enqueueTapsRequest}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
+          onTilesLoaded={onFirstTilesLoaded}
           onGoogleApiLoaded={({map, maps}) => {
             setGoogleMapFn(googleMapAPI(map, maps));
           }}
@@ -840,8 +895,8 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
             <ul className="nav justify-content-center">
               {socialNav.map((el, i) => (
                 <li className="nav-item" key={i}>
-                  <a href={el.href} className="nav-link px-2 text-muted">
-                    <i className={`bi ${el.iconName}`} />
+                  <a href={el.href} className="nav-link px-2 text-muted" aria-label={el.label}>
+                    <SocialIcon name={el.icon} />
                   </a>
                 </li>
               ))}

@@ -9,6 +9,7 @@ import config, { coolingSheltersEnabled } from "./config";
 import {App} from "../src/App";
 import {myMizuClient} from "./myMizuClient";
 import { MYMIZU_API_BASE_URL } from "../src/constants";
+import { PHOTO_SIZES, photoSrcSet, photoUrlForWidth } from "../src/utils/photoUrls";
 import i18nConfig from "../src/i18nConfig";
 import {buildRobotsTxt, getSitemap, isSitemapConfigured} from "./sitemap";
 import {homeMeta, isLanguage, metaForSpot, renderMetaTags, spotFallbackMeta} from "./meta";
@@ -99,11 +100,16 @@ app.use(
       // the revalidation round trips, short enough that a swapped-in asset
       // still lands without a rename.
       const longLived = /\.(png|jpe?g|gif|svg|webp|ico|woff2?|ttf|eot)$/i;
+      // public/vendor/<name>-<version>/ never changes in place: a new version
+      // is a new directory.
+      const versioned = /[\\/]vendor[\\/][^\\/]+-\d[^\\/]*[\\/]/;
       res.setHeader(
         "Cache-Control",
-        longLived.test(filePath)
-          ? "public, max-age=604800"
-          : "public, max-age=3600"
+        versioned.test(filePath)
+          ? "public, max-age=31536000, immutable"
+          : longLived.test(filePath)
+            ? "public, max-age=604800"
+            : "public, max-age=3600"
       );
     },
   })
@@ -338,6 +344,34 @@ const DEFAULT_LOCALE = "ja";
 // names one, and Google indexes that body under the URL's title and
 // description, so /refill/en/... must not come back with a Japanese nav and
 // footer. Pages with no language in the URL keep rendering Japanese.
+// JSON in a <script>: "<" is escaped so no value can close the tag, and
+// U+2028/U+2029 because they end a line in older JS parsers.
+const scriptJson = (value) =>
+  JSON.stringify(value)
+    .replace(/</g, "\\u003c")
+    .replace(/\u2028/g, "\\u2028")
+    .replace(/\u2029/g, "\\u2029");
+
+const escapeAttr = (value) =>
+  String(value).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+
+// On a refill spot page the photo in the spot card is the largest paint. The
+// browser would only find it after the bundle has run and the card rendered,
+// so the first photo is preloaded from the head with the card's own srcset and
+// sizes (the browser then picks the same file the <img> will ask for), and the
+// connection to the bucket the photo routes redirect to is opened early.
+const spotHead = (spot) => {
+  const photo = Array.isArray(spot?.photos) ? spot.photos[0] : null;
+  if (!photo) return "";
+  if (!photo.id) {
+    return `  <link rel="preload" as="image" href="${escapeAttr(photo.url)}">\n`;
+  }
+  return `  <link rel="preconnect" href="https://mymizu-static.s3-ap-northeast-1.amazonaws.com">
+  <link rel="preload" as="image" href="${escapeAttr(photoUrlForWidth(photo, 640))}" imagesrcset="${escapeAttr(
+    photoSrcSet(photo)
+  )}" imagesizes="${escapeAttr(PHOTO_SIZES)}">\n`;
+};
+
 const renderPage = (res, meta, locale = DEFAULT_LOCALE) => {
   fs.readFile(path.resolve("./public/index.html"), "utf8", (err, data) => {
     if (err) {
@@ -350,15 +384,21 @@ const renderPage = (res, meta, locale = DEFAULT_LOCALE) => {
       // A function, not a string: spot names and comments are user text, and
       // a "$'" or "$&" in a replacement string would splice in the page.
       .replace(META_BLOCK_RE, (block) => (meta ? renderMetaTags(meta) : block))
+      .replace("</head>", () => `${spotHead(meta?.spot)}</head>`)
       .replace('src="/bundle.js"', `src="${bundleUrl()}"`)
+      // A function for the same reason: the spot payload below is user text.
       .replace(
         '<div id="root"></div>',
-        `
+        () => `
         <script>window.__GM_API_KEY__=${JSON.stringify(gmapApiKey)}</script>
         <script>window.__GA_TAG__=${JSON.stringify(gaTag)}</script>
         <script>window.__COOLING_SHELTERS__=${JSON.stringify(
           coolingSheltersEnabled
-        )}</script>
+        )}</script>${
+          // The spot this page is about, as /get-refill-spot would return it,
+          // so the card opens as soon as the page hydrates.
+          meta?.spot ? `\n        <script>window.__SPOT__=${scriptJson(meta.spot)}</script>` : ""
+        }
         <div id="root">${ReactDOMServer.renderToString(
           <App
             gmApiKey={gmapApiKey}
@@ -372,14 +412,31 @@ const renderPage = (res, meta, locale = DEFAULT_LOCALE) => {
       .replace(
         '<div id="ga"></div>',
         `
-        <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=${gaTag}"></script>
+        <!-- Google tag (gtag.js). The commands queue in dataLayer straight
+             away, but the 170KB library is only fetched once the map has
+             drawn (the app fires "mymizu:map-painted"), or after 8s if it
+             never does, so it no longer shares a phone's connection with the
+             bundle, the Maps script, the tiles and the spot photo. -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){window.dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', '${gaTag}');
+  gtag('config', ${JSON.stringify(gaTag)});
+
+  (function () {
+    var loaded = false;
+    function load() {
+      if (loaded) return;
+      loaded = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(${JSON.stringify(gaTag)});
+      document.head.appendChild(s);
+    }
+    window.addEventListener('mymizu:map-painted', load);
+    setTimeout(load, 8000);
+  })();
 </script>
         `
       )
