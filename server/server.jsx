@@ -412,14 +412,31 @@ const renderPage = (res, meta, locale = DEFAULT_LOCALE) => {
       .replace(
         '<div id="ga"></div>',
         `
-        <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=${gaTag}"></script>
+        <!-- Google tag (gtag.js). The commands queue in dataLayer straight
+             away, but the 170KB library is only fetched once the map has
+             drawn (the app fires "mymizu:map-painted"), or after 8s if it
+             never does, so it no longer shares a phone's connection with the
+             bundle, the Maps script, the tiles and the spot photo. -->
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){window.dataLayer.push(arguments);}
   gtag('js', new Date());
 
-  gtag('config', '${gaTag}');
+  gtag('config', ${JSON.stringify(gaTag)});
+
+  (function () {
+    var loaded = false;
+    function load() {
+      if (loaded) return;
+      loaded = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(${JSON.stringify(gaTag)});
+      document.head.appendChild(s);
+    }
+    window.addEventListener('mymizu:map-painted', load);
+    setTimeout(load, 8000);
+  })();
 </script>
         `
       )

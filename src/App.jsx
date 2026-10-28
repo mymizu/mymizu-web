@@ -579,7 +579,11 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     if (mapPainted) return;
     const whenIdle =
       window.requestIdleCallback || ((fn) => setTimeout(fn, 1000));
-    whenIdle(() => setMapPainted(true), { timeout: 3000 });
+    whenIdle(() => {
+      setMapPainted(true);
+      // Tells the page's analytics snippet it can load now (server.jsx).
+      window.dispatchEvent(new Event("mymizu:map-painted"));
+    }, { timeout: 3000 });
   };
 
   // The cluster tree is every cluster at every level: ~3.5MB compressed and
