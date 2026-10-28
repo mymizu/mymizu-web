@@ -29,7 +29,6 @@
   <link rel="preconnect" href="https://maps.gstatic.com" crossorigin>
   <link rel="dns-prefetch" href="https://maps.googleapis.com">
   <link rel="dns-prefetch" href="https://maps.gstatic.com">
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
   <!-- The logo is the first contentful paint, so fetch it alongside the CSS
        rather than waiting for the parser to reach the navbar markup. -->
@@ -41,13 +40,6 @@
        of it could arrive. Same files as the CDN's (the integrity hashes match
        theirs); the versioned path is cached for a year. -->
   <link rel="stylesheet" href="/public/vendor/bootstrap-5.1.3/bootstrap.min.css">
-
-  <!-- bootstrap-icons is 11KB of render-blocking CSS from a third-party origin,
-       used for three social icons in the footer — below the fold on every
-       viewport. Load it without blocking the first paint. The <noscript> keeps
-       it working when JS is unavailable. -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css" media="print" onload="this.media='all';this.onload=null">
-  <noscript><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css"></noscript>
 
   <link rel="stylesheet" href="/public/styles/main.css">
   <link rel="stylesheet" href="/public/styles/metrics.css">

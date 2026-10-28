@@ -12,6 +12,7 @@ import { useLang } from "./utils/useLang";
 import { fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
 import getSlug from "./utils/getSlug";
 import { spotTitle } from "./utils/spotTitle";
+import { SocialIcon } from "./components/SocialIcon";
 import { Marker } from "./components/Marker";
 import { ClusterMarker } from "./components/ClusterMarker";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
@@ -234,9 +235,9 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   ];
 
   const socialNav = [
-    { href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram" },
-    { href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook" },
-    { href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter" },
+    { href: "https://www.instagram.com/mymizu.co/", icon: "instagram", label: "Instagram" },
+    { href: "https://www.facebook.com/mymizu.co/", icon: "facebook", label: "Facebook" },
+    { href: "https://www.twitter.com/mymizuco/", icon: "twitter", label: "Twitter" },
   ];
 
   const footerNav = [
@@ -885,8 +886,8 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
             <ul className="nav justify-content-center">
               {socialNav.map((el, i) => (
                 <li className="nav-item" key={i}>
-                  <a href={el.href} className="nav-link px-2 text-muted">
-                    <i className={`bi ${el.iconName}`} />
+                  <a href={el.href} className="nav-link px-2 text-muted" aria-label={el.label}>
+                    <SocialIcon name={el.icon} />
                   </a>
                 </li>
               ))}
