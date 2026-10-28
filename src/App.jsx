@@ -419,9 +419,14 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   };
 
   const enqueueTapsRequest = (region) => {
+    // Queued before the state updates: called from a Maps event, outside
+    // React's batching, each setState re-renders synchronously and runs any
+    // pending effects. If one of those sets initialLoad, its replay must
+    // already find these bounds, or they are dropped (this closure's
+    // initialLoad is the old one) and the map shows no taps.
+    queuedTapsRequestRef.current = region.bounds;
     setZoom(region.zoom);
     setMapBounds(region.bounds);
-    queuedTapsRequestRef.current = region.bounds;
     fetchQueuedTapsRequestIfAllowed();
   };
 
