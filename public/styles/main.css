@@ -1,8 +1,3 @@
-/* Colour: the brand blue #2F97D1 is for icons, pins, borders and fills. As
-   text it is under 4.5:1 on white (3.25:1) and on the light blue #E6F4FD
-   (2.89:1), so blue text uses #1A6FA0 (5.5:1 and 4.9:1). White text on a blue
-   fill uses #1F78AB (4.85:1), like the share dialog's buttons. */
-
 .navbar {
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   z-index: 1;
@@ -91,7 +86,7 @@ img#logo {
 
 .nav-link {
   margin-right: 10px;
-  color: #1A6FA0;
+  color: #2F97D1;
 }
 
 .nav-item.lang-selector .nav-link {
@@ -331,7 +326,7 @@ img#logo {
   padding: 14px 20px 14px 16px;
   line-height: 20px;
   font-size: 1.05rem;
-  color: #1A6FA0;
+  color: #2F97D1;
   cursor: pointer;
   text-align: left;
 }
@@ -378,7 +373,7 @@ img#logo {
 
 .cluster-marker-all,
 .cluster-marker-water {
-  background-color: #1F78AB;
+  background-color: #2F97D1;
 }
 
 .cluster-marker-cooling {
@@ -405,7 +400,7 @@ img#logo {
 .facts {
   text-align: center;
   margin-bottom: 60px;
-  color: #1A6FA0;
+  color: #2F97D1;
 }
 
 .footer {
@@ -427,7 +422,7 @@ footer .nav-link {
   margin: 0 10px;
   padding-left: 0;
   padding-right: 0;
-  color: #1A6FA0;
+  color: #2F97D1;
 }
 
 footer .nav-link i {
@@ -716,7 +711,7 @@ footer .nav-link i {
   font-weight: 400;
   font-size: 16px;
   line-height: 21px;
-  color: #1A6FA0;
+  color: #2F97D1;
   border: 0;
   padding: 0.5rem 1rem;
 }
@@ -748,7 +743,7 @@ footer .nav-link i {
 
 .summary .title .spot-card-title {
   font-size: 20px;
-  color: #1A6FA0;
+  color: #2F97D1;
   margin: 0;
 }
 
