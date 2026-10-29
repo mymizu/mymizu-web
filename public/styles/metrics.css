@@ -11,6 +11,12 @@
   padding-inline: var(--pad);
 }
 
+.metrics:focus-visible {
+  outline: 3px solid #1F78AB;
+  outline-offset: 2px;
+  border-radius: 24px;
+}
+
 @media screen and (min-width: 1024px) {
   .metrics {
     justify-content: center;

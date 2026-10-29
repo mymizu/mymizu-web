@@ -55,6 +55,8 @@
   "categoryFilter.water": "給水スポット",
   "categoryFilter.coolingShelter": "クーリングシェルター",
   "results.nearbyCoolingShelters": "近くのクーリングシェルター",
+  "categoryFilter.label": "地図に表示する種類",
+  "metrics.label": "mymizuコミュニティの成果",
   "results.nearbyWaterStations": "近くの給水スポット",
   "results.aroundPlace": "{place}周辺の結果"
 }
