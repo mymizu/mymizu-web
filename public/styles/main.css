@@ -931,6 +931,78 @@ and (max-device-width: 812px) {
   transform: translate(-50%, -50%);
 }
 
+/* The list of spots under the map (SpotList.jsx). */
+.spot-list {
+  margin-top: 32px;
+  margin-bottom: 8px;
+}
+
+.spot-list-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.spot-list-count {
+  font-weight: 400;
+  color: #555;
+}
+
+.spot-list-note {
+  color: #555;
+  margin-bottom: 12px;
+}
+
+.spot-list-items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  gap: 8px 24px;
+}
+
+.spot-list-link {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid #DDE7EE;
+  text-decoration: none;
+  color: #333;
+}
+
+.spot-list-link:hover {
+  background-color: #F2F8FC;
+}
+
+.spot-list-link:focus-visible,
+.spot-list-more:focus-visible {
+  outline: 3px solid #1F78AB;
+  outline-offset: 2px;
+}
+
+.spot-list-name {
+  font-weight: 600;
+  color: #19638D;
+  overflow-wrap: anywhere;
+}
+
+.spot-list-meta {
+  font-size: 14px;
+  color: #555;
+}
+
+.spot-list-more {
+  margin-top: 12px;
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 35px;
+  background-color: #E6F4FD;
+  color: #19638D;
+}
+
 /* Share popup (src/components/ShareModal.jsx). A centred dialog on desktop and
    a bottom sheet on phones. Filled buttons use #1F78AB rather than the brand
    #2F97D1, because white text on #2F97D1 is under 4.5:1. */
