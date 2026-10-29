@@ -1105,9 +1105,11 @@ and (max-device-width: 812px) {
   margin-top: 10px;
 }
 
-/* The panel's list and its way back from a spot only exist beside the map. */
+/* The panel's list, its way back from a spot and the bar that opens it only
+   exist beside the map. */
 .spot-list-panel,
-.spot-panel-back {
+.spot-panel-back,
+.spot-panel-bar {
   display: none;
 }
 
@@ -1179,6 +1181,87 @@ and (max-device-width: 812px) {
 
   .spot-list-panel .spot-list-items {
     padding: 4px 0;
+  }
+
+  .spot-list-heading-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  /* Closes the panel to the bar below. */
+  .spot-panel-hide {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: -10px -12px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #555;
+  }
+
+  .spot-panel-hide:hover {
+    background-color: #F2F8FC;
+    color: #222;
+  }
+
+  /* While the panel is closed: a white tab on the map's left edge whose
+     button opens it. It fades in as the panel finishes sliding away, and is
+     hidden (and out of the Tab order) while the panel is open. */
+  .spot-panel-bar {
+    display: block;
+    position: absolute;
+    top: 16px;
+    left: 0;
+    z-index: 2;
+    padding: 6px 6px 6px 4px;
+    border-radius: 0 14px 14px 0;
+    background-color: #fff;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    transition: opacity 150ms ease 200ms, visibility 0s linear 0s;
+  }
+
+  .maps-container.spot-panel-open .spot-panel-bar {
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+  }
+
+  .spot-panel-show {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 6px 4px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .spot-panel-show svg {
+    color: #2F97D1;
+  }
+
+  .spot-panel-show:hover {
+    background-color: #F2F8FC;
+  }
+
+  .spot-panel-hide:focus-visible,
+  .spot-panel-show:focus-visible {
+    outline: 3px solid #1F78AB;
+    outline-offset: 2px;
   }
 
   .spot-list-panel .spot-list-more {
@@ -1253,6 +1336,7 @@ and (max-device-width: 812px) {
 @media (prefers-reduced-motion: reduce) {
   .spot-panel,
   .spot-panel-closed,
+  .spot-panel-bar,
   .map-controls,
   .marker img.pin {
     transition: none;

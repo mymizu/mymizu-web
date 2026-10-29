@@ -70,11 +70,14 @@ const SpotRow = memo(({ tap, distance, locale, onOpen, onHighlight }) => {
 //   "panel"   the column beside the map on wide screens (App's spot panel)
 //   "compact" a short list under the map, for phones and narrow windows
 // spots: [{ tap, distance }] from utils/spotsInView, nearest first
-// zoomedIn: false while the map draws clusters, which only some of the taps
-//   behind them are loaded for, so the list asks for a closer look instead.
+// zoomedIn: false while the map draws clusters. Only some of the taps behind
+//   them are loaded then, so the list is either empty, with a hint to zoom
+//   in, or (when the panel was opened by hand) a capped list of the nearest
+//   loaded spots, which says that is what it is.
 // ready: the map has said where it is (until then there is nothing to list)
 // onOpen(tap): opens a spot
 // onHighlight(tapId | null): points a spot out on the map (panel only)
+// onHide: closes the panel to its bar beside the map (panel only)
 export const SpotList = memo(
   ({
     variant,
@@ -86,9 +89,11 @@ export const SpotList = memo(
     locale,
     onOpen,
     onHighlight,
+    onHide,
     pageSize,
     hidden,
   }) => {
+    const intl = useIntl();
     const [shown, setShown] = useState(pageSize);
 
     // Start again from the top when the map moves to another area.
@@ -98,12 +103,14 @@ export const SpotList = memo(
     const visible = spots.slice(0, shown);
 
     let note = null;
-    if (!zoomedIn) {
+    if (!spots.length && !zoomedIn) {
       note = "spotList.zoomIn";
     } else if (!spots.length && (loading || !ready)) {
       note = ready ? "loading.spots" : null;
     } else if (!spots.length) {
       note = "spotList.empty";
+    } else if (!zoomedIn) {
+      note = "spotList.nearest";
     } else if (isPanel) {
       note = "spotList.order";
     }
@@ -115,27 +122,52 @@ export const SpotList = memo(
         hidden={hidden}
       >
         <div className="spot-list-header">
-          <h2 id={headingId} className="spot-list-title">
-            <FormattedMessage id="spotList.title" />
-            {zoomedIn && spots.length > 0 && (
-              <>
-                <span className="visually-hidden"> </span>
-                <span className="spot-list-count">
-                  <FormattedMessage
-                    id="spotList.count"
-                    values={{ count: spots.length }}
+          <div className="spot-list-heading-row">
+            <h2 id={headingId} className="spot-list-title">
+              <FormattedMessage id="spotList.title" />
+              {/* Zoomed out the list is a sample, so it gives no total. */}
+              {zoomedIn && spots.length > 0 && (
+                <>
+                  <span className="visually-hidden"> </span>
+                  <span className="spot-list-count">
+                    <FormattedMessage
+                      id="spotList.count"
+                      values={{ count: spots.length }}
+                    />
+                  </span>
+                </>
+              )}
+            </h2>
+            {onHide && (
+              <button
+                type="button"
+                id="spot-panel-hide"
+                className="spot-panel-hide"
+                aria-expanded="true"
+                aria-controls="spot-panel"
+                aria-label={intl.formatMessage({ id: "spotList.hideLabel" })}
+                onClick={onHide}
+              >
+                <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 20 20">
+                  <path
+                    d="M12.5 4.5 7 10l5.5 5.5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
                   />
-                </span>
-              </>
+                </svg>
+              </button>
             )}
-          </h2>
+          </div>
           {note && (
             <p className="spot-list-note">
-              <FormattedMessage id={note} />
+              <FormattedMessage id={note} values={{ count: spots.length }} />
             </p>
           )}
         </div>
-        {zoomedIn && visible.length > 0 && (
+        {visible.length > 0 && (
           <ul className="spot-list-items">
             {visible.map(({ tap, distance }) => (
               <SpotRow
@@ -149,7 +181,7 @@ export const SpotList = memo(
             ))}
           </ul>
         )}
-        {zoomedIn && spots.length > shown && (
+        {spots.length > shown && (
           <button
             type="button"
             className="spot-list-more"
