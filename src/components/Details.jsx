@@ -27,7 +27,7 @@ export const Details = ({ data }) => {
   const year = date.getFullYear();
 
   const [dropdownOpen, setDropdownOpen] = React.useState(false);
-  const today = getDayOfWeek();
+  const today = getDayOfWeek(intl.locale);
 
   const onClickLink = () => {
     /*ReactGA.event({

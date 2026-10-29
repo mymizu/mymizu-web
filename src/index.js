@@ -10,6 +10,8 @@ const gaTag = window.__GA_TAG__
 const coolingShelters = window.__COOLING_SHELTERS__ === true
 // Read from the URL, as the server does, so both render the same language.
 const initialLocale = languageFromPath(window.location.pathname)
+// The spot a /refill/ page is about, which the server rendered open.
+const initialSpot = window.__SPOT__ || null
 
 ReactDOM.hydrate(
   <App
@@ -17,6 +19,7 @@ ReactDOM.hydrate(
     gaTag={gaTag}
     coolingShelters={coolingShelters}
     initialLocale={initialLocale}
+    initialSpot={initialSpot}
   />,
   document.getElementById("root")
 );

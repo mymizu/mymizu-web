@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import classnames from "classnames";
 import { useIntl } from "react-intl";
 
@@ -11,9 +11,23 @@ const BUSINESS_CATEGORY_ID = 4;
 // works out which marker was clicked from the pointer position). A keyboard
 // click has no pointer position, so it is handled here instead: see
 // keyboardClick.
-export const Marker = (props) => {
-  const { category, isSearch, isActive, tap, inView = true, onKeyboardClick } =
-    props;
+//
+// isHighlighted: the spot's row in the list beside the map is hovered or
+// focused, so its pin is drawn larger and on top.
+//
+// Memoised: App re-renders whenever a list row is hovered, and the map can
+// hold hundreds of markers. Only the ones whose props changed redraw (App
+// passes a stable onKeyboardClick for this).
+export const Marker = memo((props) => {
+  const {
+    category,
+    isSearch,
+    isActive,
+    isHighlighted,
+    tap,
+    inView = true,
+    onKeyboardClick,
+  } = props;
   const intl = useIntl();
 
   // Base pin variant (before any "-active" suffix is applied). Every variant
@@ -40,7 +54,7 @@ export const Marker = (props) => {
   return (
     <button
       type="button"
-      className="marker"
+      className={classnames("marker", { ["marker-highlighted"]: isHighlighted })}
       aria-label={
         tap?.name ||
         intl.formatMessage({
@@ -63,7 +77,7 @@ export const Marker = (props) => {
       />
     </button>
   );
-};
+});
 
 // google-map-react renders every marker it is given, including the ones
 // panned out of view. Those stay out of the Tab order and the accessibility
