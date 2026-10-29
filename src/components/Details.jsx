@@ -3,6 +3,22 @@ import { FormattedMessage, useIntl } from "react-intl";
 import DropdownButton from "./Buttons/DropdownButton";
 import getDayOfWeek from "../utils/getDayOfWeek";
 
+// What a detail row is, for screen readers: sighted users get it from the
+// row's icon, which has alt="" (the text would be read twice in a list).
+const RowLabel = ({ id }) => (
+  <span className="visually-hidden">
+    <FormattedMessage id={id} />{" "}
+  </span>
+);
+
+// Said after a link that opens a new tab.
+const NewTabNote = () => (
+  <span className="visually-hidden">
+    {" "}
+    <FormattedMessage id="link.newTab" />
+  </span>
+);
+
 export const Details = ({ data }) => {
   const intl = useIntl();
 
@@ -38,20 +54,27 @@ export const Details = ({ data }) => {
       {data.refillMethod && (
         <div className="detail-section">
           <img src="/public/images/cup.svg" alt="" />
-          <div>{data.refillMethod}</div>
+          <div>
+            <RowLabel id="spot.label.refillMethod" />
+            {data.refillMethod}
+          </div>
         </div>
       )}
       {data.location && (
         <div className="detail-section">
           <img src="/public/images/mymizu_find_large.png" alt="" />
-          <div>{data.location}</div>
+          <div>
+            <RowLabel id="spot.label.location" />
+            {data.location}
+          </div>
         </div>
       )}
       {data.categoryId !== 6 && data.openingHours && (
         <div className="detail-section">
           <img src="/public/images/clock.svg" alt="" />
-          <div>
+          <div id="spot-opening-hours">
             <p className={!dropdownOpen && "place-open-dropdown-closed"}>
+              <RowLabel id="spot.label.hours" />
               <b>
                 <FormattedMessage id="today" values={{ day: today }} />
               </b>{" "}
@@ -70,6 +93,7 @@ export const Details = ({ data }) => {
           </div>
           <DropdownButton
             dropdownOpen={dropdownOpen}
+            controls="spot-opening-hours"
             onClick={() => setDropdownOpen(!dropdownOpen)}
           />
         </div>
@@ -81,6 +105,7 @@ export const Details = ({ data }) => {
         <div className="detail-section">
           <img src="/public/images/clock.svg" alt="" />
           <div>
+            <RowLabel id="spot.label.hours" />
             {data.coolingShelter.formattedOpeningHours.split("\n").map((line, idx) => (
               <p key={idx}>{line}</p>
             ))}
@@ -91,6 +116,7 @@ export const Details = ({ data }) => {
         <div className="detail-section">
           <img src="/public/images/phone.svg" alt="" />
           <div>
+            <RowLabel id="spot.label.phone" />
             <a href={`tel:${data.coolingShelter.phone}`}>
               {data.coolingShelter.phone}
             </a>
@@ -123,6 +149,7 @@ export const Details = ({ data }) => {
         <div className="detail-section">
           <img src="/public/images/globe.svg" alt="" />
           <div>
+            <RowLabel id="spot.label.website" />
             <a
               href={data.link}
               onClick={onClickLink}
@@ -130,6 +157,7 @@ export const Details = ({ data }) => {
               target="_blank"
             >
               {data.link}
+              <NewTabNote />
             </a>
           </div>
         </div>
@@ -137,7 +165,10 @@ export const Details = ({ data }) => {
       {data.address && (
         <div className="detail-section">
           <img src="/public/images/pin_drop.svg" alt="" />
-          <div>{data.address}</div>
+          <div>
+            <RowLabel id="spot.label.address" />
+            {data.address}
+          </div>
         </div>
       )}
       {data.createdAt && data.categoryId === 4 && (
@@ -155,9 +186,11 @@ export const Details = ({ data }) => {
                 ? `https://docs.google.com/forms/d/e/1FAIpQLSeRNzWZhQ7jBGzZQOJS4sHt1s4MUR6cf2AinT5ujioLJChPYQ/viewform?usp=pp_url&entry.2092238618=${data.id}`
                 : `https://docs.google.com/forms/d/e/1FAIpQLSe0sjbGYk-jJAOxhTFd6eWGWxLbsidYWK4VMPyVmDPx7UGlFQ/viewform?usp=pp_url&entry.2092238618=${data.id}`
             }
-            target="_new"
+            target="_blank"
+            rel="noopener"
           >
             <FormattedMessage id="spot.report" />
+            <NewTabNote />
           </a>
         </div>
       </div>

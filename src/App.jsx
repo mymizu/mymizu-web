@@ -85,6 +85,12 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   const clustersRequestedRef = useRef(false);
   const [mapBounds, setMapBounds] = useState(null);
   const [activeTapId, setActiveTapId] = useState(null);
+  // What had focus when a spot was opened from the map (usually its marker),
+  // so closing the card can return focus there. See handleCloseModal.
+  const cardOpenerRef = useRef(null);
+  // Counts spots opened from the map; the card takes focus each time it
+  // changes, including for the spot that is already open. 0 = leave focus.
+  const [focusCard, setFocusCard] = useState(0);
 
   const queuedTapsRequestRef = useRef(null);
   const ongoingTapsRequestRef = useRef(null);
@@ -467,6 +473,8 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     }
 
     const path = `/refill/${locale}/${markerData.slug}`;
+    cardOpenerRef.current = document.activeElement;
+    setFocusCard((n) => n + 1);
     //ReactGA.send({ hitType: "pageview", page: path});
     document.title = spotTitle(markerData, locale);
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
@@ -475,10 +483,31 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     setCenter({ lat: markerData.latitude, lng: markerData.longitude });
   };
 
-  const handleCloseModal = () => {
+  // Closed from the keyboard (Escape, or Enter on the close button: a click
+  // with detail 0), focus goes back to what opened the card, or to the search
+  // box. Otherwise it would drop to <body>, the top of the page. A mouse or
+  // touch close leaves focus alone, so a phone doesn't open its keyboard.
+  const handleCloseModal = (event) => {
+    const opener = cardOpenerRef.current;
+    cardOpenerRef.current = null;
+    setFocusCard(0);
     setCardData(null);
     setShowShareModal(false);
     setActiveTapId(null);
+
+    if (event && event.detail !== 0) return;
+    setTimeout(() => {
+      const canReturn =
+        opener &&
+        opener !== document.body &&
+        opener.isConnected &&
+        opener.tabIndex >= 0 &&
+        !opener.closest("[aria-hidden='true']");
+      const target = canReturn
+        ? opener
+        : document.querySelector(".maps-location-search-input");
+      target?.focus();
+    });
   };
 
   // Ask user for permission to give device location
@@ -854,6 +883,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
               isSlideUp={isSlideUp}
               setIsSlideUp={setIsSlideUp}
               setShareModal={setShowShareModal}
+              focusOnOpen={focusCard}
             />
             {showShareModal && (
               <ShareModal

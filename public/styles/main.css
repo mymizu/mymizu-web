@@ -551,47 +551,53 @@ footer .nav-link i {
   flex-shrink: 0;
 }
 
-.left-carousel-button {
-  left: 10px;
+/* The carousel arrows are 44px targets (WCAG 2.5.8) that still draw the same
+   20px circle, as ::before, centred where the 20px button used to be. */
+.left-carousel-button,
+.right-carousel-button {
   position: absolute;
-  height: 20px;
-  width: 20px;
+  height: 44px;
+  width: 44px;
   top: 50%;
   transform: translate(0, -50%);
   margin-top: 10px;
-  background-color: white;
+  padding: 0;
+  background: none;
   border-radius: 50%;
   border: solid 0px transparent;
   z-index: 50;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.left-carousel-button::before,
+.right-carousel-button::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   opacity: 0.8;
 }
 
 .left-carousel-button #back,
 .right-carousel-button #back {
-  height: 8px
+  position: relative;
+  height: 8px;
+  opacity: 0.8;
+}
+
+.left-carousel-button {
+  left: -2px;
 }
 
 .right-carousel-button {
-  right: 10px;
-  position: absolute;
-  height: 20px;
-  width: 20px;
-  top: 50%;
-  transform: translate(0, -50%);
-  margin-top: 10px;
-  background-color: white;
-  border-radius: 50%;
-  border: solid 0px transparent;
-  z-index: 50;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-  opacity: 0.8;
+  right: -2px;
 }
 
 .arrow-container {
@@ -600,6 +606,12 @@ footer .nav-link i {
   background: #FFFFFF;
   border: 1px solid #FFFFFF;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+}
+
+/* Focus is moved to the spot's name when its card opens (Modal.jsx). It isn't
+   a control, so it shows no ring. */
+.spot-card-title:focus {
+  outline: none;
 }
 
 .share-button {
@@ -660,7 +672,7 @@ footer .nav-link i {
   height: 35px;
 }
 
-.summary .title h6 {
+.summary .title .spot-card-title {
   font-size: 20px;
   color: #2F97D1;
   margin: 0;
