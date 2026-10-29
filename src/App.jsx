@@ -15,6 +15,7 @@ import { spotTitle } from "./utils/spotTitle";
 import { SocialIcon } from "./components/SocialIcon";
 import { Marker } from "./components/Marker";
 import { ClusterMarker } from "./components/ClusterMarker";
+import { inBounds } from "./utils/inBounds";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
 import { Search } from "./components/Search";
 import { SearchResults } from "./components/SearchResults";
@@ -848,6 +849,8 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
                 bbox={node.bbox}
                 level={node.level}
                 isCluster
+                inView={inBounds(node.lat, node.lng, mapBounds)}
+                onKeyboardClick={onMarkerClick}
               />
             ))
             : visibleTaps.length
@@ -859,6 +862,8 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
                 category={tap.category_id}
                 tap={tap}
                 isActive={tap.id === activeTapId}
+                inView={inBounds(tap.latitude, tap.longitude, mapBounds)}
+                onKeyboardClick={onMarkerClick}
               />
             ))
             : null}

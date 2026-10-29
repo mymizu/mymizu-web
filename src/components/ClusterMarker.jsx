@@ -1,5 +1,7 @@
 import React from "react";
 import classnames from "classnames";
+import { useIntl } from "react-intl";
+import { keyboardClick, offMapProps } from "./Marker";
 
 // Rough size tiers so a cluster of 4000 taps visibly reads as "bigger" than
 // one of 12, without needing continuous scaling.
@@ -19,17 +21,26 @@ const formatCount = (count) => {
 };
 
 // category: "all" | "water" | "cooling" — used only for the badge color.
-export const ClusterMarker = ({ count, category }) => {
+// A button for the same reason as Marker: clicking one zooms in.
+export const ClusterMarker = (props) => {
+  const { count, category, inView = true, onKeyboardClick } = props;
+  const intl = useIntl();
   const size = clusterDiameter(count);
 
   return (
     <div className="cluster-marker-wrapper">
-      <div
+      <button
+        type="button"
         className={classnames("cluster-marker", `cluster-marker-${category}`)}
         style={{ width: size, height: size }}
+        aria-label={intl.formatMessage({ id: "marker.cluster" }, { count })}
+        {...offMapProps(inView)}
+        onClick={keyboardClick(onKeyboardClick, null, props)}
       >
-        <span className="cluster-marker-count">{formatCount(count)}</span>
-      </div>
+        <span className="cluster-marker-count" aria-hidden="true">
+          {formatCount(count)}
+        </span>
+      </button>
     </div>
   );
 };

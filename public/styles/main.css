@@ -383,12 +383,14 @@ footer .nav-link i {
 
 .marker {
   color: #2F97D1;
-  position: relative;
-}
-
-.marker img {
   position: absolute;
   transform: translate(-50%,-100%);
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  line-height: 0;
+  cursor: pointer;
 }
 
 .marker img.pin {
@@ -402,6 +404,24 @@ footer .nav-link i {
 
 .current-location-icon img.pin-large {
   height: 50px;
+}
+
+/* Markers and clusters are buttons (Marker.jsx, ClusterMarker.jsx). The ring
+   matches the share dialog's, and clears the cluster's white border. */
+.cluster-marker {
+  padding: 0;
+  font: inherit;
+  font-weight: 600;
+}
+
+.marker:focus-visible,
+.cluster-marker:focus-visible {
+  outline: 3px solid #1F78AB;
+  outline-offset: 2px;
+}
+
+.marker:focus-visible {
+  border-radius: 4px;
 }
 
 .modal-container {
