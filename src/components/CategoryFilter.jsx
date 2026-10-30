@@ -13,12 +13,17 @@ export function CategoryFilter({ activeCategory, onSelect }) {
   };
 
   return (
-    <div className="category-filter">
+    <div
+      className="category-filter"
+      role="group"
+      aria-label={intl.formatMessage({ id: "categoryFilter.label" })}
+    >
       <button
         type="button"
         className={classnames("category-filter-chip", {
           ["category-filter-chip-active"]: activeCategory === WATER_CATEGORY,
         })}
+        aria-pressed={activeCategory === WATER_CATEGORY}
         onClick={() => toggle(WATER_CATEGORY)}
       >
         <span className="category-filter-chip-icon-container">
@@ -38,6 +43,7 @@ export function CategoryFilter({ activeCategory, onSelect }) {
           ["category-filter-chip-active"]:
             activeCategory === COOLING_SHELTER_CATEGORY,
         })}
+        aria-pressed={activeCategory === COOLING_SHELTER_CATEGORY}
         onClick={() => toggle(COOLING_SHELTER_CATEGORY)}
       >
         <span className="category-filter-chip-icon-container">

@@ -74,10 +74,27 @@ export function getLevelsForCategory(clusterTree, categoryKey) {
   return clusterTree.levels || {};
 }
 
+// The loaded level closest to `level`, preferring `level` itself. The map
+// loads the tree a level at a time, so for the moment after a zoom crosses
+// into a level that is still on its way, the nearest one already here is
+// drawn rather than nothing.
+function nearestLoadedLevel(levels, level) {
+  if (levels[String(level)]) {
+    return level;
+  }
+  const loaded = Object.keys(levels).map(Number);
+  if (!loaded.length) {
+    return level;
+  }
+  return loaded.reduce((best, candidate) =>
+    Math.abs(candidate - level) < Math.abs(best - level) ? candidate : best
+  );
+}
+
 // categoryKey: "all" | "water" | "cooling"
 export function getClusterNodes(clusterTree, categoryKey, zoom, bounds) {
   const levels = getLevelsForCategory(clusterTree, categoryKey);
-  const level = getClusterLevelForZoom(zoom);
+  const level = nearestLoadedLevel(levels, getClusterLevelForZoom(zoom));
   const nodes = levels[String(level)] || [];
   return nodes
     .filter((node) => bboxIntersectsBounds(node.bbox, bounds))

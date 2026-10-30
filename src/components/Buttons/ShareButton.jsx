@@ -12,7 +12,12 @@ export const ShareButton = ({ setShareModal, id }) => {
     setShareModal(true)
   }
   return (
-    <button className="share-button" onClick={() => onClickShare()}>
+    <button
+      type="button"
+      className="share-button"
+      aria-haspopup="dialog"
+      onClick={() => onClickShare()}
+    >
       <FormattedMessage id="spot.share" />
     </button>
   );

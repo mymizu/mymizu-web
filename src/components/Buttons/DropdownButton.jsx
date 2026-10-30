@@ -1,8 +1,17 @@
 import React from "react";
+import { useIntl } from "react-intl";
 
-const DropdownButton = ({ onClick, dropdownOpen }) => {
+const DropdownButton = ({ onClick, dropdownOpen, controls }) => {
+  const intl = useIntl();
   return (
-    <button onClick={onClick} className="dropdown-button">
+    <button
+      type="button"
+      onClick={onClick}
+      className="dropdown-button"
+      aria-label={intl.formatMessage({ id: "spot.hours.toggle" })}
+      aria-expanded={dropdownOpen}
+      aria-controls={controls}
+    >
       <img
         src="/public/images/back-arrow.svg"
         alt=""

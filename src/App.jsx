@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 
@@ -9,22 +9,32 @@ import Metrics from "./components/Metrics";
 import { transformCardData } from "./utils/transformCardData";
 import { Modal } from "./components/Modal";
 import { useLang } from "./utils/useLang";
-import { fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
+import { fetchPublicClusterLevel, fetchPublicClusters, fetchPublicTaps } from "./utils/publicApi";
 import getSlug from "./utils/getSlug";
+import { spotTitle } from "./utils/spotTitle";
+import { SocialIcon } from "./components/SocialIcon";
 import { Marker } from "./components/Marker";
 import { ClusterMarker } from "./components/ClusterMarker";
+import { inBounds } from "./utils/inBounds";
 import { CurrentLocationIcon } from "./components/CurrentLocationIcon";
 import { Search } from "./components/Search";
-import { SearchResults } from "./components/SearchResults";
 import { CategoryFilter } from "./components/CategoryFilter";
+import { SpotList } from "./components/SpotList";
 import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
+import { useDebounce } from "use-debounce";
 import classnames from "classnames";
 import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
-import { LANG_PREF_KEY } from "./constants";
+import { LANG_PREF_KEY, SPOT_PANEL_COLUMN_QUERY } from "./constants";
+import { useMediaQuery } from "./helpers/useMediaQuery";
+import { spotsInView } from "./utils/spotsInView";
 import { languageFromPath, pathForLanguage } from "./utils/languagePath";
-import { getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel } from "./utils/clusters";
+import { getClusterLevelForZoom, getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel, MIN_ZOOM_FOR_INDIVIDUAL_TAPS } from "./utils/clusters";
+
+// How many spots the panel lists while the map is zoomed out to clusters.
+const ZOOMED_OUT_LIST_LIMIT = 50;
+const NO_SPOTS = [];
 
 const translations = {
   en: require("./translations/en.json"),
@@ -34,7 +44,10 @@ const translations = {
 // coolingShelters: the seasonal shelter layer. Off by default so a bundle that
 // somehow renders without the server's value shows the safe thing; the server
 // stamps the real value into the page (see server/config.js).
-export function App({ gmApiKey, gaTag, coolingShelters = false }) {
+// initialSpot: on a /refill/{locale}/{slug} page, the spot (as
+// /get-refill-spot returns it), so the server renders it open and the
+// browser hydrates the same thing. See server.jsx and index.js.
+export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale, initialSpot = null }) {
   /*useEffect(() => {
     ReactGA.initialize(gaTag);
     ReactGA.send("pageview");
@@ -50,17 +63,30 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
     zoom: 11,
   };
 
-  const [navOpen, setNavOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [initialLoad, setInitialLoad] = useState(false);
   const [taps, setTaps] = useState([]);
   const [coordinate, setCoordinate] = useState({});
-  const [locale, setLocale] = useState("ja");
+  // A refill spot URL names its language, and the server renders the page in
+  // it; starting from the same one keeps hydration in step with that HTML.
+  // Everywhere else the server renders Japanese, and the effect below picks
+  // the visitor's language once the page has loaded.
+  const [locale, setLocale] = useState(initialLocale || "ja");
   const [detectedLocale, setDetectedLocale] = useState(false);
   const [language] = useLang();
-  const [center, setCenter] = useState(gmDefaultProps.center);
-  const [zoom, setZoom] = useState(gmDefaultProps.zoom);
-  const [cardData, setCardData] = useState(null);
+  // A spot page starts on its spot, as showInitialSpot would set it.
+  const [center, setCenter] = useState(() =>
+    initialSpot
+      ? {
+          lat: initialSpot.latitude ?? gmDefaultProps.center.lat,
+          lng: initialSpot.longitude ?? gmDefaultProps.center.lng,
+        }
+      : gmDefaultProps.center
+  );
+  const [zoom, setZoom] = useState(initialSpot ? 16 : gmDefaultProps.zoom);
+  const [cardData, setCardData] = useState(() =>
+    initialSpot ? transformCardData(initialSpot, initialLocale || "ja") : null
+  );
   const [showShareModal, setShowShareModal] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -68,14 +94,29 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
   const [requestsInProgress, setRequestsInProgress] = useState([]);
   const [isSlideUp, setIsSlideUp] = useState(true);
   const [userToken, setUserToken] = useState(null);
-  const [showCopyCheck, setShowCopyCheck] = useState(true);
   const [userLatitude, setUserLatitude] = useState(0);
   const [userLongitude, setUserLongitude] = useState(0);
   const [currentLocationLoaded, setCurrentLocationLoaded] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState(null);
   const [clusterTree, setClusterTree] = useState(null);
+  // Set once the first map tiles have drawn. The cluster tree waits for it:
+  // see the effect that fetches it.
+  const [mapPainted, setMapPainted] = useState(false);
+  // Levels of the tree asked for so far (loaded or on their way), and whether
+  // the whole tree has been loaded instead (an API without per-level URLs).
+  const clusterLevelsRequestedRef = useRef(new Set());
+  const wholeClusterTreeRef = useRef(false);
   const [mapBounds, setMapBounds] = useState(null);
-  const [activeTapId, setActiveTapId] = useState(null);
+  const [activeTapId, setActiveTapId] = useState(initialSpot?.id ?? null);
+  // The spot whose row in the spot panel is hovered or focused: its marker is
+  // drawn larger, so it can be found on the map.
+  const [highlightTapId, setHighlightTapId] = useState(null);
+  // What had focus when a spot was opened from the map (usually its marker),
+  // so closing the card can return focus there. See handleCloseModal.
+  const cardOpenerRef = useRef(null);
+  // Counts spots opened from the map; the card takes focus each time it
+  // changes, including for the spot that is already open. 0 = leave focus.
+  const [focusCard, setFocusCard] = useState(0);
 
   const queuedTapsRequestRef = useRef(null);
   const ongoingTapsRequestRef = useRef(null);
@@ -85,6 +126,11 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
 
   const flyTo = (target, targetZoom, onComplete) => {
     if (!googleMapFn?.map || !googleMapFn?.maps || !target) {
+      return false;
+    }
+    // Someone who has asked for less motion gets the target view at once:
+    // returning false makes the caller set it directly.
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
       return false;
     }
     const { map, maps } = googleMapFn;
@@ -107,8 +153,14 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
     return true;
   };
 
+  // Each search looks up its places one by one, so an earlier, shorter query
+  // can answer after a later one. Only the latest is shown (and announced).
+  const latestSearchRef = useRef(null);
   const handleSearchQuery = (query) => {
-    googleMapFn.search(query, searchResultCallback);
+    latestSearchRef.current = query;
+    googleMapFn.search(query, (places) => {
+      if (latestSearchRef.current === query) searchResultCallback(places);
+    });
   };
 
   const handleReset = () => {
@@ -225,9 +277,9 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
   ];
 
   const socialNav = [
-    { href: "https://www.instagram.com/mymizu.co/", iconName: "bi-instagram" },
-    { href: "https://www.facebook.com/mymizu.co/", iconName: "bi-facebook" },
-    { href: "https://www.twitter.com/mymizuco/", iconName: "bi-twitter" },
+    { href: "https://www.instagram.com/mymizu.co/", icon: "instagram", label: "Instagram" },
+    { href: "https://www.facebook.com/mymizu.co/", icon: "facebook", label: "Facebook" },
+    { href: "https://www.twitter.com/mymizuco/", icon: "twitter", label: "Twitter" },
   ];
 
   const footerNav = [
@@ -267,10 +319,6 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
       },
     },
   ];
-
-  const handleNav = () => {
-    setNavOpen(!navOpen);
-  };
 
   const getUserToken = async () => {
     try {
@@ -369,8 +417,10 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
     }
   };
 
-// Feature: Not working yet, error on server side, but we can use this to fetch all clusters and cache them on the client side
-  const fetchClusters = async () => {
+  // The whole tree, for an API that can't serve it a level at a time.
+  const fetchWholeClusterTree = async () => {
+    if (wholeClusterTreeRef.current) return;
+    wholeClusterTreeRef.current = true;
     try {
       // Straight from the API's edge (see utils/publicApi), otherwise through
       // this server.
@@ -384,7 +434,28 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
       });
       setClusterTree(res.data);
     } catch (e) {
+      // Let the next zoom or pan try again.
+      wholeClusterTreeRef.current = false;
       console.log("error fetching clusters", e);
+    }
+  };
+
+  // One level of the tree, merged into what is already loaded.
+  const fetchClusterLevel = async (level) => {
+    clusterLevelsRequestedRef.current.add(level);
+    try {
+      const payload = await fetchPublicClusterLevel(level);
+      if (!payload) {
+        fetchWholeClusterTree();
+        return;
+      }
+      setClusterTree((current) => ({
+        generated_at: payload.generated_at,
+        levels: { ...(current?.levels || {}), ...(payload.levels || {}) },
+      }));
+    } catch (e) {
+      clusterLevelsRequestedRef.current.delete(level);
+      console.log("error fetching cluster level", level, e);
     }
   };
 //*
@@ -407,9 +478,14 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
   };
 
   const enqueueTapsRequest = (region) => {
+    // Queued before the state updates: called from a Maps event, outside
+    // React's batching, each setState re-renders synchronously and runs any
+    // pending effects. If one of those sets initialLoad, its replay must
+    // already find these bounds, or they are dropped (this closure's
+    // initialLoad is the old one) and the map shows no taps.
+    queuedTapsRequestRef.current = region.bounds;
     setZoom(region.zoom);
     setMapBounds(region.bounds);
-    queuedTapsRequestRef.current = region.bounds;
     fetchQueuedTapsRequestIfAllowed();
   };
 
@@ -446,18 +522,70 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
     }
 
     const path = `/refill/${locale}/${markerData.slug}`;
+    cardOpenerRef.current = document.activeElement;
+    setFocusCard((n) => n + 1);
     //ReactGA.send({ hitType: "pageview", page: path});
-    document.title = `${markerData.name} - mymizu`;
+    document.title = spotTitle(markerData, locale);
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
-    setShowCopyCheck(true);
     setActiveTapId(markerData.id);
+    setHighlightTapId(null);
     setCenter({ lat: markerData.latitude, lng: markerData.longitude });
   };
 
-  const handleCloseModal = () => {
+  // Stable stand-ins for onMarkerClick, which is a new function each render:
+  // the markers and the spot list are memoised, and would otherwise all
+  // redraw whenever anything in App changed.
+  const onMarkerClickRef = useRef(onMarkerClick);
+  onMarkerClickRef.current = onMarkerClick;
+  const onMarkerKeyboardClick = useCallback(
+    (key, props) => onMarkerClickRef.current(key, props),
+    []
+  );
+
+  // Beside the map (spotPanelColumn) the spot opens in the panel the list is
+  // in. Otherwise its card opens over the map, which may be scrolled out of
+  // view under the list.
+  const spotPanelColumn = useMediaQuery(SPOT_PANEL_COLUMN_QUERY);
+  const spotPanelColumnRef = useRef(spotPanelColumn);
+  spotPanelColumnRef.current = spotPanelColumn;
+  const zoomRef = useRef(zoom);
+  zoomRef.current = zoom;
+  const openSpotFromList = useCallback((tap) => {
+    if (!spotPanelColumnRef.current) {
+      document.querySelector(".maps-container")?.scrollIntoView({ block: "start" });
+    }
+    onMarkerClickRef.current(tap.id, { tap });
+    // Picked from the list while the map was zoomed out to clusters: zoom in
+    // to the spot, so its marker is on the map.
+    if (zoomRef.current < MIN_ZOOM_FOR_INDIVIDUAL_TAPS) setZoom(16);
+  }, []);
+
+  // Closed from the keyboard (Escape, or Enter on the close button: a click
+  // with detail 0), focus goes back to what opened the card, or to the search
+  // box. Otherwise it would drop to <body>, the top of the page. A mouse or
+  // touch close leaves focus alone, so a phone doesn't open its keyboard.
+  const handleCloseModal = (event) => {
+    const opener = cardOpenerRef.current;
+    cardOpenerRef.current = null;
+    setFocusCard(0);
     setCardData(null);
+    setShowShareModal(false);
     setActiveTapId(null);
+
+    if (event && event.detail !== 0) return;
+    setTimeout(() => {
+      const canReturn =
+        opener &&
+        opener !== document.body &&
+        opener.isConnected &&
+        opener.tabIndex >= 0 &&
+        !opener.closest("[aria-hidden='true']");
+      const target = canReturn
+        ? opener
+        : document.querySelector(".maps-location-search-input");
+      target?.focus();
+    });
   };
 
   // Ask user for permission to give device location
@@ -559,50 +687,94 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
     }
   }, [initialLoad]);
 
+  // "Tiles loaded" means fetched, not yet drawn: the map still fades them in,
+  // and the main thread may be busy. Starting the cluster download then still
+  // put it in front of the paint on a slow phone, so wait until the browser
+  // is idle as well (with a cap, so a page that never idles still gets it).
+  const onFirstTilesLoaded = () => {
+    if (mapPainted) return;
+    const whenIdle =
+      window.requestIdleCallback || ((fn) => setTimeout(fn, 1000));
+    whenIdle(() => {
+      setMapPainted(true);
+      // Tells the page's analytics snippet it can load now (server.jsx).
+      window.dispatchEvent(new window.Event("mymizu:map-painted"));
+    }, { timeout: 3000 });
+  };
+
+  // The whole cluster tree is every cluster at every level: ~3.4MB compressed
+  // and ~16MB of JSON, 12MB of it level 1, which only zoom 14 draws. So only
+  // the level the current zoom draws is fetched (the home view at zoom 11
+  // needs level 3, ~160KB compressed), and others as the zoom reaches them;
+  // each is kept once loaded. As before, nothing is fetched until the first
+  // tiles have drawn, and nothing at street level: a refill spot page opens
+  // at zoom 16, showing individual taps, and needs no clusters unless the
+  // visitor zooms out.
   useEffect(() => {
-    if (userToken) {
-      fetchClusters();
-    }
-  }, [userToken]);
+    if (!mapPainted || !shouldShowClusters(zoom)) return;
+    if (wholeClusterTreeRef.current) return;
+    const level = getClusterLevelForZoom(zoom);
+    if (clusterLevelsRequestedRef.current.has(level)) return;
+    fetchClusterLevel(level);
+  }, [mapPainted, zoom]);
 
   useEffect(() => {
     localStorage.setItem(LANG_PREF_KEY, locale);
+    document.documentElement.lang = locale;
   }, [locale]);
 
+  // Opens the card for the spot a /refill/... URL names, and centres the map
+  // on it.
+  const showInitialSpot = (data) => {
+    setCardData(transformCardData(data, locale));
+    setActiveTapId(data.id);
+    document.title = spotTitle(data, locale);
+    setTaps((currentTaps) =>
+      currentTaps.some((tap) => tap.id === data.id)
+        ? currentTaps
+        : [...currentTaps, data]
+    );
+    setCenter({
+      lat: data?.latitude ?? gmDefaultProps.center.lat,
+      lng: data?.longitude ?? gmDefaultProps.center.lng,
+    });
+    setZoom(16);
+  };
+
+  // The server puts the spot in the page (window.__SPOT__), so the card and
+  // the map's starting position no longer wait for a token and a second fetch.
+  // Run in the same pass as the locale effect, the map mounts already centred
+  // on the spot, rather than loading the default view's tiles and then
+  // moving. Without the inline copy (an old cached page, a failed lookup) it
+  // is fetched once the token is there, as before.
+  const initialSpotRef = useRef(false);
   useEffect(() => {
-    if (userToken) {
-      const load = async () => {
-        const slug = getSlug(REFILL_SPOT_ROUTE);
-        if (slug) {
-          const res = await axios.get(`/get-refill-spot/${slug}`);
-          setCardData(transformCardData(res.data, locale));
-          setActiveTapId(res.data.id);
-          document.title = `${res.data.name} - mymizu`;
-          const newTaps = [];
-          let flag = false;
-          for (let j = 0; j < taps.length; j++) {
-            if (res.data.id === taps[j].id) {
-              flag = true;
-              break;
-            }
-          }
-          if (!flag) {
-            newTaps.push(res.data);
-          }
-          setTaps((currentTaps) => [...currentTaps, ...newTaps]);
+    if (initialSpotRef.current) return;
+    const slug = getSlug(REFILL_SPOT_ROUTE);
+    if (!slug) return;
 
-          setInitialLoad(true);
-
-          setCenter({
-            lat: res?.data?.latitude ?? gmDefaultProps.center.lat,
-            lng: res?.data?.longitude ?? gmDefaultProps.center.lng,
-          });
-          setZoom(16);
-        }
-      };
-      load();
+    const inline = window.__SPOT__;
+    if (inline && inline.slug === slug) {
+      initialSpotRef.current = true;
+      showInitialSpot(inline);
+      return;
     }
+    if (!userToken) return;
+
+    initialSpotRef.current = true;
+    axios
+      .get(`/get-refill-spot/${slug}`)
+      .then((res) => showInitialSpot(res.data))
+      .catch((e) => console.log("error fetching refill spot", e));
   }, [userToken]);
+
+  // Marker requests carry the token, so the first load still waits for it,
+  // and for the spot to be on the map.
+  useEffect(() => {
+    if (initialSpotRef.current && userToken && cardData) {
+      setInitialLoad(true);
+    }
+  }, [userToken, cardData]);
 
   const visibleTaps = useMemo(() => {
     if (categoryFilter === "cooling") {
@@ -636,23 +808,156 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
     return getClusterNodes(clusterTree, clusterCategoryKey, zoom, mapBounds);
   }, [showClusters, clusterTree, clusterCategoryKey, zoom, mapBounds]);
 
+  // Beside the map, the panel holds the open spot, or the list of spots in
+  // view. By itself it is open while the map shows individual spots, and
+  // slides away to a bar on the map's edge when the map is zoomed out to
+  // clusters, so the map takes the whole width. The bar's button and the
+  // panel's own close button override that until the map next crosses
+  // between clusters and spots (the choice remembers which side it was made
+  // on), after which the panel follows the zoom again.
+  const zoomedIn = zoom >= MIN_ZOOM_FOR_INDIVIDUAL_TAPS;
+  const [spotPanelChoice, setSpotPanelChoice] = useState(null);
+  const chosenOpen =
+    spotPanelChoice && spotPanelChoice.zoomedIn === zoomedIn
+      ? spotPanelChoice.open
+      : null;
+  const spotPanelOpen = !!cardData || (chosenOpen ?? zoomedIn);
+  const spotPanelRef = useRef(null);
+  const zoomedInRef = useRef(zoomedIn);
+  zoomedInRef.current = zoomedIn;
+
+  // Focus follows the toggle: to the panel's close button when it opens, and
+  // back to the bar's button when it closes (each hides the other).
+  const showSpotPanel = useCallback(() => {
+    setSpotPanelChoice({ open: true, zoomedIn: zoomedInRef.current });
+    setTimeout(() => document.getElementById("spot-panel-hide")?.focus());
+  }, []);
+  const hideSpotPanel = useCallback(() => {
+    setSpotPanelChoice({ open: false, zoomedIn: zoomedInRef.current });
+    setTimeout(() => document.getElementById("spot-panel-show")?.focus());
+  }, []);
+
+  // The panel can also close by itself (zooming out). If focus was in it,
+  // it would be lost with it: put it on the bar's button instead.
+  useEffect(() => {
+    if (spotPanelOpen || !spotPanelColumn) return;
+    if (spotPanelRef.current?.contains(document.activeElement)) {
+      document.getElementById("spot-panel-show")?.focus();
+    }
+  }, [spotPanelOpen, spotPanelColumn]);
+
+  // The spots in view, for the panel beside the map and the list under it.
+  // The map reports its bounds once it comes to rest, but a cluster click or
+  // a search flies it through several zooms; the short debounce sorts the
+  // list once at the end of that.
+  //
+  // Zoomed out, the map draws clusters and only some of their taps are
+  // loaded, so the list under the map just asks for a closer look. The panel,
+  // if opened by hand there, lists the nearest ZOOMED_OUT_LIST_LIMIT of the
+  // loaded spots and says so: a full list of a city would be thousands of
+  // rows, and an incomplete one.
+  const listWanted = zoomedIn || (spotPanelOpen && spotPanelColumn);
+  const [listBounds] = useDebounce(mapBounds, 200);
+  const spots = useMemo(
+    () => (listWanted ? spotsInView(visibleTaps, listBounds) : NO_SPOTS),
+    [listWanted, visibleTaps, listBounds]
+  );
+  const panelSpots = useMemo(
+    () => (zoomedIn ? spots : spots.slice(0, ZOOMED_OUT_LIST_LIMIT)),
+    [zoomedIn, spots]
+  );
+
+  // Opening or closing the panel changes the map's width (the panel pushes
+  // it, rather than covering it). The Maps API keeps its own centre through
+  // that, but google-map-react only re-measures the map after a window
+  // resize, so until then it reports the old width's bounds: the list and the
+  // markers' Tab order would cover the wrong area.
+  //
+  // So the map's box is watched, and once its size has stopped changing
+  // (the slide over, or at once with reduced motion) google-map-react is
+  // told about a resize, the map is put back on the centre it had when the
+  // panel started to move (unless the user has dragged it since), and an
+  // "idle" makes it re-measure and report the bounds now in view. Waiting on
+  // the size itself rather than on the panel's transition holds even when a
+  // busy page starts the slide late.
+  const mapAreaRef = useRef(null);
+  const refitRef = useRef(null);
+  const previousSpotPanelOpenRef = useRef(spotPanelOpen);
+  useEffect(() => {
+    const changed = previousSpotPanelOpenRef.current !== spotPanelOpen;
+    previousSpotPanelOpenRef.current = spotPanelOpen;
+    if (!changed || !spotPanelColumn || !googleMapFn?.map) return;
+    const { map, maps } = googleMapFn;
+    const pending = refitRef.current;
+    if (pending) {
+      // Toggled again mid-slide: keep the first centre and drag listener.
+      return;
+    }
+    const refit = { centre: map.getCenter(), dragged: false, at: Date.now() };
+    refit.listener = maps.event.addListenerOnce(map, "dragstart", () => {
+      refit.dragged = true;
+    });
+    refitRef.current = refit;
+  }, [spotPanelOpen, spotPanelColumn, googleMapFn]);
+
+  useEffect(() => {
+    const area = mapAreaRef.current;
+    if (!googleMapFn?.map || !area || !window.ResizeObserver) return undefined;
+    const { map, maps } = googleMapFn;
+    let timer = null;
+    const settle = () => {
+      const refit = refitRef.current;
+      refitRef.current = null;
+      window.dispatchEvent(new window.Event("resize"));
+      if (refit) {
+        maps.event.removeListener(refit.listener);
+        // A centre from a toggle that never changed the size (opened and
+        // closed within a frame) is stale by the next unrelated resize.
+        const fresh = Date.now() - refit.at < 5000;
+        if (fresh && !refit.dragged && refit.centre) map.setCenter(refit.centre);
+      }
+      maps.event.trigger(map, "idle");
+    };
+    let first = true;
+    const observer = new window.ResizeObserver(() => {
+      // The first call only reports the size it started with.
+      if (first) {
+        first = false;
+        return;
+      }
+      clearTimeout(timer);
+      timer = setTimeout(settle, 120);
+    });
+    observer.observe(area);
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [googleMapFn]);
+
   return (
     <IntlProvider
       messages={translations[locale]}
       locale={locale}
       defaultLocale={i18nConfig.defaultLocale}
     >
-      <div>
-        {/* Header */}
+      <header>
+        {/* The first thing Tab reaches: past the nav links and straight to
+            the map and search. Shown only while it has focus. */}
+        <a className="skip-link visually-hidden-focusable" href="#main-content">
+          <FormattedMessage id="skip.main" />
+        </a>
         <nav className="navbar navbar-expand-lg bg-light">
           <div className="container-fluid nav-container">
-            <img
-              id="logo"
-              src="/public/images/logo.svg"
-              alt=""
-              height="45"
-              className="d-inline-block align-text-top"
-            />
+            <a href="/" className="logo-link">
+              <img
+                id="logo"
+                src="/public/images/logo.svg"
+                alt="mymizu"
+                height="45"
+                className="d-inline-block align-text-top"
+              />
+            </a>
             <div
               className="collapse navbar-collapse justify-content-end"
               id="navbarNav"
@@ -676,6 +981,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
                         updateLanguage("ja", true);
                       }}
                       hrefLang="ja"
+                      lang="ja"
                     >
                       日本語
                     </a>
@@ -685,6 +991,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
                       className="nav-link"
                       href="#"
                       hrefLang="en"
+                      lang="en"
                       onClick={(e) => {
                         // Stop the "#" navigation, which could cancel the page change.
                         e.preventDefault();
@@ -702,20 +1009,150 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
               data-bs-toggle="collapse"
               data-bs-target="#navbarNav"
               aria-expanded="false"
-              aria-label="Toggle navigation"
+              aria-controls="navbarNav"
+              aria-label={translations[locale]["nav.toggle"]}
             >
-              <span
-                className="hamburger d-sm-inline d-md-inline d-lg-none"
-                onClick={handleNav}
-              >
+              <span className="hamburger d-sm-inline d-md-inline d-lg-none">
                 &#9776;
               </span>
             </button>
           </div>
         </nav>
-      </div>
-      <div className="maps-container">
-        <CurrentLocationButton onClick={buttonResetLocation} />
+      </header>
+      {/* tabIndex so the skip link moves focus here, not just the scroll. */}
+      <main id="main-content" tabIndex={-1}>
+      <h1 className="visually-hidden">
+        <FormattedMessage id="page.heading" />
+      </h1>
+      <div
+        className={classnames("maps-container", {
+          ["spot-panel-open"]: spotPanelOpen,
+        })}
+      >
+        {/* First, so keyboard and screen reader users reach the search box
+            before the spot panel, the map and the spot card. Drawn over the
+            map: beside the panel, this box moves with the map's left edge. */}
+        <div className="map-controls">
+          {taps.length > 0 && (
+            <>
+              <Search
+                results={results}
+                onSearch={handleSearchQuery}
+                onReset={handleReset}
+                onSearchResultClick={handleResultClick}
+              />
+              {coolingShelters && (
+                <CategoryFilter
+                  activeCategory={categoryFilter}
+                  onSelect={setCategoryFilter}
+                />
+              )}
+            </>
+          )}
+          <CurrentLocationButton onClick={buttonResetLocation} />
+        </div>
+        {/* The spot panel. On a wide window it is a column left of the map
+            holding the open spot or, without one, the spots in view; it
+            slides away when the map is zoomed out to clusters (main.css,
+            "Spot panel"). On a phone the list is hidden and only the card
+            shows, over the map, as before. */}
+        {/* While the panel is closed beside the map: a bar on the map's left
+            edge whose button opens it. Hidden while it is open, when the
+            panel's own button closes it again (SpotList). */}
+        <div className="spot-panel-bar">
+          <button
+            type="button"
+            id="spot-panel-show"
+            className="spot-panel-show"
+            aria-expanded="false"
+            aria-controls="spot-panel"
+            aria-label={translations[locale]["spotList.showLabel"]}
+            onClick={showSpotPanel}
+          >
+            <svg aria-hidden="true" focusable="false" width="22" height="22" viewBox="0 0 22 22">
+              <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M8 5.5h10M8 11h10M8 16.5h10" />
+                <path d="M4 5.5h.01M4 11h.01M4 16.5h.01" strokeWidth="2.6" />
+              </g>
+            </svg>
+            <span className="spot-panel-show-text">
+              <FormattedMessage id="spotList.show" />
+            </span>
+          </button>
+        </div>
+        <div
+          id="spot-panel"
+          ref={spotPanelRef}
+          className={classnames("spot-panel", {
+            ["spot-panel-closed"]: !spotPanelOpen,
+          })}
+        >
+          <SpotList
+            variant="panel"
+            headingId="spot-panel-title"
+            spots={panelSpots}
+            zoomedIn={zoomedIn}
+            ready={!!listBounds}
+            loading={loading}
+            locale={locale}
+            onOpen={openSpotFromList}
+            onHighlight={setHighlightTapId}
+            onHide={hideSpotPanel}
+            pageSize={20}
+            hidden={!!cardData}
+          />
+          {cardData && (
+            <div
+              className={classnames("modal-container", {
+                ["modal-container-slide-up"]: isSlideUp,
+              })}
+            >
+              {/* The way back from a spot to the list, beside the map. On a
+                  phone the card's own close button does this. */}
+              <button
+                type="button"
+                className="spot-panel-back"
+                onClick={handleCloseModal}
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M10 3 5 8l5 5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <FormattedMessage id="spotList.back" />
+              </button>
+              {/* TODO: properly calculate height */}
+              <Modal
+                key={cardData.id}
+                cardData={cardData}
+                onClose={handleCloseModal}
+                isSlideUp={isSlideUp}
+                setIsSlideUp={setIsSlideUp}
+                setShareModal={setShowShareModal}
+                focusOnOpen={focusCard}
+              />
+              {showShareModal && (
+                <ShareModal
+                  key={cardData.id}
+                  data={cardData}
+                  onClose={() => setShowShareModal(false)}
+                />
+              )}
+            </div>
+          )}
+        </div>
+        <div className="map-area" ref={mapAreaRef}>
         {/* Deliberately not gated on userToken. The map itself needs no auth —
             only the markers do — and waiting for /api/authorize put a ~780ms
             round trip (for a 356-byte token) directly in front of the 385KB
@@ -734,6 +1171,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
           onChange={enqueueTapsRequest}
           defaultCenter={gmDefaultProps.center}
           defaultZoom={gmDefaultProps.zoom}
+          onTilesLoaded={onFirstTilesLoaded}
           onGoogleApiLoaded={({map, maps}) => {
             setGoogleMapFn(googleMapAPI(map, maps));
           }}
@@ -754,6 +1192,8 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
                 bbox={node.bbox}
                 level={node.level}
                 isCluster
+                inView={inBounds(node.lat, node.lng, mapBounds)}
+                onKeyboardClick={onMarkerKeyboardClick}
               />
             ))
             : visibleTaps.length
@@ -765,6 +1205,12 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
                 category={tap.category_id}
                 tap={tap}
                 isActive={tap.id === activeTapId}
+                isHighlighted={tap.id === highlightTapId}
+                $markerHolderClassName={
+                  tap.id === highlightTapId ? "marker-holder-highlighted" : undefined
+                }
+                inView={inBounds(tap.latitude, tap.longitude, mapBounds)}
+                onKeyboardClick={onMarkerKeyboardClick}
               />
             ))
             : null}
@@ -776,66 +1222,44 @@ export function App({ gmApiKey, gaTag, coolingShelters = false }) {
             />
             }
         </GoogleMapReact>}
-        {cardData && (
-          <div
-            className={classnames("modal-container", {
-              ["modal-container-slide-up"]: isSlideUp,
-            })}
-          >
-            {/* TODO: properly calculate height */}
-            <Modal
-              cardData={cardData}
-              onClose={handleCloseModal}
-              isSlideUp={isSlideUp}
-              setIsSlideUp={setIsSlideUp}
-              setShareModal={setShowShareModal}
-            />
-            {showShareModal ? (
-              <div className="share-modal-container">
-                <ShareModal data={cardData} setShareModal={setShowShareModal} setShowCopyCheck={setShowCopyCheck} showCopyCheck={showCopyCheck}/>
-              </div>
-            ) : (
-              ""
-            )}
-          </div>
-        )}
-        {taps.length > 0 && (
-          <>
-            <Search
-              results={results}
-              onSearch={handleSearchQuery}
-              onReset={handleReset}
-            />
-            <SearchResults
-              results={results}
-              onSearchResultClick={handleResultClick}
-            />
-            {coolingShelters && (
-              <CategoryFilter
-                activeCategory={categoryFilter}
-                onSelect={setCategoryFilter}
-              />
-            )}
-          </>
-        )}
+        </div>
       </div>
       <div className="loading-container">
         {loading && (
           <div className="loading-indicator">&nbsp;</div>
         )}
+        {/* Always rendered, so screen readers notice when the text changes. */}
+        <div role="status" className="visually-hidden">
+          {loading && <FormattedMessage id="loading.spots" />}
+        </div>
       </div>
+      {/* On phones and narrow windows, where there is no room for the panel:
+          a short list of the nearest spots, for anyone who can't use the
+          map. Hidden beside the panel (main.css). */}
+      <SpotList
+        variant="compact"
+        headingId="spot-list-title"
+        spots={zoomedIn ? spots : NO_SPOTS}
+        zoomedIn={zoomedIn}
+        ready={!!listBounds}
+        loading={loading}
+        locale={locale}
+        onOpen={openSpotFromList}
+        pageSize={5}
+      />
       <div className="container-lg">
         {userToken && <Metrics />}
         <FunFacts />
       </div>
+      </main>
       <div className="footer">
         <div className="container-lg">
           <footer>
             <ul className="nav justify-content-center">
               {socialNav.map((el, i) => (
                 <li className="nav-item" key={i}>
-                  <a href={el.href} className="nav-link px-2 text-muted">
-                    <i className={`bi ${el.iconName}`} />
+                  <a href={el.href} className="nav-link px-2 text-muted" aria-label={el.label}>
+                    <SocialIcon name={el.icon} />
                   </a>
                 </li>
               ))}
