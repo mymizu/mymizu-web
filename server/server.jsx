@@ -424,6 +424,7 @@ const renderPage = (res, meta, locale = DEFAULT_LOCALE) => {
             gaTag={gaTag}
             coolingShelters={coolingSheltersEnabled}
             initialLocale={locale}
+            initialSpot={meta?.spot || null}
           />
         )}</div>
         `

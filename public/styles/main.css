@@ -931,76 +931,416 @@ and (max-device-width: 812px) {
   transform: translate(-50%, -50%);
 }
 
-/* The list of spots under the map (SpotList.jsx). */
-.spot-list {
-  margin-top: 32px;
-  margin-bottom: 8px;
+/* The map's own controls (App.jsx): the search box, the category filter and
+   the current-location button, laid over the map. Beside the spot panel this
+   box starts at the panel's edge, so they stay centred on the map. */
+.map-controls {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  pointer-events: none;
 }
 
+.map-controls > * {
+  pointer-events: auto;
+}
+
+.map-area {
+  position: relative;
+  height: 100%;
+}
+
+/* Pins whose row in the spot panel is hovered or focused (Marker.jsx). The
+   holder is google-map-react's wrapper, raised over the other pins. */
+.marker-holder-highlighted {
+  z-index: 10;
+}
+
+.marker img.pin {
+  transform-origin: 50% 100%;
+  transition: transform 120ms ease-out;
+}
+
+.marker-highlighted img.pin {
+  transform: scale(1.3);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
+}
+
+/* Lists of spots (SpotList.jsx): the panel beside the map, and the compact
+   list under it on phones. Text is dark grey rather than blue: the brand blue
+   #2F97D1 is for pins, borders and accents. */
 .spot-list-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #222;
 }
 
 .spot-list-count {
-  font-weight: 400;
-  color: #555;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background-color: #E6F4FD;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
 }
 
 .spot-list-note {
+  margin: 6px 0 0;
+  font-size: 14px;
   color: #555;
-  margin-bottom: 12px;
 }
 
 .spot-list-items {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
-  gap: 8px 24px;
 }
 
-.spot-list-link {
+.spot-row-item + .spot-row-item {
+  border-top: 1px solid #EEF3F6;
+}
+
+.spot-row {
   display: flex;
-  flex-direction: column;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid #DDE7EE;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 20px 12px 17px;
+  border-left: 3px solid transparent;
+  color: #333;
   text-decoration: none;
+}
+
+.spot-row:hover,
+.spot-row:focus-visible {
+  background-color: #F2F8FC;
+  border-left-color: #2F97D1;
   color: #333;
 }
 
-.spot-list-link:hover {
-  background-color: #F2F8FC;
-}
-
-.spot-list-link:focus-visible,
-.spot-list-more:focus-visible {
+.spot-row:focus-visible {
   outline: 3px solid #1F78AB;
-  outline-offset: 2px;
+  outline-offset: -3px;
 }
 
-.spot-list-name {
+.spot-row-pin {
+  flex-shrink: 0;
+  width: auto;
+  height: 28px;
+}
+
+.spot-row-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.spot-row-name {
   font-weight: 600;
-  color: #19638D;
+  line-height: 1.3;
+  color: #222;
   overflow-wrap: anywhere;
 }
 
-.spot-list-meta {
+.spot-row-meta {
+  margin-top: 2px;
   font-size: 14px;
   color: #555;
 }
 
 .spot-list-more {
-  margin-top: 12px;
   padding: 0.5rem 1rem;
   border: 0;
   border-radius: 35px;
   background-color: #E6F4FD;
-  color: #19638D;
+  color: #333;
+  font-weight: 600;
+}
+
+.spot-list-more:hover {
+  background-color: #D4EBFA;
+}
+
+.spot-list-more:focus-visible,
+.spot-panel-back:focus-visible {
+  outline: 3px solid #1F78AB;
+  outline-offset: 2px;
+}
+
+/* The compact list under the map. A handful of rows in one box. */
+.spot-list-compact {
+  max-width: 960px;
+  margin: 24px auto 8px;
+  padding: 0 12px;
+}
+
+.spot-list-compact .spot-list-header {
+  margin-bottom: 10px;
+}
+
+.spot-list-compact .spot-list-items {
+  border: 1px solid #DDE7EE;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.spot-list-compact .spot-row {
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 10px 9px;
+}
+
+.spot-list-compact .spot-row-pin {
+  height: 22px;
+}
+
+.spot-list-compact .spot-list-more {
+  margin-top: 10px;
+}
+
+/* The panel's list, its way back from a spot and the bar that opens it only
+   exist beside the map. */
+.spot-list-panel,
+.spot-panel-back,
+.spot-panel-bar {
+  display: none;
+}
+
+/* Spot panel (App.jsx): a column left of the map on wide windows. Keep the
+   query in step with SPOT_PANEL_COLUMN_QUERY in src/constants. Narrower, the
+   panel is an empty box the card is positioned over the map from, as before. */
+@media (min-width: 900px) and (min-device-width: 813px) {
+  .maps-container {
+    --spot-panel-width: 360px;
+    display: flex;
+    overflow: hidden;
+  }
+
+  .map-area {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* Zoomed out to clusters, the panel slides off to the left and the map
+     widens to fill the space; zoomed in, it slides back and pushes the map.
+     It hides once it has gone, so it leaves the Tab order too. */
+  .spot-panel {
+    position: relative;
+    z-index: 3;
+    flex: 0 0 var(--spot-panel-width);
+    display: flex;
+    flex-direction: column;
+    width: var(--spot-panel-width);
+    height: 100%;
+    background-color: #fff;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
+    transition: margin-left 250ms ease, visibility 0s;
+  }
+
+  .spot-panel-closed {
+    margin-left: calc(-1 * var(--spot-panel-width));
+    visibility: hidden;
+    transition: margin-left 250ms ease, visibility 0s linear 250ms;
+  }
+
+  .map-controls {
+    left: var(--spot-panel-width);
+    transition: left 250ms ease;
+  }
+
+  .maps-container:not(.spot-panel-open) .map-controls {
+    left: 0;
+  }
+
+  .spot-list-compact {
+    display: none;
+  }
+
+  .spot-list-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+  }
+
+  .spot-list-panel .spot-list-header {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid #E3ECF2;
+    background-color: #fff;
+  }
+
+  .spot-list-panel .spot-list-items {
+    padding: 4px 0;
+  }
+
+  .spot-list-heading-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  /* Closes the panel to the bar below. */
+  .spot-panel-hide {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    margin: -10px -12px 0 0;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: #555;
+  }
+
+  .spot-panel-hide:hover {
+    background-color: #F2F8FC;
+    color: #222;
+  }
+
+  /* While the panel is closed: a white tab on the map's left edge whose
+     button opens it. It fades in as the panel finishes sliding away, and is
+     hidden (and out of the Tab order) while the panel is open. */
+  .spot-panel-bar {
+    display: block;
+    position: absolute;
+    top: 16px;
+    left: 0;
+    z-index: 2;
+    padding: 6px 6px 6px 4px;
+    border-radius: 0 14px 14px 0;
+    background-color: #fff;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+    transition: opacity 150ms ease 200ms, visibility 0s linear 0s;
+  }
+
+  .maps-container.spot-panel-open .spot-panel-bar {
+    opacity: 0;
+    visibility: hidden;
+    transition: none;
+  }
+
+  .spot-panel-show {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    min-width: 48px;
+    min-height: 48px;
+    padding: 6px 4px;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: #333;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+
+  .spot-panel-show svg {
+    color: #2F97D1;
+  }
+
+  .spot-panel-show:hover {
+    background-color: #F2F8FC;
+  }
+
+  .spot-panel-hide:focus-visible,
+  .spot-panel-show:focus-visible {
+    outline: 3px solid #1F78AB;
+    outline-offset: 2px;
+  }
+
+  .spot-list-panel .spot-list-more {
+    align-self: flex-start;
+    margin: 8px 20px 24px;
+  }
+
+  /* The open spot fills the panel, under a bar leading back to the list. */
+  .spot-panel .modal-container {
+    position: static;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .spot-panel-back {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 16px;
+    border: 0;
+    border-bottom: 1px solid #E3ECF2;
+    background-color: #fff;
+    color: #333;
+    font-weight: 600;
+    text-align: left;
+  }
+
+  .spot-panel-back:hover {
+    background-color: #F2F8FC;
+  }
+
+  .spot-panel-back svg {
+    flex-shrink: 0;
+    color: #2F97D1;
+  }
+
+  .spot-panel-back:focus-visible {
+    outline-offset: -3px;
+  }
+
+  .spot-panel .info-card {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    border-radius: 0;
+    box-shadow: none;
+    overflow-y: auto;
+  }
+
+  /* The bar above replaces the card's close button here. */
+  .spot-panel .info-card .back-button {
+    display: none;
+  }
+
+  .spot-panel .carousel {
+    height: 200px;
+  }
+}
+
+@media (min-width: 1280px) and (min-device-width: 813px) {
+  .maps-container {
+    --spot-panel-width: 400px;
+  }
+}
+
+/* No sliding: the panel and the map's controls move in one step. */
+@media (prefers-reduced-motion: reduce) {
+  .spot-panel,
+  .spot-panel-closed,
+  .spot-panel-bar,
+  .map-controls,
+  .marker img.pin {
+    transition: none;
+  }
 }
 
 /* Share popup (src/components/ShareModal.jsx). A centred dialog on desktop and

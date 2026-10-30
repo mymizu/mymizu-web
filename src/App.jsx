@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import GoogleMapReact from "google-map-react";
 import axios from "axios";
 
@@ -22,12 +22,19 @@ import { CategoryFilter } from "./components/CategoryFilter";
 import { SpotList } from "./components/SpotList";
 import googleMapAPI from "../utils/googlemaps";
 import debounce from "lodash.debounce";
+import { useDebounce } from "use-debounce";
 import classnames from "classnames";
 import { ShareModal } from "./components/ShareModal";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
-import { LANG_PREF_KEY } from "./constants";
+import { LANG_PREF_KEY, SPOT_PANEL_COLUMN_QUERY } from "./constants";
+import { useMediaQuery } from "./helpers/useMediaQuery";
+import { spotsInView } from "./utils/spotsInView";
 import { languageFromPath, pathForLanguage } from "./utils/languagePath";
-import { getClusterLevelForZoom, getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel } from "./utils/clusters";
+import { getClusterLevelForZoom, getClusterNodes, shouldShowClusters, getLevelsForCategory, getZoomToRevealNextLevel, MIN_ZOOM_FOR_INDIVIDUAL_TAPS } from "./utils/clusters";
+
+// How many spots the panel lists while the map is zoomed out to clusters.
+const ZOOMED_OUT_LIST_LIMIT = 50;
+const NO_SPOTS = [];
 
 const translations = {
   en: require("./translations/en.json"),
@@ -37,7 +44,10 @@ const translations = {
 // coolingShelters: the seasonal shelter layer. Off by default so a bundle that
 // somehow renders without the server's value shows the safe thing; the server
 // stamps the real value into the page (see server/config.js).
-export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale }) {
+// initialSpot: on a /refill/{locale}/{slug} page, the spot (as
+// /get-refill-spot returns it), so the server renders it open and the
+// browser hydrates the same thing. See server.jsx and index.js.
+export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale, initialSpot = null }) {
   /*useEffect(() => {
     ReactGA.initialize(gaTag);
     ReactGA.send("pageview");
@@ -64,9 +74,19 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   const [locale, setLocale] = useState(initialLocale || "ja");
   const [detectedLocale, setDetectedLocale] = useState(false);
   const [language] = useLang();
-  const [center, setCenter] = useState(gmDefaultProps.center);
-  const [zoom, setZoom] = useState(gmDefaultProps.zoom);
-  const [cardData, setCardData] = useState(null);
+  // A spot page starts on its spot, as showInitialSpot would set it.
+  const [center, setCenter] = useState(() =>
+    initialSpot
+      ? {
+          lat: initialSpot.latitude ?? gmDefaultProps.center.lat,
+          lng: initialSpot.longitude ?? gmDefaultProps.center.lng,
+        }
+      : gmDefaultProps.center
+  );
+  const [zoom, setZoom] = useState(initialSpot ? 16 : gmDefaultProps.zoom);
+  const [cardData, setCardData] = useState(() =>
+    initialSpot ? transformCardData(initialSpot, initialLocale || "ja") : null
+  );
   const [showShareModal, setShowShareModal] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
@@ -87,7 +107,10 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
   const clusterLevelsRequestedRef = useRef(new Set());
   const wholeClusterTreeRef = useRef(false);
   const [mapBounds, setMapBounds] = useState(null);
-  const [activeTapId, setActiveTapId] = useState(null);
+  const [activeTapId, setActiveTapId] = useState(initialSpot?.id ?? null);
+  // The spot whose row in the spot panel is hovered or focused: its marker is
+  // drawn larger, so it can be found on the map.
+  const [highlightTapId, setHighlightTapId] = useState(null);
   // What had focus when a spot was opened from the map (usually its marker),
   // so closing the card can return focus there. See handleCloseModal.
   const cardOpenerRef = useRef(null);
@@ -506,8 +529,37 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     window.history.pushState(`refillSpot${markerData.id}`, "", path);
     setCardData(transformCardData(markerData, locale));
     setActiveTapId(markerData.id);
+    setHighlightTapId(null);
     setCenter({ lat: markerData.latitude, lng: markerData.longitude });
   };
+
+  // Stable stand-ins for onMarkerClick, which is a new function each render:
+  // the markers and the spot list are memoised, and would otherwise all
+  // redraw whenever anything in App changed.
+  const onMarkerClickRef = useRef(onMarkerClick);
+  onMarkerClickRef.current = onMarkerClick;
+  const onMarkerKeyboardClick = useCallback(
+    (key, props) => onMarkerClickRef.current(key, props),
+    []
+  );
+
+  // Beside the map (spotPanelColumn) the spot opens in the panel the list is
+  // in. Otherwise its card opens over the map, which may be scrolled out of
+  // view under the list.
+  const spotPanelColumn = useMediaQuery(SPOT_PANEL_COLUMN_QUERY);
+  const spotPanelColumnRef = useRef(spotPanelColumn);
+  spotPanelColumnRef.current = spotPanelColumn;
+  const zoomRef = useRef(zoom);
+  zoomRef.current = zoom;
+  const openSpotFromList = useCallback((tap) => {
+    if (!spotPanelColumnRef.current) {
+      document.querySelector(".maps-container")?.scrollIntoView({ block: "start" });
+    }
+    onMarkerClickRef.current(tap.id, { tap });
+    // Picked from the list while the map was zoomed out to clusters: zoom in
+    // to the spot, so its marker is on the map.
+    if (zoomRef.current < MIN_ZOOM_FOR_INDIVIDUAL_TAPS) setZoom(16);
+  }, []);
 
   // Closed from the keyboard (Escape, or Enter on the close button: a click
   // with detail 0), focus goes back to what opened the card, or to the search
@@ -756,6 +808,133 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
     return getClusterNodes(clusterTree, clusterCategoryKey, zoom, mapBounds);
   }, [showClusters, clusterTree, clusterCategoryKey, zoom, mapBounds]);
 
+  // Beside the map, the panel holds the open spot, or the list of spots in
+  // view. By itself it is open while the map shows individual spots, and
+  // slides away to a bar on the map's edge when the map is zoomed out to
+  // clusters, so the map takes the whole width. The bar's button and the
+  // panel's own close button override that until the map next crosses
+  // between clusters and spots (the choice remembers which side it was made
+  // on), after which the panel follows the zoom again.
+  const zoomedIn = zoom >= MIN_ZOOM_FOR_INDIVIDUAL_TAPS;
+  const [spotPanelChoice, setSpotPanelChoice] = useState(null);
+  const chosenOpen =
+    spotPanelChoice && spotPanelChoice.zoomedIn === zoomedIn
+      ? spotPanelChoice.open
+      : null;
+  const spotPanelOpen = !!cardData || (chosenOpen ?? zoomedIn);
+  const spotPanelRef = useRef(null);
+  const zoomedInRef = useRef(zoomedIn);
+  zoomedInRef.current = zoomedIn;
+
+  // Focus follows the toggle: to the panel's close button when it opens, and
+  // back to the bar's button when it closes (each hides the other).
+  const showSpotPanel = useCallback(() => {
+    setSpotPanelChoice({ open: true, zoomedIn: zoomedInRef.current });
+    setTimeout(() => document.getElementById("spot-panel-hide")?.focus());
+  }, []);
+  const hideSpotPanel = useCallback(() => {
+    setSpotPanelChoice({ open: false, zoomedIn: zoomedInRef.current });
+    setTimeout(() => document.getElementById("spot-panel-show")?.focus());
+  }, []);
+
+  // The panel can also close by itself (zooming out). If focus was in it,
+  // it would be lost with it: put it on the bar's button instead.
+  useEffect(() => {
+    if (spotPanelOpen || !spotPanelColumn) return;
+    if (spotPanelRef.current?.contains(document.activeElement)) {
+      document.getElementById("spot-panel-show")?.focus();
+    }
+  }, [spotPanelOpen, spotPanelColumn]);
+
+  // The spots in view, for the panel beside the map and the list under it.
+  // The map reports its bounds once it comes to rest, but a cluster click or
+  // a search flies it through several zooms; the short debounce sorts the
+  // list once at the end of that.
+  //
+  // Zoomed out, the map draws clusters and only some of their taps are
+  // loaded, so the list under the map just asks for a closer look. The panel,
+  // if opened by hand there, lists the nearest ZOOMED_OUT_LIST_LIMIT of the
+  // loaded spots and says so: a full list of a city would be thousands of
+  // rows, and an incomplete one.
+  const listWanted = zoomedIn || (spotPanelOpen && spotPanelColumn);
+  const [listBounds] = useDebounce(mapBounds, 200);
+  const spots = useMemo(
+    () => (listWanted ? spotsInView(visibleTaps, listBounds) : NO_SPOTS),
+    [listWanted, visibleTaps, listBounds]
+  );
+  const panelSpots = useMemo(
+    () => (zoomedIn ? spots : spots.slice(0, ZOOMED_OUT_LIST_LIMIT)),
+    [zoomedIn, spots]
+  );
+
+  // Opening or closing the panel changes the map's width (the panel pushes
+  // it, rather than covering it). The Maps API keeps its own centre through
+  // that, but google-map-react only re-measures the map after a window
+  // resize, so until then it reports the old width's bounds: the list and the
+  // markers' Tab order would cover the wrong area.
+  //
+  // So the map's box is watched, and once its size has stopped changing
+  // (the slide over, or at once with reduced motion) google-map-react is
+  // told about a resize, the map is put back on the centre it had when the
+  // panel started to move (unless the user has dragged it since), and an
+  // "idle" makes it re-measure and report the bounds now in view. Waiting on
+  // the size itself rather than on the panel's transition holds even when a
+  // busy page starts the slide late.
+  const mapAreaRef = useRef(null);
+  const refitRef = useRef(null);
+  const previousSpotPanelOpenRef = useRef(spotPanelOpen);
+  useEffect(() => {
+    const changed = previousSpotPanelOpenRef.current !== spotPanelOpen;
+    previousSpotPanelOpenRef.current = spotPanelOpen;
+    if (!changed || !spotPanelColumn || !googleMapFn?.map) return;
+    const { map, maps } = googleMapFn;
+    const pending = refitRef.current;
+    if (pending) {
+      // Toggled again mid-slide: keep the first centre and drag listener.
+      return;
+    }
+    const refit = { centre: map.getCenter(), dragged: false, at: Date.now() };
+    refit.listener = maps.event.addListenerOnce(map, "dragstart", () => {
+      refit.dragged = true;
+    });
+    refitRef.current = refit;
+  }, [spotPanelOpen, spotPanelColumn, googleMapFn]);
+
+  useEffect(() => {
+    const area = mapAreaRef.current;
+    if (!googleMapFn?.map || !area || !window.ResizeObserver) return undefined;
+    const { map, maps } = googleMapFn;
+    let timer = null;
+    const settle = () => {
+      const refit = refitRef.current;
+      refitRef.current = null;
+      window.dispatchEvent(new window.Event("resize"));
+      if (refit) {
+        maps.event.removeListener(refit.listener);
+        // A centre from a toggle that never changed the size (opened and
+        // closed within a frame) is stale by the next unrelated resize.
+        const fresh = Date.now() - refit.at < 5000;
+        if (fresh && !refit.dragged && refit.centre) map.setCenter(refit.centre);
+      }
+      maps.event.trigger(map, "idle");
+    };
+    let first = true;
+    const observer = new window.ResizeObserver(() => {
+      // The first call only reports the size it started with.
+      if (first) {
+        first = false;
+        return;
+      }
+      clearTimeout(timer);
+      timer = setTimeout(settle, 120);
+    });
+    observer.observe(area);
+    return () => {
+      clearTimeout(timer);
+      observer.disconnect();
+    };
+  }, [googleMapFn]);
+
   return (
     <IntlProvider
       messages={translations[locale]}
@@ -845,26 +1024,135 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
       <h1 className="visually-hidden">
         <FormattedMessage id="page.heading" />
       </h1>
-      <div className="maps-container">
+      <div
+        className={classnames("maps-container", {
+          ["spot-panel-open"]: spotPanelOpen,
+        })}
+      >
         {/* First, so keyboard and screen reader users reach the search box
-            before the map and the spot card, as it is drawn above them. */}
-        {taps.length > 0 && (
-          <>
-            <Search
-              results={results}
-              onSearch={handleSearchQuery}
-              onReset={handleReset}
-              onSearchResultClick={handleResultClick}
-            />
-            {coolingShelters && (
-              <CategoryFilter
-                activeCategory={categoryFilter}
-                onSelect={setCategoryFilter}
+            before the spot panel, the map and the spot card. Drawn over the
+            map: beside the panel, this box moves with the map's left edge. */}
+        <div className="map-controls">
+          {taps.length > 0 && (
+            <>
+              <Search
+                results={results}
+                onSearch={handleSearchQuery}
+                onReset={handleReset}
+                onSearchResultClick={handleResultClick}
               />
-            )}
-          </>
-        )}
-        <CurrentLocationButton onClick={buttonResetLocation} />
+              {coolingShelters && (
+                <CategoryFilter
+                  activeCategory={categoryFilter}
+                  onSelect={setCategoryFilter}
+                />
+              )}
+            </>
+          )}
+          <CurrentLocationButton onClick={buttonResetLocation} />
+        </div>
+        {/* The spot panel. On a wide window it is a column left of the map
+            holding the open spot or, without one, the spots in view; it
+            slides away when the map is zoomed out to clusters (main.css,
+            "Spot panel"). On a phone the list is hidden and only the card
+            shows, over the map, as before. */}
+        {/* While the panel is closed beside the map: a bar on the map's left
+            edge whose button opens it. Hidden while it is open, when the
+            panel's own button closes it again (SpotList). */}
+        <div className="spot-panel-bar">
+          <button
+            type="button"
+            id="spot-panel-show"
+            className="spot-panel-show"
+            aria-expanded="false"
+            aria-controls="spot-panel"
+            aria-label={translations[locale]["spotList.showLabel"]}
+            onClick={showSpotPanel}
+          >
+            <svg aria-hidden="true" focusable="false" width="22" height="22" viewBox="0 0 22 22">
+              <g fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M8 5.5h10M8 11h10M8 16.5h10" />
+                <path d="M4 5.5h.01M4 11h.01M4 16.5h.01" strokeWidth="2.6" />
+              </g>
+            </svg>
+            <span className="spot-panel-show-text">
+              <FormattedMessage id="spotList.show" />
+            </span>
+          </button>
+        </div>
+        <div
+          id="spot-panel"
+          ref={spotPanelRef}
+          className={classnames("spot-panel", {
+            ["spot-panel-closed"]: !spotPanelOpen,
+          })}
+        >
+          <SpotList
+            variant="panel"
+            headingId="spot-panel-title"
+            spots={panelSpots}
+            zoomedIn={zoomedIn}
+            ready={!!listBounds}
+            loading={loading}
+            locale={locale}
+            onOpen={openSpotFromList}
+            onHighlight={setHighlightTapId}
+            onHide={hideSpotPanel}
+            pageSize={20}
+            hidden={!!cardData}
+          />
+          {cardData && (
+            <div
+              className={classnames("modal-container", {
+                ["modal-container-slide-up"]: isSlideUp,
+              })}
+            >
+              {/* The way back from a spot to the list, beside the map. On a
+                  phone the card's own close button does this. */}
+              <button
+                type="button"
+                className="spot-panel-back"
+                onClick={handleCloseModal}
+              >
+                <svg
+                  aria-hidden="true"
+                  focusable="false"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                >
+                  <path
+                    d="M10 3 5 8l5 5"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+                <FormattedMessage id="spotList.back" />
+              </button>
+              {/* TODO: properly calculate height */}
+              <Modal
+                key={cardData.id}
+                cardData={cardData}
+                onClose={handleCloseModal}
+                isSlideUp={isSlideUp}
+                setIsSlideUp={setIsSlideUp}
+                setShareModal={setShowShareModal}
+                focusOnOpen={focusCard}
+              />
+              {showShareModal && (
+                <ShareModal
+                  key={cardData.id}
+                  data={cardData}
+                  onClose={() => setShowShareModal(false)}
+                />
+              )}
+            </div>
+          )}
+        </div>
+        <div className="map-area" ref={mapAreaRef}>
         {/* Deliberately not gated on userToken. The map itself needs no auth —
             only the markers do — and waiting for /api/authorize put a ~780ms
             round trip (for a 356-byte token) directly in front of the 385KB
@@ -905,7 +1193,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
                 level={node.level}
                 isCluster
                 inView={inBounds(node.lat, node.lng, mapBounds)}
-                onKeyboardClick={onMarkerClick}
+                onKeyboardClick={onMarkerKeyboardClick}
               />
             ))
             : visibleTaps.length
@@ -917,8 +1205,12 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
                 category={tap.category_id}
                 tap={tap}
                 isActive={tap.id === activeTapId}
+                isHighlighted={tap.id === highlightTapId}
+                $markerHolderClassName={
+                  tap.id === highlightTapId ? "marker-holder-highlighted" : undefined
+                }
                 inView={inBounds(tap.latitude, tap.longitude, mapBounds)}
-                onKeyboardClick={onMarkerClick}
+                onKeyboardClick={onMarkerKeyboardClick}
               />
             ))
             : null}
@@ -930,30 +1222,7 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
             />
             }
         </GoogleMapReact>}
-        {cardData && (
-          <div
-            className={classnames("modal-container", {
-              ["modal-container-slide-up"]: isSlideUp,
-            })}
-          >
-            {/* TODO: properly calculate height */}
-            <Modal
-              cardData={cardData}
-              onClose={handleCloseModal}
-              isSlideUp={isSlideUp}
-              setIsSlideUp={setIsSlideUp}
-              setShareModal={setShowShareModal}
-              focusOnOpen={focusCard}
-            />
-            {showShareModal && (
-              <ShareModal
-                key={cardData.id}
-                data={cardData}
-                onClose={() => setShowShareModal(false)}
-              />
-            )}
-          </div>
-        )}
+        </div>
       </div>
       <div className="loading-container">
         {loading && (
@@ -964,13 +1233,19 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale })
           {loading && <FormattedMessage id="loading.spots" />}
         </div>
       </div>
-      {/* The spots on the map as a list, for anyone who can't use the map. */}
+      {/* On phones and narrow windows, where there is no room for the panel:
+          a short list of the nearest spots, for anyone who can't use the
+          map. Hidden beside the panel (main.css). */}
       <SpotList
-        taps={visibleTaps}
-        bounds={mapBounds}
-        zoom={zoom}
+        variant="compact"
+        headingId="spot-list-title"
+        spots={zoomedIn ? spots : NO_SPOTS}
+        zoomedIn={zoomedIn}
+        ready={!!listBounds}
+        loading={loading}
         locale={locale}
-        onOpen={(tap) => onMarkerClick(tap.id, { tap })}
+        onOpen={openSpotFromList}
+        pageSize={5}
       />
       <div className="container-lg">
         {userToken && <Metrics />}
