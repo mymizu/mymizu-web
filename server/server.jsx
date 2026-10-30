@@ -484,6 +484,8 @@ app.get("/refill/:language/:slug", async (req, res) => {
 
 app.get("/", (req, res) => renderPage(res, homeMeta(DEFAULT_LOCALE)));
 
+app.post("/proxy-path", express.json({ limit: "4kb" }), handler);
+
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
