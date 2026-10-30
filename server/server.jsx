@@ -13,11 +13,18 @@ import { PHOTO_SIZES, photoSrcSet, photoUrlForWidth } from "../src/utils/photoUr
 import i18nConfig from "../src/i18nConfig";
 import {buildRobotsTxt, getSitemap, isSitemapConfigured} from "./sitemap";
 import {homeMeta, isLanguage, metaForSpot, renderMetaTags, spotFallbackMeta} from "./meta";
+import { rateLimit } from "express-rate-limit";
 
 const PORT = process.env.PORT || 3000;
 const gmapApiKey = config.gmApiKey;
 const gaTag = config.gaTag;
 const app = express();
+app.set("trust proxy", 1);
+const limiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 15 minutes
+  max: 30, // limit each IP to 30 requests per windowMs
+  message: { message: "You've sent a lot of reports in a short time. Please try again later."},
+});
 const crypto = require('crypto');
 
 const getLanguage = (req) => {
@@ -484,7 +491,59 @@ app.get("/refill/:language/:slug", async (req, res) => {
 
 app.get("/", (req, res) => renderPage(res, homeMeta(DEFAULT_LOCALE)));
 
-app.post("/proxy-path", express.json({ limit: "4kb" }), handler);
+app.post("/spot-feedback/:tapId", limiter, express.json({ limit: "4kb" }), async (req, res) => {
+  const token = getToken(req);
+  const { grade, issue_type: issueType, comment } = req.body ?? {};
+
+  // Fill these in with the values and limit defined by the API contract.
+  const allowedGrades = new Set([0, 1, 2]);
+  const allowedIssueTypes = new Set([0, 1, 2, 99]);
+  const maxCommentLength = 500;
+
+  if (!allowedGrades.has(grade)) {
+    return res.status(400).json({ message: "Invalid grade" });
+  }
+
+  if (!allowedIssueTypes.has(issueType)) {
+    return res.status(400).json({ message: "Invalid issue type" });
+  }
+
+  if (
+    comment !== undefined &&
+    (typeof comment !== "string" || comment.length > maxCommentLength)
+  ) {
+    return res.status(400).json({ message: "Invalid comment" });
+  }
+
+  const source = "web";
+
+  try {
+  const result = await myMizuClient(token, getLanguage(req)).post(
+    `/api/taps/${encodeURIComponent(req.params.tapId)}/feedbacks`,
+    {
+      grade,
+      issue_type: issueType,
+      comment,
+      source: "web",
+    }
+  );
+    return res.status(201).json(result);
+} catch (error) {
+  const errorStatus = error.response?.status;
+
+  if (errorStatus === 422) {
+    return res.status(422).json(error.response.data);
+  }
+
+  if (errorStatus === 429) {
+    return res.status(429).json({ message: "Please try again later." });
+  }
+
+  console.error("Unable to submit spot feedback:", error.message);
+  return res.status(502).json({ message: "Unable to submit spot feedback" });
+}
+
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
