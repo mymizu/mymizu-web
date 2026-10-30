@@ -11,7 +11,7 @@ import {myMizuClient} from "./myMizuClient";
 import { MYMIZU_API_BASE_URL } from "../src/constants";
 import { PHOTO_SIZES, photoSrcSet, photoUrlForWidth } from "../src/utils/photoUrls";
 import i18nConfig from "../src/i18nConfig";
-import {buildRobotsTxt, getSitemap, isSitemapConfigured} from "./sitemap";
+import {buildRobotsTxt, getSitemap, isSitemapConfigured, SITE_ORIGIN} from "./sitemap";
 import {homeMeta, isLanguage, metaForSpot, renderMetaTags, spotFallbackMeta} from "./meta";
 import { rateLimit } from "express-rate-limit";
 
@@ -20,12 +20,32 @@ const gmapApiKey = config.gmApiKey;
 const gaTag = config.gaTag;
 const app = express();
 app.set("trust proxy", 1);
-const limiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 15 minutes
-  max: 30, // limit each IP to 30 requests per windowMs
-  message: { message: "You've sent a lot of reports in a short time. Please try again later."},
-});
+const limiters = [
+  rateLimit({
+    windowMs: 60 * 1000,
+    limit: 5,
+    message: { message: "You've sent a lot of reports in a short time. Please try again later."},
+}),
+  rateLimit({
+    windowMs: 24 * 60 * 60 * 1000,
+    limit: 30,
+    message: { message: "Daily submission limit reached. Please try again tomorrow." },
+  })
+];
 const crypto = require('crypto');
+const feedbackOrigin = new URL(SITE_ORIGIN).origin;
+
+const checkFeedbackRequest = (req, res, next) => {
+  if (req.get("Origin") !== feedbackOrigin) {
+    return res.status(403).json({ message: "Invalid origin" });
+  }
+
+  if (!req.is("application/json")) {
+    return res.status(415).json({ message: "Content-Type must be application/json" });
+  }
+
+  next();
+};
 
 const getLanguage = (req) => {
   const lang = req.acceptsLanguages("en", "ja");
@@ -491,7 +511,7 @@ app.get("/refill/:language/:slug", async (req, res) => {
 
 app.get("/", (req, res) => renderPage(res, homeMeta(DEFAULT_LOCALE)));
 
-app.post("/spot-feedback/:tapId", limiter, express.json({ limit: "4kb" }), async (req, res) => {
+app.post("/spot-feedback/:tapId", limiters, checkFeedbackRequest, express.json({ limit: "4kb" }), async (req, res) => {
   const token = getToken(req);
   const { grade, issue_type: issueType, comment } = req.body ?? {};
 
