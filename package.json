@@ -22,6 +22,7 @@
     "dotenv": "^16.0.1",
     "esbuild": "0.14.13",
     "express": "4.17.2",
+    "express-rate-limit": "^8.7.2",
     "google-map-react": "^2.1.10",
     "intl": "^1.2.5",
     "lodash.debounce": "^4.0.8",
@@ -34,5 +35,6 @@
   "devDependencies": {
     "nodemon": "1.18.4"
   },
-  "keywords": []
+  "keywords": [],
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
