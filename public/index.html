@@ -21,6 +21,11 @@
   <meta name="twitter:card" content="summary_large_image">
   <!-- /head:meta -->
 
+  <!-- Safari's Smart App Banner, and the App Clip card for refill links
+       (the clip is ios/MyMizuClip in mymizu-react-native). The same on every
+       page, so it sits outside the per-request meta block. -->
+  <meta name="apple-itunes-app" content="app-id=1480535233, app-clip-bundle-id=com.lawriecate.mizu.Clip, app-clip-display=card">
+
   <!-- The map fills ~91% of a mobile viewport, so the Google Maps tiles are the
        LCP element. The Maps script is requested by google-map-react only after
        our bundle has run, so warming these connections up front removes the
