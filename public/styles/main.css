@@ -97,6 +97,84 @@ img#logo {
   outline-offset: 2px;
 }
 
+/* "Get the app" banner for Android (src/components/AppBanner.jsx). In the
+   page's flow above the navbar, like Safari's own banner, so it never covers
+   the map controls or the spot card. The button uses #1F78AB, not the brand
+   #2F97D1, for 4.5:1 with white text. */
+.app-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: calc(8px + env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+    8px max(12px, env(safe-area-inset-left));
+  background-color: #fff;
+  border-bottom: 1px solid #dee2e6;
+  color: #333;
+}
+
+.app-banner-icon {
+  flex: none;
+  border-radius: 9px;
+}
+
+.app-banner-text {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.app-banner-title {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.app-banner-subtitle {
+  margin: 0;
+  font-size: 13px;
+  color: #555;
+}
+
+.app-banner-get {
+  flex: none;
+  min-width: 64px;
+  min-height: 36px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  background-color: #1F78AB;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
+.app-banner-get:hover {
+  background-color: #19638D;
+  color: #fff;
+}
+
+.app-banner-close {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin: -4px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: #555;
+}
+
+.app-banner-get:focus-visible,
+.app-banner-close:focus-visible {
+  outline: 3px solid #1F78AB;
+  outline-offset: 2px;
+}
+
 /* Focused by the skip link; it isn't a control, so no ring. */
 #main-content:focus {
   outline: none;
