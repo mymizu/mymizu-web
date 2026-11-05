@@ -33,6 +33,17 @@ const dismissedRecently = () => {
   }
 };
 
+// Google Analytics events (gtag.js, loaded in server.jsx), for the funnel
+// from banner to install; the install itself is tracked by the app. Never
+// throws, and does nothing if GA is blocked.
+const track = (name, params) => {
+  try {
+    window.gtag?.("event", name, params);
+  } catch {
+    // Analytics is never worth breaking the page for.
+  }
+};
+
 const rememberDismissal = () => {
   try {
     localStorage.setItem(DISMISSED_AT_KEY, String(Date.now()));
@@ -42,9 +53,10 @@ const rememberDismissal = () => {
 };
 
 // The Play Store passes `referrer` to the app on its first launch (Install
-// Referrer API), so installs can be traced to this banner, and to the spot
-// the visitor was looking at. The app doesn't read it yet; it could use the
-// slug to open that spot after installing.
+// Referrer API). The app (src/utils/installReferrer.js in
+// mymizu-react-native) opens the spot in utm_content, and tracks the install
+// in Mixpanel as "App installed with referrer" with these utm fields, so
+// keep them in step with it.
 export const playStoreUrl = (slug) => {
   const referrer = [
     "utm_source=map.mymizu.co",
@@ -69,9 +81,16 @@ export const AppBanner = ({ slug }) => {
     if (isAndroid() && !dismissedRecently()) setShow(true);
   }, []);
 
+  // Once per page load, with the spot it was shown on (none on the home page).
+  useEffect(() => {
+    if (show) track("app_banner_shown", { spot_slug: slug || undefined });
+    // Only when it appears, not when the spot changes under it.
+  }, [show]);
+
   if (!show) return null;
 
   const dismiss = () => {
+    track("app_banner_dismissed", { spot_slug: slug || undefined });
     rememberDismissal();
     setShow(false);
     // The close button had focus and is going away; carry on from the next
@@ -86,7 +105,7 @@ export const AppBanner = ({ slug }) => {
     >
       <img
         className="app-banner-icon"
-        src="/public/android-chrome-192x192.png"
+        src="/public/app-banner-icon.png"
         alt=""
         width="40"
         height="40"
@@ -100,6 +119,7 @@ export const AppBanner = ({ slug }) => {
       <a
         className="app-banner-get"
         href={playStoreUrl(slug)}
+        onClick={() => track("app_banner_tapped", { spot_slug: slug || undefined })}
         aria-label={intl.formatMessage({ id: "appBanner.getLabel" })}
       >
         <FormattedMessage id="appBanner.get" />

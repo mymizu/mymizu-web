@@ -115,6 +115,8 @@ img#logo {
 .app-banner-icon {
   flex: none;
   border-radius: 9px;
+  /* The Play Store icon is white: an edge so it doesn't melt into the banner. */
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
 .app-banner-text {
@@ -133,6 +135,11 @@ img#logo {
   margin: 0;
   font-size: 13px;
   color: #555;
+  /* On narrower phones, no single word or character left on a line, and
+     Japanese broken between phrases rather than inside a word (Chrome 119+,
+     with the page's lang="ja"). */
+  text-wrap: pretty;
+  word-break: auto-phrase;
 }
 
 .app-banner-get {
