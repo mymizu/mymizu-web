@@ -99,5 +99,10 @@
   "categoryFilter.label": "地図に表示する種類",
   "metrics.label": "mymizuコミュニティの成果",
   "results.nearbyWaterStations": "近くの給水スポット",
-  "results.aroundPlace": "{place}周辺の結果"
+  "results.aroundPlace": "{place}周辺の結果",
+  "appBanner.label": "mymizuアプリ",
+  "appBanner.text": "無料の給水スポットをアプリで",
+  "appBanner.get": "入手",
+  "appBanner.getLabel": "Google Playでmymizuアプリを入手",
+  "appBanner.close": "閉じる"
 }

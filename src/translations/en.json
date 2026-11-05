@@ -99,5 +99,10 @@
   "categoryFilter.label": "Show on the map",
   "metrics.label": "What the mymizu community has saved",
   "results.nearbyWaterStations": "Nearby water stations",
-  "results.aroundPlace": "Results around {place}"
+  "results.aroundPlace": "Results around {place}",
+  "appBanner.label": "mymizu app",
+  "appBanner.text": "Find free refill spots with the app",
+  "appBanner.get": "Get",
+  "appBanner.getLabel": "Get the mymizu app on Google Play",
+  "appBanner.close": "Close"
 }

@@ -25,6 +25,7 @@ import debounce from "lodash.debounce";
 import { useDebounce } from "use-debounce";
 import classnames from "classnames";
 import { ShareModal } from "./components/ShareModal";
+import { AppBanner } from "./components/AppBanner";
 import CurrentLocationButton from "./components/Buttons/CurrentLocationButton";
 import { LANG_PREF_KEY, SPOT_PANEL_COLUMN_QUERY } from "./constants";
 import { useMediaQuery } from "./helpers/useMediaQuery";
@@ -947,6 +948,10 @@ export function App({ gmApiKey, gaTag, coolingShelters = false, initialLocale, i
         <a className="skip-link visually-hidden-focusable" href="#main-content">
           <FormattedMessage id="skip.main" />
         </a>
+        {/* Android visitors without the app: a link to it on Google Play.
+            Above the navbar, in the page's flow, so it pushes the page down
+            rather than covering the map's controls or the spot card. */}
+        <AppBanner slug={cardData?.slug} />
         <nav className="navbar navbar-expand-lg bg-light">
           <div className="container-fluid nav-container">
             <a href="/" className="logo-link">
