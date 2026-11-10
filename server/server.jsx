@@ -541,7 +541,7 @@ app.post("/spot-feedback/:tapId", limiters, checkFeedbackRequest, express.json({
   const result = await myMizuClient(token, getLanguage(req)).post(
     `/api/taps/${encodeURIComponent(req.params.tapId)}/feedbacks`,
     {
-      grade,
+      feedback_grade: grade,
       issue_type: issueType,
       comment,
       source: "web",
