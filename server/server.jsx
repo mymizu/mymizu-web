@@ -11,14 +11,41 @@ import {myMizuClient} from "./myMizuClient";
 import { MYMIZU_API_BASE_URL } from "../src/constants";
 import { PHOTO_SIZES, photoSrcSet, photoUrlForWidth } from "../src/utils/photoUrls";
 import i18nConfig from "../src/i18nConfig";
-import {buildRobotsTxt, getSitemap, isSitemapConfigured} from "./sitemap";
+import {buildRobotsTxt, getSitemap, isSitemapConfigured, SITE_ORIGIN} from "./sitemap";
 import {homeMeta, isLanguage, metaForSpot, renderMetaTags, spotFallbackMeta} from "./meta";
+import { rateLimit } from "express-rate-limit";
 
 const PORT = process.env.PORT || 3000;
 const gmapApiKey = config.gmApiKey;
 const gaTag = config.gaTag;
 const app = express();
+app.set("trust proxy", 1);
+const limiters = [
+  rateLimit({
+    windowMs: 60 * 1000,
+    limit: 5,
+    message: { message: "You've sent a lot of reports in a short time. Please try again later."},
+}),
+  rateLimit({
+    windowMs: 24 * 60 * 60 * 1000,
+    limit: 30,
+    message: { message: "Daily submission limit reached. Please try again tomorrow." },
+  })
+];
 const crypto = require('crypto');
+const feedbackOrigin = new URL(SITE_ORIGIN).origin;
+
+const checkFeedbackRequest = (req, res, next) => {
+  if (req.get("Origin") !== feedbackOrigin) {
+    return res.status(403).json({ message: "Invalid origin" });
+  }
+
+  if (!req.is("application/json")) {
+    return res.status(415).json({ message: "Content-Type must be application/json" });
+  }
+
+  next();
+};
 
 const getLanguage = (req) => {
   const lang = req.acceptsLanguages("en", "ja");
@@ -483,6 +510,60 @@ app.get("/refill/:language/:slug", async (req, res) => {
 });
 
 app.get("/", (req, res) => renderPage(res, homeMeta(DEFAULT_LOCALE)));
+
+app.post("/spot-feedback/:tapId", limiters, checkFeedbackRequest, express.json({ limit: "4kb" }), async (req, res) => {
+  const token = getToken(req);
+  const { grade, issue_type: issueType, comment } = req.body ?? {};
+
+  // Fill these in with the values and limit defined by the API contract.
+  const allowedGrades = new Set([0, 1, 2]);
+  const allowedIssueTypes = new Set([0, 1, 2, 99]);
+  const maxCommentLength = 500;
+
+  if (!allowedGrades.has(grade)) {
+    return res.status(400).json({ message: "Invalid grade" });
+  }
+
+  if (!allowedIssueTypes.has(issueType)) {
+    return res.status(400).json({ message: "Invalid issue type" });
+  }
+
+  if (
+    comment !== undefined &&
+    (typeof comment !== "string" || comment.length > maxCommentLength)
+  ) {
+    return res.status(400).json({ message: "Invalid comment" });
+  }
+
+  const source = "web";
+
+  try {
+  const result = await myMizuClient(token, getLanguage(req)).post(
+    `/api/taps/${encodeURIComponent(req.params.tapId)}/feedbacks`,
+    {
+      feedback_grade: grade,
+      issue_type: issueType,
+      comment,
+      source: "web",
+    }
+  );
+    return res.status(201).json(result);
+} catch (error) {
+  const errorStatus = error.response?.status;
+
+  if (errorStatus === 422) {
+    return res.status(422).json(error.response.data);
+  }
+
+  if (errorStatus === 429) {
+    return res.status(429).json({ message: "Please try again later." });
+  }
+
+  console.error("Unable to submit spot feedback:", error.message);
+  return res.status(502).json({ message: "Unable to submit spot feedback" });
+}
+
+});
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);

@@ -20,6 +20,12 @@ function createMyMizuClient({apiBaseUrl, apiKey, userToken, language}) {
     l: language,
   });
 
+  const postQuery = queryString.stringify({
+    api_key: apiKey,
+    user_token: userToken,
+    l: language,
+  });
+
   const get = async (
     url,
     data, // Position data
@@ -36,7 +42,8 @@ function createMyMizuClient({apiBaseUrl, apiKey, userToken, language}) {
     data,
     config,
   ) => {
-    const response = await httpClient.post(url, data, config);
+    const urlToUse = `${url}?${postQuery}`;
+    const response = await httpClient.post(urlToUse, data, config);
 
     return response.data;
   };
